@@ -1,0 +1,26 @@
+
+
+include ':knarch-common'
+//include ':jvm'
+
+include ':knarch-ios'
+//include ':kurgan-android'
+
+//include ':sample/common'
+//include ':sample/ios'
+//include ':sample/android'
+
+//include ':kurgan-db'
+//include ':common'
+//include ':jvm'
+//include ':android'
+//include ':ios'
+
+if (System.getenv('ANDROID_HOME') != null) {
+//    include ':android'
+}
+
+def kotlinNativeDir = System.getenv('KOTLIN_NATIVE_DIR')
+
+includeBuild "${kotlinNativeDir}/shared"
+includeBuild "${kotlinNativeDir}/tools/kotlin-native-gradle-plugin"

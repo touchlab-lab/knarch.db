@@ -1,0 +1,38 @@
+buildscript {
+    repositories {
+        mavenCentral()
+        maven { url "https://dl.bintray.com/jetbrains/kotlin-native-dependencies" }
+    }
+
+    dependencies {
+        classpath "org.jetbrains.kotlin:kotlin-native-gradle-plugin:${project.property('konan.plugin.version')}"
+    }
+}
+
+apply plugin: 'konan'
+
+konan.targets = ['iphone', 'iphone_sim']
+
+//def j2objcRuntime = System.getenv('J2OBJC_RUNTIME')
+
+konanArtifacts {
+    /*interop ("objcsrc"){
+        includeDirs ".", "${j2objcRuntime}/include", "dbarch"
+        linkerOpts "-L${j2objcRuntime}/lib", "-Ldbarch/Build/Products/Debug-universal"
+    }*/
+
+    library("kurgan"){
+        /*libraries {
+            artifact 'objcsrc'
+        }*/
+        enableMultiplatform true
+    }
+}
+
+dependencies {
+    expectedBy project(':knarch-common')
+}
+
+repositories {
+    maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
+}

@@ -1,0 +1,36 @@
+buildscript {
+    ext.kotlin_version = '1.2.41'
+
+    repositories {
+        mavenCentral()
+        jcenter()
+    }
+
+    dependencies {
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7.3'
+    }
+}
+
+apply plugin: 'maven-publish'
+apply plugin: 'kotlin-platform-common'
+apply plugin: 'com.jfrog.bintray'
+
+group = 'co.touchlab.kurgan'
+//ext.artifactId = 'common'
+
+version = "0.1"
+
+ext.bintrayGitUrl = 'https://github.com/doppllib/core-doppl'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-common:$kotlin_version"
+//    implementation project(":kurgan-db")
+}
+
+apply from: "$dopplSharedScriptHome/kotlinpublish.gradle"
+apply from: "$dopplSharedScriptHome/bintray.gradle"
