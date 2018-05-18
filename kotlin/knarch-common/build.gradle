@@ -16,7 +16,7 @@ apply plugin: 'maven-publish'
 apply plugin: 'kotlin-platform-common'
 apply plugin: 'com.jfrog.bintray'
 
-group = 'co.touchlab.kurgan'
+group = 'co.touchlab.knarch'
 //ext.artifactId = 'common'
 
 version = "0.1"
