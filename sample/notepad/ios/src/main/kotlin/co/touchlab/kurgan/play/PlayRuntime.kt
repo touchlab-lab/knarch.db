@@ -14,8 +14,8 @@ class PlayRuntime(){
 //            )) }), 123)
 //        dataContainer.freeze()
 //            goNuts(dataContainer)
-            val tab = TestAtomicBox()
-            tab.goHello()
+//            val tab = TestAtomicBox()
+//            tab.goHello()
         }
     }
 

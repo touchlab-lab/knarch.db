@@ -4,12 +4,10 @@ set(CMAKE_DEPENDS_LANGUAGES
   )
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_CXX
-  "/Users/kgalligan/temp4/knarch/cpp/knarch/src/main/cpp/AndroidLog.cpp" "/Users/kgalligan/temp4/knarch/cpp/cmake-build-debug/CMakeFiles/cpp.dir/knarch/src/main/cpp/AndroidLog.cpp.o"
   "/Users/kgalligan/temp4/knarch/cpp/knarch/src/main/cpp/AndroidfwCursorWindow.cpp" "/Users/kgalligan/temp4/knarch/cpp/cmake-build-debug/CMakeFiles/cpp.dir/knarch/src/main/cpp/AndroidfwCursorWindow.cpp.o"
   "/Users/kgalligan/temp4/knarch/cpp/knarch/src/main/cpp/AtomicData.cpp" "/Users/kgalligan/temp4/knarch/cpp/cmake-build-debug/CMakeFiles/cpp.dir/knarch/src/main/cpp/AtomicData.cpp.o"
   "/Users/kgalligan/temp4/knarch/cpp/knarch/src/main/cpp/KonanHelper.cpp" "/Users/kgalligan/temp4/knarch/cpp/cmake-build-debug/CMakeFiles/cpp.dir/knarch/src/main/cpp/KonanHelper.cpp.o"
   "/Users/kgalligan/temp4/knarch/cpp/knarch/src/main/cpp/TLAssert.cpp" "/Users/kgalligan/temp4/knarch/cpp/cmake-build-debug/CMakeFiles/cpp.dir/knarch/src/main/cpp/TLAssert.cpp.o"
-  "/Users/kgalligan/temp4/knarch/cpp/knarch/src/main/cpp/ThreadHelp.cpp" "/Users/kgalligan/temp4/knarch/cpp/cmake-build-debug/CMakeFiles/cpp.dir/knarch/src/main/cpp/ThreadHelp.cpp.o"
   "/Users/kgalligan/temp4/knarch/cpp/knarch/src/main/cpp/android_database_CursorWindow.cpp" "/Users/kgalligan/temp4/knarch/cpp/cmake-build-debug/CMakeFiles/cpp.dir/knarch/src/main/cpp/android_database_CursorWindow.cpp.o"
   "/Users/kgalligan/temp4/knarch/cpp/knarch/src/main/cpp/android_database_SQLiteCommon.cpp" "/Users/kgalligan/temp4/knarch/cpp/cmake-build-debug/CMakeFiles/cpp.dir/knarch/src/main/cpp/android_database_SQLiteCommon.cpp.o"
   "/Users/kgalligan/temp4/knarch/cpp/knarch/src/main/cpp/android_database_SQLiteConnection.cpp" "/Users/kgalligan/temp4/knarch/cpp/cmake-build-debug/CMakeFiles/cpp.dir/knarch/src/main/cpp/android_database_SQLiteConnection.cpp.o"

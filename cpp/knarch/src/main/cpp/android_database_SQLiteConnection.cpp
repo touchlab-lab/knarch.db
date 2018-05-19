@@ -30,6 +30,7 @@
 
 #include <string.h>
 #include <unistd.h>
+#include "KonanHelper.h"
 
 #include "AndroidfwCursorWindow.h"
 
@@ -91,14 +92,14 @@ struct SQLiteConnection {
 // Called each time a statement begins execution, when tracing is enabled.
 static void sqliteTraceCallback(void *data, const char *sql) {
     SQLiteConnection* connection = static_cast<SQLiteConnection*>(data);
-    ALOG(LOG_VERBOSE, SQLITE_TRACE_TAG, "%s: \"%s\"\n",
+    ALOGV("%s: \"%s\"\n",
             connection->label.c_str(), sql);
 }
 
 // Called each time a statement finishes execution, when profiling is enabled.
 static void sqliteProfileCallback(void *data, const char *sql, sqlite3_uint64 tm) {
     SQLiteConnection* connection = static_cast<SQLiteConnection*>(data);
-    ALOG(LOG_VERBOSE, SQLITE_PROFILE_TAG, "%s: \"%s\" took %0.3f ms\n",
+    ALOGV("%s: \"%s\" took %0.3f ms\n",
             connection->label.c_str(), sql, tm * 0.000001f);
 }
 
@@ -203,35 +204,28 @@ static KLong nativePrepareStatement(KLong connectionPtr, KString sqlString) {
 
     RuntimeAssert(sqlString->type_info() == theStringTypeInfo, "Must use a string");
 
-    SQLiteConnection* connection = reinterpret_cast<SQLiteConnection*>(connectionPtr);
+    auto connection = reinterpret_cast<SQLiteConnection*>(connectionPtr);
 
     KInt sqlLength = sqlString->count_;
 
     const KChar* sql = CharArrayAddressOfElementAt(sqlString, 0);
-//    const jchar* sql = env->GetStringCritical(sqlString, NULL);
+
     sqlite3_stmt* statement;
     int err = sqlite3_prepare16_v2(connection->db,
             sql, sqlLength * sizeof(KChar), &statement, NULL);
-
-            //TODO: I don't think we create or manage anything but...
-//    env->ReleaseStringCritical(sqlString, sql);
 
     if (err != SQLITE_OK) {
         // Error messages like 'near ")": syntax error' are not
         // always helpful enough, so construct an error string that
         // includes the query itself.
 
-      /*
-      TODO: Figure out KN string manipulation
-        char *message = (char*) malloc(strlen(query) + 50);
-        if (message) {
-            strcpy(message, ", while compiling: "); // less than 50 chars
-            strcat(message, query);
-        }
-        env->ReleaseStringUTFChars(sqlString, query);
-        throw_sqlite3_exception( connection->db, message);
-        free(message);
-        */
+        std::string str;
+
+        size_t utf8size;
+        str.append(", while compiling: ");
+        str.append(const_cast<const char *>(CreateCStringFromStringWithSize(sqlString, &utf8size)));
+
+        throw_sqlite3_exception(connection->db, str.c_str());
         return 0;
     }
 
@@ -245,8 +239,8 @@ extern "C" KLong Android_Database_SQLiteConnection_nativePrepareStatement(KLong 
 }
 
 static void nativeFinalizeStatement(KLong connectionPtr, KLong statementPtr) {
-    SQLiteConnection* connection = reinterpret_cast<SQLiteConnection*>(connectionPtr);
-    sqlite3_stmt* statement = reinterpret_cast<sqlite3_stmt*>(statementPtr);
+    auto connection = reinterpret_cast<SQLiteConnection*>(connectionPtr);
+    auto statement = reinterpret_cast<sqlite3_stmt*>(statementPtr);
 
     // We ignore the result of sqlite3_finalize because it is really telling us about
     // whether any errors occurred while executing the statement.  The statement itself
@@ -262,8 +256,7 @@ extern "C" void Android_Database_SQLiteConnection_nativeFinalizeStatement(
 }
 
 static KInt nativeGetParameterCount(KLong connectionPtr, KLong statementPtr) {
-    //SQLiteConnection* connection = reinterpret_cast<SQLiteConnection*>(connectionPtr);
-    sqlite3_stmt* statement = reinterpret_cast<sqlite3_stmt*>(statementPtr);
+    auto statement = reinterpret_cast<sqlite3_stmt*>(statementPtr);
 
     return sqlite3_bind_parameter_count(statement);
 }
@@ -275,8 +268,7 @@ extern "C" KInt Android_Database_SQLiteConnection_nativeGetParameterCount(
 }
 
 static KBoolean nativeIsReadOnly(KLong connectionPtr, KLong statementPtr) {
-    //SQLiteConnection* connection = reinterpret_cast<SQLiteConnection*>(connectionPtr);
-    sqlite3_stmt* statement = reinterpret_cast<sqlite3_stmt*>(statementPtr);
+    auto statement = reinterpret_cast<sqlite3_stmt*>(statementPtr);
 
     return sqlite3_stmt_readonly(statement) != 0;
 }
@@ -288,8 +280,7 @@ extern "C" KBoolean Android_Database_SQLiteConnection_nativeIsReadOnly(
 }
 
 static KInt nativeGetColumnCount(KLong connectionPtr, KLong statementPtr) {
-    //SQLiteConnection* connection = reinterpret_cast<SQLiteConnection*>(connectionPtr);
-    sqlite3_stmt* statement = reinterpret_cast<sqlite3_stmt*>(statementPtr);
+    auto * statement = reinterpret_cast<sqlite3_stmt*>(statementPtr);
 
     return sqlite3_column_count(statement);
 }
@@ -302,7 +293,7 @@ extern "C" KInt Android_Database_SQLiteConnection_nativeGetColumnCount(
 
 static size_t lengthOfString(const KChar* wstr)
 {
-    KChar* p = (KChar*)wstr;
+    auto p = (KChar*)wstr;
     size_t len = 0;
     while(*p != 0){
         p++;
@@ -313,9 +304,9 @@ static size_t lengthOfString(const KChar* wstr)
 }
 
 extern "C" OBJ_GETTER(Android_Database_SQLiteConnection_nativeGetColumnName, KLong connectionPtr, KLong statementPtr, KInt index){
-    sqlite3_stmt* statement = reinterpret_cast<sqlite3_stmt*>(statementPtr);
+    auto * statement = reinterpret_cast<sqlite3_stmt*>(statementPtr);
 
-    const KChar* name = static_cast<const KChar*>(sqlite3_column_name16(statement, index));
+    const auto * name = static_cast<const KChar*>(sqlite3_column_name16(statement, index));
     if (name) {
         size_t size = lengthOfString(name);
         ArrayHeader* result = AllocArrayInstance(
@@ -332,8 +323,8 @@ extern "C" OBJ_GETTER(Android_Database_SQLiteConnection_nativeGetColumnName, KLo
 }
 
 static void nativeBindNull(KLong connectionPtr, KLong statementPtr, KInt index) {
-    SQLiteConnection* connection = reinterpret_cast<SQLiteConnection*>(connectionPtr);
-    sqlite3_stmt* statement = reinterpret_cast<sqlite3_stmt*>(statementPtr);
+    auto * connection = reinterpret_cast<SQLiteConnection*>(connectionPtr);
+    auto * statement = reinterpret_cast<sqlite3_stmt*>(statementPtr);
 
     int err = sqlite3_bind_null(statement, index);
     if (err != SQLITE_OK) {
@@ -348,8 +339,8 @@ extern "C" void Android_Database_SQLiteConnection_nativeBindNull(
 }
 
 static void nativeBindLong(KLong connectionPtr, KLong statementPtr, KInt index, KLong value) {
-    SQLiteConnection* connection = reinterpret_cast<SQLiteConnection*>(connectionPtr);
-    sqlite3_stmt* statement = reinterpret_cast<sqlite3_stmt*>(statementPtr);
+    auto * connection = reinterpret_cast<SQLiteConnection*>(connectionPtr);
+    auto * statement = reinterpret_cast<sqlite3_stmt*>(statementPtr);
 
     int err = sqlite3_bind_int64(statement, index, value);
     if (err != SQLITE_OK) {
@@ -364,8 +355,8 @@ extern "C" void Android_Database_SQLiteConnection_nativeBindLong(
 }
 
 static void nativeBindDouble(KLong connectionPtr, KLong statementPtr, KInt index, KDouble value) {
-    SQLiteConnection* connection = reinterpret_cast<SQLiteConnection*>(connectionPtr);
-    sqlite3_stmt* statement = reinterpret_cast<sqlite3_stmt*>(statementPtr);
+    auto * connection = reinterpret_cast<SQLiteConnection*>(connectionPtr);
+    auto * statement = reinterpret_cast<sqlite3_stmt*>(statementPtr);
 
     int err = sqlite3_bind_double(statement, index, value);
     if (err != SQLITE_OK) {
@@ -380,8 +371,8 @@ extern "C" void Android_Database_SQLiteConnection_nativeBindDouble(
 }
 
 static void nativeBindString(KLong connectionPtr, KLong statementPtr, KInt index, KString valueString) {
-    SQLiteConnection* connection = reinterpret_cast<SQLiteConnection*>(connectionPtr);
-    sqlite3_stmt* statement = reinterpret_cast<sqlite3_stmt*>(statementPtr);
+    auto * connection = reinterpret_cast<SQLiteConnection*>(connectionPtr);
+    auto * statement = reinterpret_cast<sqlite3_stmt*>(statementPtr);
 
     KInt valueLength = valueString->count_;
 
@@ -401,13 +392,13 @@ extern "C" void Android_Database_SQLiteConnection_nativeBindString(
 }
 
 static void nativeBindBlob(KLong connectionPtr, KLong statementPtr, KInt index, KConstRef valueArray) {
-    SQLiteConnection* connection = reinterpret_cast<SQLiteConnection*>(connectionPtr);
-    sqlite3_stmt* statement = reinterpret_cast<sqlite3_stmt*>(statementPtr);
+    auto * connection = reinterpret_cast<SQLiteConnection*>(connectionPtr);
+    auto * statement = reinterpret_cast<sqlite3_stmt*>(statementPtr);
 
     const ArrayHeader* array = valueArray->array();
 
     KInt valueLength = array->count_;
-    const KByte* value = static_cast<const KByte*>(ByteArrayAddressOfElementAt(array, 0));
+    const auto * value = ByteArrayAddressOfElementAt(array, 0);
     //TODO: Do *we* need to copy the array?
     int err = sqlite3_bind_blob(statement, index, value, valueLength, SQLITE_TRANSIENT);
 
@@ -423,8 +414,8 @@ extern "C" void Android_Database_SQLiteConnection_nativeBindBlob(
 }
 
 static void nativeResetStatementAndClearBindings(KLong connectionPtr, KLong statementPtr) {
-    SQLiteConnection* connection = reinterpret_cast<SQLiteConnection*>(connectionPtr);
-    sqlite3_stmt* statement = reinterpret_cast<sqlite3_stmt*>(statementPtr);
+    auto * connection = reinterpret_cast<SQLiteConnection*>(connectionPtr);
+    auto * statement = reinterpret_cast<sqlite3_stmt*>(statementPtr);
 
     int err = sqlite3_reset(statement);
     if (err == SQLITE_OK) {
@@ -453,8 +444,8 @@ static int executeNonQuery(SQLiteConnection* connection, sqlite3_stmt* statement
 }
 
 static void nativeExecute(KLong connectionPtr, KLong statementPtr) {
-    SQLiteConnection* connection = reinterpret_cast<SQLiteConnection*>(connectionPtr);
-    sqlite3_stmt* statement = reinterpret_cast<sqlite3_stmt*>(statementPtr);
+    auto connection = reinterpret_cast<SQLiteConnection*>(connectionPtr);
+    auto statement = reinterpret_cast<sqlite3_stmt*>(statementPtr);
 
     executeNonQuery(connection, statement);
 }
@@ -466,8 +457,8 @@ extern "C" void Android_Database_SQLiteConnection_nativeExecute(
 }
 
 static KInt nativeExecuteForChangedRowCount(KLong connectionPtr, KLong statementPtr) {
-    SQLiteConnection* connection = reinterpret_cast<SQLiteConnection*>(connectionPtr);
-    sqlite3_stmt* statement = reinterpret_cast<sqlite3_stmt*>(statementPtr);
+    auto connection = reinterpret_cast<SQLiteConnection*>(connectionPtr);
+    auto statement = reinterpret_cast<sqlite3_stmt*>(statementPtr);
 
     int err = executeNonQuery(connection, statement);
     return err == SQLITE_DONE ? sqlite3_changes(connection->db) : -1;
@@ -480,8 +471,8 @@ extern "C" KInt Android_Database_SQLiteConnection_nativeExecuteForChangedRowCoun
 }
 
 static KLong nativeExecuteForLastInsertedRowId(KLong connectionPtr, KLong statementPtr) {
-    SQLiteConnection* connection = reinterpret_cast<SQLiteConnection*>(connectionPtr);
-    sqlite3_stmt* statement = reinterpret_cast<sqlite3_stmt*>(statementPtr);
+    auto connection = reinterpret_cast<SQLiteConnection*>(connectionPtr);
+    auto statement = reinterpret_cast<sqlite3_stmt*>(statementPtr);
 
     int err = executeNonQuery(connection, statement);
     return err == SQLITE_DONE && sqlite3_changes(connection->db) > 0
@@ -503,8 +494,8 @@ static int executeOneRowQuery(SQLiteConnection* connection, sqlite3_stmt* statem
 }
 
 static KLong nativeExecuteForLong(KLong connectionPtr, KLong statementPtr) {
-    SQLiteConnection* connection = reinterpret_cast<SQLiteConnection*>(connectionPtr);
-    sqlite3_stmt* statement = reinterpret_cast<sqlite3_stmt*>(statementPtr);
+    auto connection = reinterpret_cast<SQLiteConnection*>(connectionPtr);
+    auto statement = reinterpret_cast<sqlite3_stmt*>(statementPtr);
 
     int err = executeOneRowQuery(connection, statement);
     if (err == SQLITE_ROW && sqlite3_column_count(statement) >= 1) {
@@ -520,12 +511,12 @@ extern "C" KLong Android_Database_SQLiteConnection_nativeExecuteForLong(
 }
 
 extern "C" OBJ_GETTER(Android_Database_SQLiteConnection_nativeExecuteForString, KLong connectionPtr, KLong statementPtr){
-    SQLiteConnection* connection = reinterpret_cast<SQLiteConnection*>(connectionPtr);
-    sqlite3_stmt* statement = reinterpret_cast<sqlite3_stmt*>(statementPtr);
+    auto connection = reinterpret_cast<SQLiteConnection*>(connectionPtr);
+    auto statement = reinterpret_cast<sqlite3_stmt*>(statementPtr);
 
     int err = executeOneRowQuery(connection, statement);
     if (err == SQLITE_ROW && sqlite3_column_count(statement) >= 1) {
-        const KChar* text = static_cast<const KChar*>(sqlite3_column_text16(statement, 0));
+        auto text = static_cast<const KChar*>(sqlite3_column_text16(statement, 0));
         if (text) {
             size_t size = lengthOfString(text);
             ArrayHeader* result = AllocArrayInstance(
@@ -642,27 +633,25 @@ static CopyRowResult copyRow(CursorWindow* window,
 
 static KLong nativeExecuteForCursorWindow(KLong connectionPtr, KLong statementPtr, KLong windowPtr,
         KInt startPos, KInt requiredPos, KBoolean countAllRows) {
-    SQLiteConnection* connection = reinterpret_cast<SQLiteConnection*>(connectionPtr);
-    sqlite3_stmt* statement = reinterpret_cast<sqlite3_stmt*>(statementPtr);
-    CursorWindow* window = reinterpret_cast<CursorWindow*>(windowPtr);
+    auto connection = reinterpret_cast<SQLiteConnection*>(connectionPtr);
+    auto statement = reinterpret_cast<sqlite3_stmt*>(statementPtr);
+    auto window = reinterpret_cast<CursorWindow*>(windowPtr);
 
     status_t status = window->clear();
     if (status) {
-    //TODO: format and throw
-        /*String8 msg;
-        msg.appendFormat("Failed to clear the cursor window, status=%d", status);
-        throw_sqlite3_exception( connection->db, msg.string());*/
+        char buff[100];
+        snprintf(buff, sizeof(buff), "Failed to clear the cursor window, status=%d", status);
+        throw_sqlite3_exception( connection->db, const_cast<const char*>(buff));
         return 0;
     }
 
     int numColumns = sqlite3_column_count(statement);
     status = window->setNumColumns(numColumns);
     if (status) {
-    //TODO: format and throw
-        /*String8 msg;
-        msg.appendFormat("Failed to set the cursor window column count to %d, status=%d",
-                numColumns, status);
-        throw_sqlite3_exception( connection->db, msg.string());*/
+        char buff[100];
+        snprintf(buff, sizeof(buff), "Failed to set the cursor window column count to %d, status=%d",
+                 numColumns, status);
+        throw_sqlite3_exception( connection->db, const_cast<const char*>(buff));
         return 0;
     }
 
@@ -747,7 +736,7 @@ extern "C" KLong Android_Database_SQLiteConnection_nativeExecuteForCursorWindow(
 }
 
 static KInt nativeGetDbLookaside(KLong connectionPtr) {
-    SQLiteConnection* connection = reinterpret_cast<SQLiteConnection*>(connectionPtr);
+    auto connection = reinterpret_cast<SQLiteConnection*>(connectionPtr);
 
     int cur = -1;
     int unused;
@@ -762,7 +751,7 @@ extern "C" KInt Android_Database_SQLiteConnection_nativeGetDbLookaside(
 }
 
 static void nativeCancel(KLong connectionPtr) {
-    SQLiteConnection* connection = reinterpret_cast<SQLiteConnection*>(connectionPtr);
+    auto connection = reinterpret_cast<SQLiteConnection*>(connectionPtr);
     connection->canceled = true;
 }
 
@@ -774,7 +763,7 @@ extern "C" void Android_Database_SQLiteConnection_nativeCancel(
 
 static void nativeResetCancel(KLong connectionPtr,
         KBoolean cancelable) {
-    SQLiteConnection* connection = reinterpret_cast<SQLiteConnection*>(connectionPtr);
+    auto connection = reinterpret_cast<SQLiteConnection*>(connectionPtr);
     connection->canceled = false;
 
     if (cancelable) {
@@ -790,96 +779,5 @@ extern "C" void Android_Database_SQLiteConnection_nativeResetCancel(
 {
     nativeResetCancel(connectionPtr, cancelable) ;
 }
-
-/*static JNINativeMethod sMethods[] =
-{
-    { "nativeOpen", "(Ljava/lang/String;ILjava/lang/String;ZZ)J",
-            (void*)nativeOpen },
-    { "nativeClose", "(J)V",
-            (void*)nativeClose },
-    { "nativeRegisterCustomFunction", "(JLandroid/database/sqlite/SQLiteCustomFunction;)V",
-            (void*)nativeRegisterCustomFunction },
-    { "nativeRegisterLocalizedCollators", "(JLjava/lang/String;)V",
-            (void*)nativeRegisterLocalizedCollators },
-    { "nativePrepareStatement", "(JLjava/lang/String;)J",
-            (void*)nativePrepareStatement },
-    { "nativeFinalizeStatement", "(JJ)V",
-            (void*)nativeFinalizeStatement },
-    { "nativeGetParameterCount", "(JJ)I",
-            (void*)nativeGetParameterCount },
-    { "nativeIsReadOnly", "(JJ)Z",
-            (void*)nativeIsReadOnly },
-    { "nativeGetColumnCount", "(JJ)I",
-            (void*)nativeGetColumnCount },
-    { "nativeGetColumnName", "(JJI)Ljava/lang/String;",
-            (void*)nativeGetColumnName },
-    { "nativeBindNull", "(JJI)V",
-            (void*)nativeBindNull },
-    { "nativeBindLong", "(JJIJ)V",
-            (void*)nativeBindLong },
-    { "nativeBindDouble", "(JJID)V",
-            (void*)nativeBindDouble },
-    { "nativeBindString", "(JJILjava/lang/String;)V",
-            (void*)nativeBindString },
-    { "nativeBindBlob", "(JJI[B)V",
-            (void*)nativeBindBlob },
-    { "nativeResetStatementAndClearBindings", "(JJ)V",
-            (void*)nativeResetStatementAndClearBindings },
-    { "nativeExecute", "(JJ)V",
-            (void*)nativeExecute },
-    { "nativeExecuteForLong", "(JJ)J",
-            (void*)nativeExecuteForLong },
-    { "nativeExecuteForString", "(JJ)Ljava/lang/String;",
-            (void*)nativeExecuteForString },
-    { "nativeExecuteForBlobFileDescriptor", "(JJ)I",
-            (void*)nativeExecuteForBlobFileDescriptor },
-    { "nativeExecuteForChangedRowCount", "(JJ)I",
-            (void*)nativeExecuteForChangedRowCount },
-    { "nativeExecuteForLastInsertedRowId", "(JJ)J",
-            (void*)nativeExecuteForLastInsertedRowId },
-    { "nativeExecuteForCursorWindow", "(JJJIIZ)J",
-            (void*)nativeExecuteForCursorWindow },
-    { "nativeGetDbLookaside", "(J)I",
-            (void*)nativeGetDbLookaside },
-    { "nativeCancel", "(J)V",
-            (void*)nativeCancel },
-    { "nativeResetCancel", "(JZ)V",
-            (void*)nativeResetCancel },
-};*/
-
-
-//TODO: This?
-/*#define FIND_CLASS(var, className) \
-        var = env->FindClass(className); \
-        LOG_FATAL_IF(! var, "Unable to find class " className);
-
-#define GET_METHOD_ID(var, clazz, methodName, fieldDescriptor) \
-        var = env->GetMethodID(clazz, methodName, fieldDescriptor); \
-        LOG_FATAL_IF(! var, "Unable to find method" methodName);
-
-#define GET_FIELD_ID(var, clazz, fieldName, fieldDescriptor) \
-        var = env->GetFieldID(clazz, fieldName, fieldDescriptor); \
-        LOG_FATAL_IF(! var, "Unable to find field " fieldName);*/
-
-//TODO: This?
-/*int register_android_database_SQLiteConnection(JNIEnv *env)
-{
-    jclass clazz;
-    FIND_CLASS(clazz, "android/database/sqlite/SQLiteCustomFunction");
-
-    GET_FIELD_ID(gSQLiteCustomFunctionClassInfo.name, clazz,
-            "name", "Ljava/lang/String;");
-    GET_FIELD_ID(gSQLiteCustomFunctionClassInfo.numArgs, clazz,
-            "numArgs", "I");
-    GET_METHOD_ID(gSQLiteCustomFunctionClassInfo.dispatchCallback,
-            clazz, "dispatchCallback", "([Ljava/lang/String;)V");
-
-    FIND_CLASS(clazz, "java/lang/String");
-    gStringClassInfo.clazz = jclass(env->NewGlobalRef(clazz));
-
-    //return AndroidRuntime::registerNativeMethods(env, "android/database/sqlite/SQLiteConnection",
-    //        sMethods, NELEM(sMethods));
-    return 0;
-}*/
 
 } // namespace android

@@ -86,12 +86,6 @@
 				</MakeCommands>
 			</Target>
 		</Build>
-		<Unit filename="/Users/kgalligan/temp4/knarch/cpp/knarch/src/main/cpp/AndroidLog.cpp">
-			<Option target="cpp"/>
-		</Unit>
-		<Unit filename="/Users/kgalligan/temp4/knarch/cpp/knarch/src/main/cpp/AndroidLog.h">
-			<Option target="cpp"/>
-		</Unit>
 		<Unit filename="/Users/kgalligan/temp4/knarch/cpp/knarch/src/main/cpp/AndroidfwCursorWindow.cpp">
 			<Option target="cpp"/>
 		</Unit>
@@ -110,25 +104,10 @@
 		<Unit filename="/Users/kgalligan/temp4/knarch/cpp/knarch/src/main/cpp/KonanHelper.h">
 			<Option target="cpp"/>
 		</Unit>
-		<Unit filename="/Users/kgalligan/temp4/knarch/cpp/knarch/src/main/cpp/LogLog.h">
-			<Option target="cpp"/>
-		</Unit>
-		<Unit filename="/Users/kgalligan/temp4/knarch/cpp/knarch/src/main/cpp/LogLogd.h">
-			<Option target="cpp"/>
-		</Unit>
-		<Unit filename="/Users/kgalligan/temp4/knarch/cpp/knarch/src/main/cpp/LogUio.h">
-			<Option target="cpp"/>
-		</Unit>
 		<Unit filename="/Users/kgalligan/temp4/knarch/cpp/knarch/src/main/cpp/TLAssert.cpp">
 			<Option target="cpp"/>
 		</Unit>
 		<Unit filename="/Users/kgalligan/temp4/knarch/cpp/knarch/src/main/cpp/TLAssert.h">
-			<Option target="cpp"/>
-		</Unit>
-		<Unit filename="/Users/kgalligan/temp4/knarch/cpp/knarch/src/main/cpp/ThreadHelp.cpp">
-			<Option target="cpp"/>
-		</Unit>
-		<Unit filename="/Users/kgalligan/temp4/knarch/cpp/knarch/src/main/cpp/ThreadHelp.h">
 			<Option target="cpp"/>
 		</Unit>
 		<Unit filename="/Users/kgalligan/temp4/knarch/cpp/knarch/src/main/cpp/UtilsErrors.h">

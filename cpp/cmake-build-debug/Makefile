@@ -123,33 +123,6 @@ cpp/fast:
 	$(MAKE) -f CMakeFiles/cpp.dir/build.make CMakeFiles/cpp.dir/build
 .PHONY : cpp/fast
 
-knarch/src/main/cpp/AndroidLog.o: knarch/src/main/cpp/AndroidLog.cpp.o
-
-.PHONY : knarch/src/main/cpp/AndroidLog.o
-
-# target to build an object file
-knarch/src/main/cpp/AndroidLog.cpp.o:
-	$(MAKE) -f CMakeFiles/cpp.dir/build.make CMakeFiles/cpp.dir/knarch/src/main/cpp/AndroidLog.cpp.o
-.PHONY : knarch/src/main/cpp/AndroidLog.cpp.o
-
-knarch/src/main/cpp/AndroidLog.i: knarch/src/main/cpp/AndroidLog.cpp.i
-
-.PHONY : knarch/src/main/cpp/AndroidLog.i
-
-# target to preprocess a source file
-knarch/src/main/cpp/AndroidLog.cpp.i:
-	$(MAKE) -f CMakeFiles/cpp.dir/build.make CMakeFiles/cpp.dir/knarch/src/main/cpp/AndroidLog.cpp.i
-.PHONY : knarch/src/main/cpp/AndroidLog.cpp.i
-
-knarch/src/main/cpp/AndroidLog.s: knarch/src/main/cpp/AndroidLog.cpp.s
-
-.PHONY : knarch/src/main/cpp/AndroidLog.s
-
-# target to generate assembly for a file
-knarch/src/main/cpp/AndroidLog.cpp.s:
-	$(MAKE) -f CMakeFiles/cpp.dir/build.make CMakeFiles/cpp.dir/knarch/src/main/cpp/AndroidLog.cpp.s
-.PHONY : knarch/src/main/cpp/AndroidLog.cpp.s
-
 knarch/src/main/cpp/AndroidfwCursorWindow.o: knarch/src/main/cpp/AndroidfwCursorWindow.cpp.o
 
 .PHONY : knarch/src/main/cpp/AndroidfwCursorWindow.o
@@ -257,33 +230,6 @@ knarch/src/main/cpp/TLAssert.s: knarch/src/main/cpp/TLAssert.cpp.s
 knarch/src/main/cpp/TLAssert.cpp.s:
 	$(MAKE) -f CMakeFiles/cpp.dir/build.make CMakeFiles/cpp.dir/knarch/src/main/cpp/TLAssert.cpp.s
 .PHONY : knarch/src/main/cpp/TLAssert.cpp.s
-
-knarch/src/main/cpp/ThreadHelp.o: knarch/src/main/cpp/ThreadHelp.cpp.o
-
-.PHONY : knarch/src/main/cpp/ThreadHelp.o
-
-# target to build an object file
-knarch/src/main/cpp/ThreadHelp.cpp.o:
-	$(MAKE) -f CMakeFiles/cpp.dir/build.make CMakeFiles/cpp.dir/knarch/src/main/cpp/ThreadHelp.cpp.o
-.PHONY : knarch/src/main/cpp/ThreadHelp.cpp.o
-
-knarch/src/main/cpp/ThreadHelp.i: knarch/src/main/cpp/ThreadHelp.cpp.i
-
-.PHONY : knarch/src/main/cpp/ThreadHelp.i
-
-# target to preprocess a source file
-knarch/src/main/cpp/ThreadHelp.cpp.i:
-	$(MAKE) -f CMakeFiles/cpp.dir/build.make CMakeFiles/cpp.dir/knarch/src/main/cpp/ThreadHelp.cpp.i
-.PHONY : knarch/src/main/cpp/ThreadHelp.cpp.i
-
-knarch/src/main/cpp/ThreadHelp.s: knarch/src/main/cpp/ThreadHelp.cpp.s
-
-.PHONY : knarch/src/main/cpp/ThreadHelp.s
-
-# target to generate assembly for a file
-knarch/src/main/cpp/ThreadHelp.cpp.s:
-	$(MAKE) -f CMakeFiles/cpp.dir/build.make CMakeFiles/cpp.dir/knarch/src/main/cpp/ThreadHelp.cpp.s
-.PHONY : knarch/src/main/cpp/ThreadHelp.cpp.s
 
 knarch/src/main/cpp/android_database_CursorWindow.o: knarch/src/main/cpp/android_database_CursorWindow.cpp.o
 
@@ -402,9 +348,6 @@ help:
 	@echo "... rebuild_cache"
 	@echo "... edit_cache"
 	@echo "... cpp"
-	@echo "... knarch/src/main/cpp/AndroidLog.o"
-	@echo "... knarch/src/main/cpp/AndroidLog.i"
-	@echo "... knarch/src/main/cpp/AndroidLog.s"
 	@echo "... knarch/src/main/cpp/AndroidfwCursorWindow.o"
 	@echo "... knarch/src/main/cpp/AndroidfwCursorWindow.i"
 	@echo "... knarch/src/main/cpp/AndroidfwCursorWindow.s"
@@ -417,9 +360,6 @@ help:
 	@echo "... knarch/src/main/cpp/TLAssert.o"
 	@echo "... knarch/src/main/cpp/TLAssert.i"
 	@echo "... knarch/src/main/cpp/TLAssert.s"
-	@echo "... knarch/src/main/cpp/ThreadHelp.o"
-	@echo "... knarch/src/main/cpp/ThreadHelp.i"
-	@echo "... knarch/src/main/cpp/ThreadHelp.s"
 	@echo "... knarch/src/main/cpp/android_database_CursorWindow.o"
 	@echo "... knarch/src/main/cpp/android_database_CursorWindow.i"
 	@echo "... knarch/src/main/cpp/android_database_CursorWindow.s"

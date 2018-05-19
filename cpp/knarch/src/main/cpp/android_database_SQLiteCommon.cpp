@@ -15,8 +15,25 @@
  */
 
 #include "android_database_SQLiteCommon.h"
+#include <cstdio>
+#include <string>
+#include "KonanHelper.h"
 
 namespace android {
+
+    KString makeKString(char* str){
+        ObjHolder hold;
+        ObjHeader* res = CreateStringFromCString(const_cast<const char*>(str), hold.slot());
+        UpdateRef(hold.slot(), res);
+        return reinterpret_cast<KString>(res);
+    }
+
+    KString makeKString(const char* str){
+        ObjHolder hold;
+        ObjHeader* res = CreateStringFromCString(str, hold.slot());
+        UpdateRef(hold.slot(), res);
+        return reinterpret_cast<KString>(res);
+    }
 
 /* throw a SQLiteException with a message appropriate for the error in handle */
 void throw_sqlite3_exception(sqlite3* handle) {
@@ -119,17 +136,20 @@ void throw_sqlite3_exception(int errcode,
     }
 
     if (sqlite3Message) {
-        /*String8 fullMessage;
+        std::string fullMessage;
         fullMessage.append(sqlite3Message);
-        fullMessage.appendFormat(" (code %d)", errcode); // print extended error code
+        char buff[20];
+        snprintf(buff, sizeof(buff), " (code %d)", errcode);
+        fullMessage.append(buff);
         if (message) {
             fullMessage.append(": ");
             fullMessage.append(message);
-        }*/
-        //TODO: throw exception
-//        jniThrowException(exceptionClass, fullMessage.string());
+        }
+        ThrowSql_SQLiteException(makeKString(exceptionClass),
+                //Can (probably) just go from std::string to KString
+                makeKString(fullMessage.c_str()));
     } else {
-//        jniThrowException(exceptionClass, message);
+        ThrowSql_SQLiteException(makeKString(exceptionClass), makeKString(message));
     }
 }
 

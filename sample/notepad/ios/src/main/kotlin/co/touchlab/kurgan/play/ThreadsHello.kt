@@ -8,7 +8,9 @@ import kotlinx.cinterop.*
 class ThreadsHello {
 
     fun callBack() {
-        dispatchSingle<SomeData, SomeData>(
+
+        println(testMakeString(1235))
+        /*dispatchSingle<SomeData, SomeData>(
                 {SomeData(21)},
                 threadSafe {
                     SomeData(it.a * 2)
@@ -16,7 +18,7 @@ class ThreadsHello {
                 {
                     showText("The answer ${it.a}")
                 }
-        )
+        )*/
     }
 }
 

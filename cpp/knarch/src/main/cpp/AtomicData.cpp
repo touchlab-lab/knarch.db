@@ -23,6 +23,7 @@
 #include "Runtime.h"
 #include "Types.h"
 #include "AtomicData.h"
+#include "KString.h"
 
 extern "C" {
 
@@ -114,31 +115,31 @@ namespace {
             if (it == data_.end())
                 return nullptr;
 
-            DataStore* dataStore= it.second;
-            dataStore->lockAccess();
-            dataStore->accessData(OBJ_RESULT);
+//            DataStore* dataStore= it.second;
+//            dataStore->lockAccess();
+//            dataStore->accessData(OBJ_RESULT);
         }
 
         void closeAccess(KInt id, KRef ref) {
             pthread_mutex_lock(&lock_);
-            DataStore *dataStore = data_.find(id).second;
-            pthread_mutex_unlock(&lock_);
-
-            dataStore->returnData(ref);
-            dataStore->unlockAccess();
+//            DataStore *dataStore = data_.find(id).second;
+//            pthread_mutex_unlock(&lock_);
+//
+//            dataStore->returnData(ref);
+//            dataStore->unlockAccess();
         }
 
         void removeDataStore(KInt id) {
             //Null out reference when locked. Will prevent anybody else from getting and waiting.
             pthread_mutex_lock(&lock_);
-            DataStore *dataStore = data_.find(id).second;
-            data_.erase(id);
-            pthread_mutex_unlock(&lock_);
-
-            //Make sure nobody's currently looking at it
-            dataStore->lockAccess();
-            dataStore->unlockAccess();
-            konanDestructInstance(dataStore);
+//            DataStore *dataStore = data_.find(id).second;
+//            data_.erase(id);
+//            pthread_mutex_unlock(&lock_);
+//
+//            //Make sure nobody's currently looking at it
+//            dataStore->lockAccess();
+//            dataStore->unlockAccess();
+//            konanDestructInstance(dataStore);
         }
 
         ~AtomicDataState() {
@@ -192,4 +193,28 @@ void Co_Touchlab_Kite_Threads_AtomicData_closeAccess(KInt id, KRef ref){
 void Co_Touchlab_Kite_Threads_AtomicData_removeDataStore(KInt id){
     dataState()->removeDataStore(id);
 }
+
+KString Co_Touchlab_Kite_Threads_AtomicData_testMakeString(KInt anum){
+    char exceptionMessage[150];
+    snprintf(exceptionMessage, sizeof(exceptionMessage), "Your num %d", anum);
+//    KString formattedMessage = nullptr;
+//    KRef motherfucker = (KRef)formattedMessage;
+ObjHolder hold;
+
+    ObjHeader* res = CreateStringFromCString(const_cast<const char*>(exceptionMessage), hold.slot());
+    UpdateRef(hold.slot(), res);
+    return reinterpret_cast<KString>(res);
+}
+OBJ_GETTER(Co_Touchlab_Kite_Threads_AtomicData_testMakeStringWrapped, KInt anum){
+    char exceptionMessage[150];
+    snprintf(exceptionMessage, sizeof(exceptionMessage), "Your num %d", anum);
+//    KString formattedMessage = nullptr;
+//    KRef motherfucker = (KRef)formattedMessage;
+//    CreateStringFromCString(const_cast<const char*>(exceptionMessage), &motherfucker);
+
+    RETURN_RESULT_OF(CreateStringFromCString, exceptionMessage);
+}
+
+
+
 }

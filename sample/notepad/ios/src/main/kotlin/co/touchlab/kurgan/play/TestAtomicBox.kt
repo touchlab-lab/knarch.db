@@ -4,6 +4,7 @@ import co.touchlab.kite.threads.*
 import konan.worker.*
 import kotlinx.cinterop.*
 
+/*
 class TestAtomicBox {
     val foo = makeData().freeze()
     fun goHello(){
@@ -95,3 +96,4 @@ fun makeData(): Foo {
     return foo
 }
 
+*/

@@ -17,7 +17,6 @@
 #ifndef _ANDROID__DATABASE_WINDOW_H
 #define _ANDROID__DATABASE_WINDOW_H
 
-#include "LogLog.h"
 #include <stddef.h>
 #include <stdint.h>
 #include "UtilsErrors.h"
@@ -30,6 +29,7 @@
 #include "Types.h"
 
 #include "utf8.h"
+#include "android_database_SQLiteCommon.h"
 
 #if LOG_NDEBUG
 
@@ -39,7 +39,7 @@
 #else
 
 #define IF_LOG_WINDOW() IF_ALOG(LOG_DEBUG, "CursorWindow")
-#define LOG_WINDOW(...) ALOG(LOG_DEBUG, "CursorWindow", __VA_ARGS__)
+#define LOG_WINDOW(...) ALOG(/*LOG_DEBUG, */"CursorWindow", __VA_ARGS__)
 
 #endif
 

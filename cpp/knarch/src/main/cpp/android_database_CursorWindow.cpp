@@ -34,11 +34,13 @@
 #include <unistd.h>
 
 #include "AndroidfwCursorWindow.h"
-//#include "android_os_Parcel.h"
-//#include "android_util_Binder.h"
+
 #include "android_database_SQLiteCommon.h"
 
+
 namespace android {
+
+    //TODO: We're using KLong to point to alloced memory, but maybe we want to use a pointer type?
 
 /*
 static struct {
@@ -50,19 +52,15 @@ static struct {
 //static jstring gEmptyString;
 
 static void throwExceptionWithRowCol(KInt row, KInt column) {
-    /*String8 msg;
-    msg.appendFormat("Couldn't read row %d, col %d from CursorWindow.  "
-            "Make sure the Cursor is initialized correctly before accessing data from it.",
-            row, column);
-    jniThrowException(env, "java/lang/IllegalStateException", msg.string());*/
-    //TODO: Fix this
+    char exceptionMessage[150];
+    snprintf(exceptionMessage, sizeof(exceptionMessage), "Couldn't read row %d, col %d from CursorWindow.  Make sure the Cursor is initialized correctly before accessing data from it.", row, column);
+    ThrowSql_IllegalStateException(makeKString(exceptionMessage));
 }
 
 static void throwUnknownTypeException(KInt type) {
-    /*String8 msg;
-    msg.appendFormat("UNKNOWN type %d", type);
-    jniThrowException(env, "java/lang/IllegalStateException", msg.string());*/
-    //TODO: Fix this
+    char exceptionMessage[50];
+    snprintf(exceptionMessage, sizeof(exceptionMessage), "UNKNOWN type %d", type);
+    ThrowSql_IllegalStateException(makeKString(exceptionMessage));
 }
 
 static KLong nativeCreate(KString nameObj, KInt cursorWindowSize) {
@@ -71,9 +69,8 @@ static KLong nativeCreate(KString nameObj, KInt cursorWindowSize) {
     CursorWindow* window;
     status_t status = CursorWindow::create(nameObj, cursorWindowSize, &window);
     if (status || !window) {
-        //TODO: Sort out strings
-        /*ALOGE("Could not allocate CursorWindow '%s' of size %d due to error %d.",
-                name.string(), cursorWindowSize, status);*/
+        ALOGE("Could not allocate CursorWindow '%s' of size %d due to error %d.",
+                nameObj, cursorWindowSize, status);
         return 0;
     }
 
@@ -289,103 +286,6 @@ OBJ_GETTER(Android_Database_CursorWindow_nativeGetString, KLong windowPtr, KInt 
         return NULL;
     }
 }
-
-//TODO: See if we need these
-/*
-static jcharArray allocCharArrayBuffer(JNIEnv* env, jobject bufferObj, size_t size) {
-    jcharArray dataObj = jcharArray(env->GetObjectField(bufferObj,
-            gCharArrayBufferClassInfo.data));
-    if (dataObj && size) {
-        jsize capacity = env->GetArrayLength(dataObj);
-        if (size_t(capacity) < size) {
-            env->DeleteLocalRef(dataObj);
-            dataObj = NULL;
-        }
-    }
-    if (!dataObj) {
-        jsize capacity = size;
-        if (capacity < 64) {
-            capacity = 64;
-        }
-        dataObj = env->NewCharArray(capacity); // might throw OOM
-        if (dataObj) {
-            env->SetObjectField(bufferObj, gCharArrayBufferClassInfo.data, dataObj);
-        }
-    }
-    return dataObj;
-}
-
-static void fillCharArrayBufferUTF(JNIEnv* env, jobject bufferObj,
-        const char* str, size_t len) {
-    ssize_t size = utf8_to_utf16_length(reinterpret_cast<const uint8_t*>(str), len);
-    if (size < 0) {
-        size = 0; // invalid UTF8 string
-    }
-    jcharArray dataObj = allocCharArrayBuffer(env, bufferObj, size);
-    if (dataObj) {
-        if (size) {
-            jchar* data = static_cast<jchar*>(env->GetPrimitiveArrayCritical(dataObj, NULL));
-            utf8_to_utf16_no_null_terminator(reinterpret_cast<const uint8_t*>(str), len,
-                    reinterpret_cast<char16_t*>(data));
-            env->ReleasePrimitiveArrayCritical(dataObj, data, 0);
-        }
-        env->SetIntField(bufferObj, gCharArrayBufferClassInfo.sizeCopied, size);
-    }
-}
-
-static void clearCharArrayBuffer(JNIEnv* env, jobject bufferObj) {
-    jcharArray dataObj = allocCharArrayBuffer(env, bufferObj, 0);
-    if (dataObj) {
-        env->SetIntField(bufferObj, gCharArrayBufferClassInfo.sizeCopied, 0);
-    }
-}
-
-static void nativeCopyStringToBuffer(JNIEnv* env, jclass clazz, jlong windowPtr,
-        jint row, jint column, jobject bufferObj) {
-    CursorWindow* window = reinterpret_cast<CursorWindow*>(windowPtr);
-    LOG_WINDOW("Copying string for %d,%d from %p", row, column, window);
-
-    CursorWindow::FieldSlot* fieldSlot = window->getFieldSlot(row, column);
-    if (!fieldSlot) {
-        throwExceptionWithRowCol(env, row, column);
-        return;
-    }
-
-    int32_t type = window->getFieldSlotType(fieldSlot);
-    if (type == CursorWindow::FIELD_TYPE_STRING) {
-        size_t sizeIncludingNull;
-        const char* value = window->getFieldSlotValueString(fieldSlot, &sizeIncludingNull);
-        if (sizeIncludingNull > 1) {
-            fillCharArrayBufferUTF(env, bufferObj, value, sizeIncludingNull - 1);
-        } else {
-            clearCharArrayBuffer(env, bufferObj);
-        }
-    } else if (type == CursorWindow::FIELD_TYPE_INTEGER) {
-        int64_t value = window->getFieldSlotValueLong(fieldSlot);
-        char buf[32];
-        snprintf(buf, sizeof(buf), "%" PRId64, value);
-        fillCharArrayBufferUTF(env, bufferObj, buf, strlen(buf));
-    } else if (type == CursorWindow::FIELD_TYPE_FLOAT) {
-        double value = window->getFieldSlotValueDouble(fieldSlot);
-        char buf[32];
-        snprintf(buf, sizeof(buf), "%g", value);
-        fillCharArrayBufferUTF(env, bufferObj, buf, strlen(buf));
-    } else if (type == CursorWindow::FIELD_TYPE_NULL) {
-        clearCharArrayBuffer(env, bufferObj);
-    } else if (type == CursorWindow::FIELD_TYPE_BLOB) {
-        throw_sqlite3_exception(env, "Unable to convert BLOB to string");
-    } else {
-        throwUnknownTypeException(env, type);
-    }
-}
-*/
-
-/*extern "C" JNIEXPORT void JNICALL Android_Database_CursorWindow_nativeCopyStringToBuffer(JNIEnv* env, jclass clazz, jlong windowPtr,
-                                                                              jint row, jint column, jobject bufferObj)
-{
-    nativeCopyStringToBuffer(env, clazz, windowPtr,
-            row, column, bufferObj);
-}*/
 
 static KLong nativeGetLong(KLong windowPtr, KInt row, KInt column) {
     CursorWindow* window = reinterpret_cast<CursorWindow*>(windowPtr);

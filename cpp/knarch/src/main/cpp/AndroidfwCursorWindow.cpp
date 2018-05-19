@@ -18,7 +18,7 @@
 #define LOG_TAG "CursorWindow"
 
 #include "AndroidfwCursorWindow.h"
-#include "LogLog.h"
+#include "android_database_SQLiteCommon.h"
 
 #include <sys/mman.h>
 

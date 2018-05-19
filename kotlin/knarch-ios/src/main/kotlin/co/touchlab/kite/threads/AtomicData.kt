@@ -41,3 +41,6 @@ external private fun <T1> closeAccess(id:Int, result:T1):Unit
 
 @SymbolName("Co_Touchlab_Kite_Threads_AtomicData_removeDataStore")
 external private fun removeDataStore(id:Int):Unit
+
+@SymbolName("Co_Touchlab_Kite_Threads_AtomicData_testMakeString")
+external fun testMakeString(arg:Int):String

@@ -45,7 +45,7 @@
 #include <dispatch/dispatch.h>
 
 extern "C" {
-
+//TODO: Review everything that uses this and make sure we need
 char *CreateCStringFromStringWithSize(KString kstring, size_t *utf8Size) {
     const KChar *utf16 = CharArrayAddressOfElementAt(kstring, 0);
     KStdString utf8;
