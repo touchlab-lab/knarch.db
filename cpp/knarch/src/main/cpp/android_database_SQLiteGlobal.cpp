@@ -70,43 +70,16 @@ static KInt nativeReleaseMemory() {
     return sqlite3_release_memory(SOFT_HEAP_LIMIT);
 }
 
-extern "C" KInt Java_android_database_sqlite_SQLiteGlobal_nativeReleaseMemory()
+
+extern "C" KInt Android_Database_SQLiteGlobal_nativeReleaseMemory()
 {
     return nativeReleaseMemory();
-}
-
-extern "C" KInt Android_Database_SQLiteGlobal_basicCall()
-{
-    return 42;
 }
 
 const int MUTEX_CACHE_SIZE = 20;
 mutex cacheMutex;
 int cacheCount = 0;
 vector<mutex> mutexCache(MUTEX_CACHE_SIZE);
-
-extern "C" void Co_Touchlab_Kite_Threads_AtomicBox_openBox(KRef thiz, KInt mutexIndex){
-    mutexCache[mutexIndex].lock();
-}
-
-extern "C" void Co_Touchlab_Kite_Threads_AtomicBox_closeBox(KRef thiz, KInt mutexIndex){
-    mutexCache[mutexIndex].unlock();
-}
-
-extern "C" void Co_Touchlab_Kite_Threads_AtomicBox_unsafeFreeze(KRef target){
-    target->container()->freeze();
-}
-
-extern "C" int Co_Touchlab_Kite_Threads_AtomicBox_findMutextIndex(){
-    int returnVal = 0;
-    cacheMutex.lock();
-    cacheCount++;
-    if(cacheCount>=MUTEX_CACHE_SIZE)
-        cacheCount = 0;
-    returnVal = cacheCount;
-    cacheMutex.unlock();
-    return returnVal;
-}
 
 int register_android_database_SQLiteGlobal()
 {
