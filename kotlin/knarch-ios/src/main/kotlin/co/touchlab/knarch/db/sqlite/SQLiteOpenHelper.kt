@@ -61,9 +61,9 @@ constructor(val mContext:SystemContext, val databaseName:String?,
      */
     val writableDatabase:SQLiteDatabase
         get() {
-            synchronized (this) {
+//            synchronized (this) {
                 return getDatabaseLocked(true)
-            }
+//            }
         }
     /**
      * Create and/or open a database. This will be the same object returned by
@@ -85,9 +85,9 @@ constructor(val mContext:SystemContext, val databaseName:String?,
      */
     val readableDatabase:SQLiteDatabase
         get() {
-            synchronized (this) {
+//            synchronized (this) {
                 return getDatabaseLocked(false)
-            }
+//            }
         }
 
     /**
@@ -102,7 +102,7 @@ constructor(val mContext:SystemContext, val databaseName:String?,
      * @see SQLiteDatabase#enableWriteAheadLogging()
      */
     fun setWriteAheadLoggingEnabled(enabled:Boolean) {
-        synchronized (this) {
+//        synchronized (this) {
             if (mEnableWriteAheadLogging != enabled)
             {
                 val db = mDatabase
@@ -119,7 +119,7 @@ constructor(val mContext:SystemContext, val databaseName:String?,
                 }
                 mEnableWriteAheadLogging = enabled
             }
-        }
+//        }
     }
     private fun getDatabaseLocked(writable:Boolean):SQLiteDatabase {
 

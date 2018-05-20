@@ -189,7 +189,7 @@ class SQLiteQueryBuilder {
         }
         return db.rawQueryWithFactory(
                 mFactory, sql, selectionArgs,
-                SQLiteDatabase.findEditTable(tables)) // will throw if query is invalid
+                SQLiteDatabase.findEditTable(tables!!)) // will throw if query is invalid
     }
 
     /**

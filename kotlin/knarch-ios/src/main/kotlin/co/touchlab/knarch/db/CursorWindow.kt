@@ -617,23 +617,42 @@ class CursorWindow/**
         private val STATS_TAG = "CursorWindowStats"
         // This static member will be evaluated when first used.
         private var sCursorWindowSize = -1
+
+        @SymbolName("Android_Database_CursorWindow_nativeCreate")
         private external fun nativeCreate(name:String, cursorWindowSize:Int):Long
+        @SymbolName("Android_Database_CursorWindow_nativeDispose")
         private external fun nativeDispose(windowPtr:Long)
+        @SymbolName("Android_Database_CursorWindow_nativeClear")
         private external fun nativeClear(windowPtr:Long)
+        @SymbolName("Android_Database_CursorWindow_nativeGetNumRows")
         private external fun nativeGetNumRows(windowPtr:Long):Int
+        @SymbolName("Android_Database_CursorWindow_nativeSetNumColumns")
         private external fun nativeSetNumColumns(windowPtr:Long, columnNum:Int):Boolean
+        @SymbolName("Android_Database_CursorWindow_nativeAllocRow")
         private external fun nativeAllocRow(windowPtr:Long):Boolean
+        @SymbolName("Android_Database_CursorWindow_nativeFreeLastRow")
         private external fun nativeFreeLastRow(windowPtr:Long)
+        @SymbolName("Android_Database_CursorWindow_nativeGetType")
         private external fun nativeGetType(windowPtr:Long, row:Int, column:Int):Int
+        @SymbolName("Android_Database_CursorWindow_nativeGetBlob")
         private external fun nativeGetBlob(windowPtr:Long, row:Int, column:Int):ByteArray
+        @SymbolName("Android_Database_CursorWindow_nativeGetString")
         private external fun nativeGetString(windowPtr:Long, row:Int, column:Int):String
+        @SymbolName("Android_Database_CursorWindow_nativeGetLong")
         private external fun nativeGetLong(windowPtr:Long, row:Int, column:Int):Long
+        @SymbolName("Android_Database_CursorWindow_nativeGetDouble")
         private external fun nativeGetDouble(windowPtr:Long, row:Int, column:Int):Double
+        @SymbolName("Android_Database_CursorWindow_nativePutBlob")
         private external fun nativePutBlob(windowPtr:Long, value:ByteArray, row:Int, column:Int):Boolean
+        @SymbolName("Android_Database_CursorWindow_nativePutString")
         private external fun nativePutString(windowPtr:Long, value:String, row:Int, column:Int):Boolean
+        @SymbolName("Android_Database_CursorWindow_nativePutLong")
         private external fun nativePutLong(windowPtr:Long, value:Long, row:Int, column:Int):Boolean
+        @SymbolName("Android_Database_CursorWindow_nativePutDouble")
         private external fun nativePutDouble(windowPtr:Long, value:Double, row:Int, column:Int):Boolean
+        @SymbolName("Android_Database_CursorWindow_nativePutNull")
         private external fun nativePutNull(windowPtr:Long, row:Int, column:Int):Boolean
+        @SymbolName("Android_Database_CursorWindow_nativeGetName")
         private external fun nativeGetName(windowPtr:Long):String
     }
 }

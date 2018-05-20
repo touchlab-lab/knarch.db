@@ -33,9 +33,9 @@ open class LruCache<K, V>/**
         {
             throw IllegalArgumentException("maxSize <= 0")
         }
-        synchronized (this) {
+//        synchronized (this) {
             this.maxSize = maxSize
-        }
+//        }
         trimToSize(maxSize)
     }
     /**
@@ -50,7 +50,7 @@ open class LruCache<K, V>/**
             throw NullPointerException("key == null")
         }
         var mapValue:V?=null
-        synchronized (this) {
+//        synchronized (this) {
             mapValue = map.get(key)
             if (mapValue != null)
             {
@@ -58,7 +58,7 @@ open class LruCache<K, V>/**
                 return mapValue
             }
             missCount++
-        }
+//        }
         /*
      * Attempt to create a value. This may take a long time, and the map
      * may be different when create() returns. If a conflicting value was
@@ -70,7 +70,7 @@ open class LruCache<K, V>/**
         {
             return null
         }
-        synchronized (this) {
+//        synchronized (this) {
             createCount++
             mapValue = map.put(key, createdValue)
             if (mapValue != null)
@@ -82,7 +82,7 @@ open class LruCache<K, V>/**
             {
                 size += safeSizeOf(key, createdValue)
             }
-        }
+//        }
         if (mapValue != null)
         {
             entryRemoved(false, key, createdValue, mapValue)
@@ -106,7 +106,7 @@ open class LruCache<K, V>/**
             throw NullPointerException("key == null || value == null")
         }
         var previous:V? = null
-        synchronized (this) {
+//        synchronized (this) {
             putCount++
             size += safeSizeOf(key, value)
             previous = map.put(key, value)
@@ -114,7 +114,7 @@ open class LruCache<K, V>/**
             {
                 size -= safeSizeOf(key, previous)
             }
-        }
+//        }
         if (previous != null)
         {
             entryRemoved(false, key, previous, value)
@@ -171,13 +171,13 @@ open class LruCache<K, V>/**
             throw NullPointerException("key == null")
         }
         var previous:V?=null
-        synchronized (this) {
+//        synchronized (this) {
             previous = map.remove(key)
             if (previous != null)
             {
                 size -= safeSizeOf(key, previous)
             }
-        }
+//        }
         if (previous != null)
         {
             entryRemoved(false, key, previous, null!!)

@@ -552,7 +552,7 @@ class SQLiteDatabase private constructor(path: String, openFlags: Int, cursorFac
         try {
             try {
                 openInner();
-            } catch (SQLiteDatabaseCorruptException ex) {
+            } catch (ex:SQLiteDatabaseCorruptException) {
                 onCorruption();
                 openInner();
             }

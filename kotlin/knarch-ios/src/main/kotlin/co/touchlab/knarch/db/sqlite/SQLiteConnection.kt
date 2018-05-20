@@ -5,6 +5,8 @@ import co.touchlab.knarch.db.CursorWindow
 import co.touchlab.knarch.db.DatabaseUtils
 import co.touchlab.knarch.other.LruCache
 import co.touchlab.knarch.other.Printer
+import co.touchlab.knarch.Log
+import kotlin.system.*
 
 class SQLiteConnection private constructor(/*pool:SQLiteConnectionPool,*/
                                            configuration:SQLiteDatabaseConfiguration,
@@ -906,7 +908,7 @@ class SQLiteConnection private constructor(/*pool:SQLiteConnectionPool,*/
         private var mIndex:Int = 0
         private var mGeneration:Int = 0
         fun beginOperation(kind:String, sql:String?, bindArgs:Array<Any?>?):Int {
-            synchronized (mOperations) {
+//            synchronized (mOperations) {
                 val index = (mIndex + 1) % MAX_RECENT_OPERATIONS
                 var operation = mOperations[index]
                 if (operation == null)
@@ -953,34 +955,34 @@ class SQLiteConnection private constructor(/*pool:SQLiteConnectionPool,*/
                 operation.mCookie = newOperationCookieLocked(index)
                 mIndex = index
                 return operation.mCookie
-            }
+//            }
         }
         fun failOperation(cookie:Int, ex:Exception) {
-            synchronized (mOperations) {
+//            synchronized (mOperations) {
                 val operation = getOperationLocked(cookie)
                 if (operation != null)
                 {
                     operation.mException = ex
                 }
-            }
+//            }
         }
         fun endOperation(cookie:Int) {
-            synchronized (mOperations) {
+//            synchronized (mOperations) {
                 if (endOperationDeferLogLocked(cookie))
                 {
                     logOperationLocked(cookie, null!!)
                 }
-            }
+//            }
         }
         fun endOperationDeferLog(cookie:Int):Boolean {
-            synchronized (mOperations) {
+//            synchronized (mOperations) {
                 return endOperationDeferLogLocked(cookie)
-            }
+//            }
         }
         fun logOperation(cookie:Int, detail:String) {
-            synchronized (mOperations) {
+//            synchronized (mOperations) {
                 logOperationLocked(cookie, detail)
-            }
+//            }
         }
         private fun endOperationDeferLogLocked(cookie:Int):Boolean {
             val operation = getOperationLocked(cookie)
@@ -1013,7 +1015,7 @@ class SQLiteConnection private constructor(/*pool:SQLiteConnectionPool,*/
             return if (operation!!.mCookie == cookie) operation else null
         }
         fun describeCurrentOperation():String? {
-            synchronized (mOperations) {
+//            synchronized (mOperations) {
                 val operation = mOperations[mIndex]
                 if (operation != null && !operation.mFinished)
                 {
@@ -1022,10 +1024,10 @@ class SQLiteConnection private constructor(/*pool:SQLiteConnectionPool,*/
                     return msg.toString()
                 }
                 return null
-            }
+//            }
         }
         fun dump(printer:Printer, verbose:Boolean) {
-            synchronized (mOperations) {
+//            synchronized (mOperations) {
                 printer.println(" Most recently executed operations:")
                 var index = mIndex
                 var operation = mOperations[index]
@@ -1057,7 +1059,7 @@ class SQLiteConnection private constructor(/*pool:SQLiteConnectionPool,*/
                 {
                     printer.println(" <none>")
                 }
-            }
+//            }
         }
         companion object {
             private val MAX_RECENT_OPERATIONS = 20
@@ -1097,7 +1099,7 @@ class SQLiteConnection private constructor(/*pool:SQLiteConnectionPool,*/
             }
             else
             {
-                msg.append(" started ").append(getTimeMillis() - mStartTime)
+                msg.append(" started ").append(kotlin.system.getTimeMillis() - mStartTime)
                         .append("ms ago")
             }
             msg.append(" - ").append(status)
@@ -1152,40 +1154,64 @@ class SQLiteConnection private constructor(/*pool:SQLiteConnectionPool,*/
         private val EMPTY_STRING_ARRAY = arrayOf<String>()
         private val EMPTY_BYTE_ARRAY = ByteArray(0)
 //        private val TRIM_SQL_PATTERN = Pattern.compile("[\\s]*\\n+[\\s]*")
+        @SymbolName("Android_Database_SQLiteConnection_nativeOpen")
         private external fun nativeOpen(path:String, openFlags:Int, label:String,
                                         enableTrace:Boolean, enableProfile:Boolean):Long
+        @SymbolName("Android_Database_SQLiteConnection_nativeClose")
         private external fun nativeClose(connectionPtr:Long)
-        private external fun nativeRegisterLocalizedCollators(connectionPtr:Long, locale:String)
+//        @SymbolName("")
+//        private external fun nativeRegisterLocalizedCollators(connectionPtr:Long, locale:String)
+        @SymbolName("Android_Database_SQLiteConnection_nativePrepareStatement")
         private external fun nativePrepareStatement(connectionPtr:Long, sql:String):Long
+        @SymbolName("Android_Database_SQLiteConnection_nativeFinalizeStatement")
         private external fun nativeFinalizeStatement(connectionPtr:Long, statementPtr:Long)
+        @SymbolName("Android_Database_SQLiteConnection_nativeGetParameterCount")
         private external fun nativeGetParameterCount(connectionPtr:Long, statementPtr:Long):Int
+        @SymbolName("Android_Database_SQLiteConnection_nativeIsReadOnly")
         private external fun nativeIsReadOnly(connectionPtr:Long, statementPtr:Long):Boolean
+        @SymbolName("Android_Database_SQLiteConnection_nativeGetColumnCount")
         private external fun nativeGetColumnCount(connectionPtr:Long, statementPtr:Long):Int
+        @SymbolName("Android_Database_SQLiteConnection_nativeGetColumnName")
         private external fun nativeGetColumnName(connectionPtr:Long, statementPtr:Long,
                                                  index:Int):String
+        @SymbolName("Android_Database_SQLiteConnection_nativeBindNull")
         private external fun nativeBindNull(connectionPtr:Long, statementPtr:Long,
                                             index:Int)
+        @SymbolName("Android_Database_SQLiteConnection_nativeBindLong")
         private external fun nativeBindLong(connectionPtr:Long, statementPtr:Long,
                                             index:Int, value:Long)
+        @SymbolName("Android_Database_SQLiteConnection_nativeBindDouble")
         private external fun nativeBindDouble(connectionPtr:Long, statementPtr:Long,
                                               index:Int, value:Double)
+        @SymbolName("Android_Database_SQLiteConnection_nativeBindString")
         private external fun nativeBindString(connectionPtr:Long, statementPtr:Long,
                                               index:Int, value:String)
+        @SymbolName("Android_Database_SQLiteConnection_nativeBindBlob")
         private external fun nativeBindBlob(connectionPtr:Long, statementPtr:Long,
                                             index:Int, value:ByteArray)
+        @SymbolName("Android_Database_SQLiteConnection_nativeResetStatementAndClearBindings")
         private external fun nativeResetStatementAndClearBindings(
                 connectionPtr:Long, statementPtr:Long)
+        @SymbolName("Android_Database_SQLiteConnection_nativeExecute")
         private external fun nativeExecute(connectionPtr:Long, statementPtr:Long)
+        @SymbolName("Android_Database_SQLiteConnection_nativeExecuteForLong")
         private external fun nativeExecuteForLong(connectionPtr:Long, statementPtr:Long):Long
+        @SymbolName("Android_Database_SQLiteConnection_nativeExecuteForString")
         private external fun nativeExecuteForString(connectionPtr:Long, statementPtr:Long):String
+        @SymbolName("Android_Database_SQLiteConnection_nativeExecuteForChangedRowCount")
         private external fun nativeExecuteForChangedRowCount(connectionPtr:Long, statementPtr:Long):Int
+        @SymbolName("Android_Database_SQLiteConnection_nativeExecuteForLastInsertedRowId")
         private external fun nativeExecuteForLastInsertedRowId(
                 connectionPtr:Long, statementPtr:Long):Long
+        @SymbolName("Android_Database_SQLiteConnection_nativeExecuteForCursorWindow")
         private external fun nativeExecuteForCursorWindow(
                 connectionPtr:Long, statementPtr:Long, windowPtr:Long,
                 startPos:Int, requiredPos:Int, countAllRows:Boolean):Long
+        @SymbolName("Android_Database_SQLiteConnection_nativeGetDbLookaside")
         private external fun nativeGetDbLookaside(connectionPtr:Long):Int
+        @SymbolName("Android_Database_SQLiteConnection_nativeCancel")
         private external fun nativeCancel(connectionPtr:Long)
+        @SymbolName("Android_Database_SQLiteConnection_nativeResetCancel")
         private external fun nativeResetCancel(connectionPtr:Long, cancelable:Boolean)
         // Called by SQLiteConnectionPool only.
         internal fun open(/*pool:SQLiteConnectionPool,*/

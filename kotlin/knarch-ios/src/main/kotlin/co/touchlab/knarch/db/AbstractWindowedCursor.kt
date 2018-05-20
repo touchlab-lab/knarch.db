@@ -62,6 +62,10 @@ abstract class AbstractWindowedCursor:AbstractCursor() {
         checkPosition()
         return mWindow!!.getType(position, columnIndex) == Cursor.FIELD_TYPE_NULL
     }
+/**
+     * @deprecated Use {@link #getType}
+     */
+    fun isBlob(columnIndex:Int):Boolean = getType(columnIndex) == Cursor.FIELD_TYPE_BLOB
 
     override fun getType(columnIndex:Int):Int {
         checkPosition()

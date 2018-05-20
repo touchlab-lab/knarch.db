@@ -1,8 +1,6 @@
 package co.touchlab.knarch.db
 
-import co.touchlab.knarch.db.sqlite.SQLiteDatabase
-import co.touchlab.knarch.db.sqlite.SQLiteException
-import co.touchlab.knarch.db.sqlite.SQLiteProgram
+import co.touchlab.knarch.db.sqlite.*
 import kotlin.math.max
 
 class DatabaseUtils {
@@ -117,7 +115,7 @@ class DatabaseUtils {
             val oldPos = cursor.getPosition()
             val numColumns = cursor.getColumnCount()
             window.clear()
-            window.setStartPosition(position)
+            window.startPosition = position
             window.setNumColumns(numColumns)
 
             if (cursor.moveToPosition(position)) {
@@ -516,7 +514,7 @@ class DatabaseUtils {
          */
         fun queryNumEntries(db: SQLiteDatabase, table: String, selection: String?,
                             selectionArgs: Array<String>?): Long {
-            val s = if ((!selection.isEmpty())) " where " + selection else ""
+            val s = if ((!selection.isNullOrEmpty())) " where " + selection else ""
             return longForQuery(db, "select count(*) from " + table + s,
                     selectionArgs)
         }
@@ -550,7 +548,7 @@ class DatabaseUtils {
          * Utility method to run the pre-compiled query and return the value in the
          * first column of the first row.
          */
-        fun longForQuery(prog: SQLiteStatement, selectionArgs: Array<String>): Long {
+        fun longForQuery(prog: SQLiteStatement, selectionArgs: Array<String>?): Long {
             prog.bindAllArgsAsStrings(selectionArgs)
             return prog.simpleQueryForLong()
         }
@@ -559,7 +557,7 @@ class DatabaseUtils {
          * Utility method to run the query on the db and return the value in the
          * first column of the first row.
          */
-        fun stringForQuery(db: SQLiteDatabase, query: String, selectionArgs: Array<String>): String {
+        fun stringForQuery(db: SQLiteDatabase, query: String, selectionArgs: Array<String>?): String? {
             val prog = db.compileStatement(query)
             try {
                 return stringForQuery(prog, selectionArgs)
@@ -572,7 +570,7 @@ class DatabaseUtils {
          * Utility method to run the pre-compiled query and return the value in the
          * first column of the first row.
          */
-        fun stringForQuery(prog: SQLiteStatement, selectionArgs: Array<String>): String {
+        fun stringForQuery(prog: SQLiteStatement, selectionArgs: Array<String>?): String? {
             prog.bindAllArgsAsStrings(selectionArgs)
             return prog.simpleQueryForString()
         }
