@@ -92,6 +92,9 @@
 		<Unit filename="/Users/kgalligan/temp4/knarch/cpp/knarch/src/main/cpp/AndroidfwCursorWindow.h">
 			<Option target="cpp"/>
 		</Unit>
+		<Unit filename="/Users/kgalligan/temp4/knarch/cpp/knarch/src/main/cpp/Atomic.cpp">
+			<Option target="cpp"/>
+		</Unit>
 		<Unit filename="/Users/kgalligan/temp4/knarch/cpp/knarch/src/main/cpp/AtomicData.cpp">
 			<Option target="cpp"/>
 		</Unit>

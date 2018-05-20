@@ -7,6 +7,7 @@ file(REMOVE_RECURSE
   "CMakeFiles/cpp.dir/knarch/src/main/cpp/AtomicData.cpp.o"
   "CMakeFiles/cpp.dir/knarch/src/main/cpp/KonanHelper.cpp.o"
   "CMakeFiles/cpp.dir/knarch/src/main/cpp/TLAssert.cpp.o"
+  "CMakeFiles/cpp.dir/knarch/src/main/cpp/Atomic.cpp.o"
   "cpp.pdb"
   "cpp"
 )

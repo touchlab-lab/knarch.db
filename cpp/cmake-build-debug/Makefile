@@ -150,6 +150,33 @@ knarch/src/main/cpp/AndroidfwCursorWindow.cpp.s:
 	$(MAKE) -f CMakeFiles/cpp.dir/build.make CMakeFiles/cpp.dir/knarch/src/main/cpp/AndroidfwCursorWindow.cpp.s
 .PHONY : knarch/src/main/cpp/AndroidfwCursorWindow.cpp.s
 
+knarch/src/main/cpp/Atomic.o: knarch/src/main/cpp/Atomic.cpp.o
+
+.PHONY : knarch/src/main/cpp/Atomic.o
+
+# target to build an object file
+knarch/src/main/cpp/Atomic.cpp.o:
+	$(MAKE) -f CMakeFiles/cpp.dir/build.make CMakeFiles/cpp.dir/knarch/src/main/cpp/Atomic.cpp.o
+.PHONY : knarch/src/main/cpp/Atomic.cpp.o
+
+knarch/src/main/cpp/Atomic.i: knarch/src/main/cpp/Atomic.cpp.i
+
+.PHONY : knarch/src/main/cpp/Atomic.i
+
+# target to preprocess a source file
+knarch/src/main/cpp/Atomic.cpp.i:
+	$(MAKE) -f CMakeFiles/cpp.dir/build.make CMakeFiles/cpp.dir/knarch/src/main/cpp/Atomic.cpp.i
+.PHONY : knarch/src/main/cpp/Atomic.cpp.i
+
+knarch/src/main/cpp/Atomic.s: knarch/src/main/cpp/Atomic.cpp.s
+
+.PHONY : knarch/src/main/cpp/Atomic.s
+
+# target to generate assembly for a file
+knarch/src/main/cpp/Atomic.cpp.s:
+	$(MAKE) -f CMakeFiles/cpp.dir/build.make CMakeFiles/cpp.dir/knarch/src/main/cpp/Atomic.cpp.s
+.PHONY : knarch/src/main/cpp/Atomic.cpp.s
+
 knarch/src/main/cpp/AtomicData.o: knarch/src/main/cpp/AtomicData.cpp.o
 
 .PHONY : knarch/src/main/cpp/AtomicData.o
@@ -351,6 +378,9 @@ help:
 	@echo "... knarch/src/main/cpp/AndroidfwCursorWindow.o"
 	@echo "... knarch/src/main/cpp/AndroidfwCursorWindow.i"
 	@echo "... knarch/src/main/cpp/AndroidfwCursorWindow.s"
+	@echo "... knarch/src/main/cpp/Atomic.o"
+	@echo "... knarch/src/main/cpp/Atomic.i"
+	@echo "... knarch/src/main/cpp/Atomic.s"
 	@echo "... knarch/src/main/cpp/AtomicData.o"
 	@echo "... knarch/src/main/cpp/AtomicData.i"
 	@echo "... knarch/src/main/cpp/AtomicData.s"
