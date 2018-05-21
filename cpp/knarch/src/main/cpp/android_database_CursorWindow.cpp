@@ -181,7 +181,7 @@ extern "C" KInt Android_Database_CursorWindow_nativeGetType(KRef thiz, KLong win
     return nativeGetType(windowPtr, row, column);
 }
 
-OBJ_GETTER(Android_Database_CursorWindow_nativeGetBlob, KRef thiz, KLong windowPtr, KInt row, KInt column) {
+extern "C" OBJ_GETTER(Android_Database_CursorWindow_nativeGetBlob, KRef thiz, KLong windowPtr, KInt row, KInt column) {
 
    CursorWindow* window = reinterpret_cast<CursorWindow*>(windowPtr);
    LOG_WINDOW("Getting blob for %d,%d from %p", row, column, window);
@@ -224,7 +224,7 @@ OBJ_GETTER(Android_Database_CursorWindow_nativeGetBlob, KRef thiz, KLong windowP
    RETURN_OBJ(nullptr);
 }
 
-OBJ_GETTER(Android_Database_CursorWindow_nativeGetString, KRef thiz, KLong windowPtr, KInt row, KInt column) {
+extern "C" OBJ_GETTER(Android_Database_CursorWindow_nativeGetString, KRef thiz, KLong windowPtr, KInt row, KInt column) {
     CursorWindow* window = reinterpret_cast<CursorWindow*>(windowPtr);
     LOG_WINDOW("Getting string for %d,%d from %p", row, column, window);
 

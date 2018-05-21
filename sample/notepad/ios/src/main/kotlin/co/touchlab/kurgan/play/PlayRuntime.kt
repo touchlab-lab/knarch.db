@@ -29,17 +29,15 @@ class PlayRuntime(){
 
     fun testDb()
     {
-        kotlin.io.print("Hi hello I'm a string")
-
         val context = DefaultSystemContext()
-//        val databasePath = context.getDatabasePath("HeyBud")
-//        kotlin.io.print(databasePath)
-//        val mydb = SQLiteDatabase.openDatabase(databasePath, null, SQLiteDatabase.CREATE_IF_NECESSARY)
 
-        val dbHelper = DbHelper(context, "testdb", 1)
+        val dbHelper = DbHelper(context, "testdbwithbytes", 1)
         val db = dbHelper.writableDatabase
         val cv = ContentValues()
         cv.put("asdf", "qwert")
+        val stringToChange = "Hello I like bytes"
+        val ba = ByteArray(stringToChange.length, {i -> stringToChange.get(i).toByte()})
+        cv.put("fff", ba)
         db.insert("testtable", null, cv)
     }
 
@@ -58,7 +56,7 @@ class DbHelper(mContext:SystemContext, databaseName:String?, mNewVersion:Int):SQ
         ){
 
     override fun onCreate(db:SQLiteDatabase){
-        db.execSQL("create table testtable(asdf TEXT)")
+        db.execSQL("create table testtable(asdf TEXT, fff BLOB)")
     }
 
     override fun onUpgrade(db:SQLiteDatabase, oldVersion:Int, newVersion:Int){

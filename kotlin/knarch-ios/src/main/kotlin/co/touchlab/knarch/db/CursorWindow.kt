@@ -296,8 +296,7 @@ class CursorWindow/**
         acquireReference()
         try
         {
-            TODO()
-//            return nativeGetBlob(mWindowPtr, row - startPosition, column)
+            return nativeGetBlob(mWindowPtr, row - startPosition, column)
         }
         finally
         {
@@ -334,8 +333,7 @@ class CursorWindow/**
         acquireReference()
         try
         {
-            TODO()
-//            return nativeGetString(mWindowPtr, row - startPosition, column)
+            return nativeGetString(mWindowPtr, row - startPosition, column)
         }
         finally
         {
@@ -637,10 +635,10 @@ class CursorWindow/**
         @SymbolName("Android_Database_CursorWindow_nativeGetType")
         private external fun nativeGetType(windowPtr:Long, row:Int, column:Int):Int
 
-//        @SymbolName("Android_Database_Curs orWindow_nativeGetBlob")
-//        private external fun nativeGetBlob(windowPtr:Long, row:Int, column:Int):ByteArray
-//        @SymbolName("Android_Database_CursorWindow_nativeGetString")
-//        private external fun nativeGetString(windowPtr:Long, row:Int, column:Int):String
+        @SymbolName("Android_Database_CursorWindow_nativeGetBlob")
+        private external fun nativeGetBlob(windowPtr:Long, row:Int, column:Int):ByteArray
+        @SymbolName("Android_Database_CursorWindow_nativeGetString")
+        private external fun nativeGetString(windowPtr:Long, row:Int, column:Int):String
 
         @SymbolName("Android_Database_CursorWindow_nativeGetLong")
         private external fun nativeGetLong(windowPtr:Long, row:Int, column:Int):Long
