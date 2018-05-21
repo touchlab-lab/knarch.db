@@ -26,13 +26,13 @@ class ViewController: UIViewController {
     }
     @IBAction func insertStuffAction(_ sender: Any) {
         initKotlin()
-        playRuntime?.testThreads()//helloStart(mems: false)
+        playRuntime?.testDb()//helloStart(mems: false)
         outputLabel.text = "Ran with memory dumps"
     }
     
     @IBAction func memoryAction(_ sender: Any) {
         initKotlin()
-        playRuntime?.testThreads()//helloStart(mems: false)
+        playRuntime?.testDb()//helloStart(mems: false)
         outputLabel.text = "Ran without memory dumps"
     }
     

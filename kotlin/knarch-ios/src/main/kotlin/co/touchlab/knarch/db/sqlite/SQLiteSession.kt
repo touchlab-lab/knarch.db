@@ -80,7 +80,7 @@ class SQLiteSession(val mConnection:SQLiteConnection) {
                                           transactionListener:SQLiteTransactionListener?, connectionFlags:Int) {
         if (mTransactionStack == null)
         {
-            acquireConnection(null!!, connectionFlags) // might throw
+            acquireConnection(null, connectionFlags) // might throw
         }
         try
         {
@@ -500,7 +500,7 @@ class SQLiteSession(val mConnection:SQLiteConnection) {
      * Currently we don't support the connection pool. There's 1 session, and 1 connection. May reintroduce after
      * we get other things sorted.
      */
-    private fun acquireConnection(sql:String, connectionFlags:Int) {
+    private fun acquireConnection(sql:String?, connectionFlags:Int) {
         /*if (mConnection == null)
         {
             assert(mConnectionUseCount == 0)

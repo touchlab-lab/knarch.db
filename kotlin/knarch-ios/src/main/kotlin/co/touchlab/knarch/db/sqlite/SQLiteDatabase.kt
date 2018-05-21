@@ -175,7 +175,7 @@ class SQLiteDatabase private constructor(path: String, openFlags: Int, cursorFac
          * Equivalent to openDatabase(path, factory, CREATE_IF_NECESSARY, errorHandler).
          * Kotlin - probably remove one of these
          */
-        fun openOrCreateDatabase(path:String, factory:CursorFactory, errorHandler:DatabaseErrorHandler? = null):SQLiteDatabase {
+        fun openOrCreateDatabase(path:String, factory:CursorFactory?, errorHandler:DatabaseErrorHandler? = null):SQLiteDatabase {
             return openDatabase(path, factory, CREATE_IF_NECESSARY, errorHandler);
         }
 
@@ -274,7 +274,7 @@ class SQLiteDatabase private constructor(path: String, openFlags: Int, cursorFac
 
 
     override fun onAllReferencesReleased() {
-        dispose(false);
+//        dispose(false);
     }
 
     private fun dispose(finalized:Boolean) {
@@ -313,7 +313,9 @@ class SQLiteDatabase private constructor(path: String, openFlags: Int, cursorFac
      * the database is not open.
      */
     fun getThreadSession():SQLiteSession {
-        kotlin.assert(sqliteSession != null, {"Must call open before trying to use db"})
+//        kotlin.assert(sqliteSession != null, {"Must call open before trying to use db"})
+        if(sqliteSession == null)
+            openInner()
         return sqliteSession!!
     }
 
@@ -544,7 +546,7 @@ class SQLiteDatabase private constructor(path: String, openFlags: Int, cursorFac
     }
 
     fun forceClose(){
-        getThreadSession().mConnection.close()
+        sqliteSession?.mConnection?.close()
         sqliteSession = null
     }
 

@@ -30,7 +30,7 @@ konanArtifacts {
             }
         }
 
-//        linkerOpts "-L${j2objcRuntime}/lib", "-Lioslibs"
+        linkerOpts "-lsqlite3"
         enableMultiplatform true
     }
 }

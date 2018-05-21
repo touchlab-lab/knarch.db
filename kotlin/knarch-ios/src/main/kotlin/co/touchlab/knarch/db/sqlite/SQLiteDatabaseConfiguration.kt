@@ -20,6 +20,10 @@ class SQLiteDatabaseConfiguration{
 //    private static final Pattern EMAIL_IN_DB_PATTERN =
 //            Pattern.compile("[\\w\\.\\-]+@[\\w\\.\\-]+");
 
+    override fun toString(): String {
+        return "path: $path, lable: $label, openFlags: $openFlags, maxSqlCacheSize: $maxSqlCacheSize, foreignKeyConstraintsEnabled: $foreignKeyConstraintsEnabled"
+    }
+
     /**
      * The database path.
      */

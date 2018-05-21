@@ -4,6 +4,9 @@ import co.touchlab.kurgan.play.notepad.*
 import kotlinx.cinterop.*
 import co.touchlab.kite.threads.*
 import konan.worker.*
+import co.touchlab.knarch.*
+import co.touchlab.knarch.db.sqlite.*
+import co.touchlab.knarch.db.*
 
 class PlayRuntime(){
 
@@ -24,6 +27,22 @@ class PlayRuntime(){
         th.callBack()
     }
 
+    fun testDb()
+    {
+        kotlin.io.print("Hi hello I'm a string")
+
+        val context = DefaultSystemContext()
+//        val databasePath = context.getDatabasePath("HeyBud")
+//        kotlin.io.print(databasePath)
+//        val mydb = SQLiteDatabase.openDatabase(databasePath, null, SQLiteDatabase.CREATE_IF_NECESSARY)
+
+        val dbHelper = DbHelper(context, "testdb", 1)
+        val db = dbHelper.writableDatabase
+        val cv = ContentValues()
+        cv.put("asdf", "qwert")
+        db.insert("testtable", null, cv)
+    }
+
     companion object {
         fun hi(mems: Boolean){
 //            val pr = PlayRuntime()
@@ -32,7 +51,24 @@ class PlayRuntime(){
     }
 }
 
+class DbHelper(mContext:SystemContext, databaseName:String?, mNewVersion:Int):SQLiteOpenHelper(
+        mContext = mContext,
+        databaseName = databaseName,
+        mNewVersion = mNewVersion
+        ){
 
+    override fun onCreate(db:SQLiteDatabase){
+        db.execSQL("create table testtable(asdf TEXT)")
+    }
+
+    override fun onUpgrade(db:SQLiteDatabase, oldVersion:Int, newVersion:Int){
+
+    }
+}
+
+///Users/kgalligan/temp4/databasetest
+
+/*
 class DataContainer(val atom:AtomicBox<MyThing>, var nocount:Int)
 
 class MyThing(var counter:Long = 0, var lotso:MutableList<Int>)
@@ -62,7 +98,8 @@ fun goNuts(dataContainer: DataContainer){
                     return@access b
                 })
 
-                /*input.first.openBox()
+                */
+/*input.first.openBox()
 
                 try {
                     var localVar = input.first.target.counter
@@ -73,7 +110,8 @@ fun goNuts(dataContainer: DataContainer){
                     input.first.target.counter = localVar+1
                 } finally {
                     input.first.closeBox()
-                }*/
+                }*//*
+
             }
         }
         })
@@ -92,4 +130,4 @@ fun goNuts(dataContainer: DataContainer){
     dataContainer.atom.access {
         println("Total count: ${it.counter}")
     }
-}
+}*/

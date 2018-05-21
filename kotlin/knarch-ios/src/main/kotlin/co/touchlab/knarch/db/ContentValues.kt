@@ -222,14 +222,13 @@ class ContentValues{
                 }
                 catch (e2:NumberFormatException) {
                     Log.e(TAG, "Cannot parse Long value for $value at key $key")
-                    return null
                 }
             }
             else
             {
                 Log.e(TAG, "Cannot cast value for $key to a Long: $value", e)
-                return null
             }
+            return null
         }
     }
     /**
@@ -253,14 +252,13 @@ class ContentValues{
                 }
                 catch (e2:NumberFormatException) {
                     Log.e(TAG, "Cannot parse Integer value for $value at key $key")
-                    return null
                 }
             }
             else
             {
                 Log.e(TAG, "Cannot cast value for $key to a Integer: $value", e)
-                return null
             }
+            return null
         }
     }
     /**
@@ -285,14 +283,13 @@ class ContentValues{
                 }
                 catch (e2:NumberFormatException) {
                     Log.e(TAG, "Cannot parse Short value for $value at key $key")
-                    return null
                 }
             }
             else
             {
                 Log.e(TAG, "Cannot cast value for $key to a Short: $value", e)
-                return null
             }
+            return null
         }
     }
     /**
@@ -316,14 +313,13 @@ class ContentValues{
                 }
                 catch (e2:NumberFormatException) {
                     Log.e(TAG, "Cannot parse Byte value for $value at key $key")
-                    return null
                 }
             }
             else
             {
                 Log.e(TAG, "Cannot cast value for $key to a Byte: $value", e)
-                return null
             }
+            return null
         }
     }
     /**
@@ -347,14 +343,13 @@ class ContentValues{
                 }
                 catch (e2:NumberFormatException) {
                     Log.e(TAG, "Cannot parse Double value for $value at key $key")
-                    return null
                 }
             }
             else
             {
                 Log.e(TAG, "Cannot cast value for $key to a Double: $value", e)
-                return null
             }
+            return null
         }
     }
     /**
@@ -378,14 +373,13 @@ class ContentValues{
                 }
                 catch (e2:NumberFormatException) {
                     Log.e(TAG, "Cannot parse Float value for $value at key $key")
-                    return null
                 }
             }
             else
             {
                 Log.e(TAG, "Cannot cast value for $key to a Float: $value", e)
-                return null
             }
+            return null
         }
     }
     /**
@@ -412,8 +406,9 @@ class ContentValues{
             else
             {
                 Log.e(TAG, "Cannot cast value for $key to a Boolean: $value", e)
-                return null
             }
+
+            return null
         }
     }
     /**
