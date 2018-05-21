@@ -125,17 +125,22 @@ static KLong nativeOpen(KString pathStr, KInt openFlags,
         sqliteFlags = SQLITE_OPEN_READWRITE;
     }
 
-    KStdString path;
-    KStdString label;
+    size_t utf8Size;
+    char * path = CreateCStringFromStringWithSize(pathStr, &utf8Size);
+    char * label = CreateCStringFromStringWithSize(labelStr, &utf8Size);
 
-    const KChar* utf16 = CharArrayAddressOfElementAt(pathStr, 0);
-    utf8::with_replacement::utf16to8(utf16, utf16 + pathStr->count_, back_inserter(path));
-
-    utf16 = CharArrayAddressOfElementAt(labelStr, 0);
-    utf8::with_replacement::utf16to8(utf16, utf16 + labelStr->count_, back_inserter(label));
+//    const KChar* utf16 = CharArrayAddressOfElementAt(pathStr, 0);
+//    ALOGW("A 2a");
+//    utf8::with_replacement::utf16to8(utf16, utf16 + pathStr->count_, back_inserter(path));
+//    ALOGW("A 2b");
+//
+//    utf16 = CharArrayAddressOfElementAt(labelStr, 0);
+//    ALOGW("A 2c");
+//    utf8::with_replacement::utf16to8(utf16, utf16 + labelStr->count_, back_inserter(label));
+//    ALOGW("A 2d");
 
     sqlite3* db;
-    int err = sqlite3_open_v2(path.c_str(), &db, sqliteFlags, NULL);
+    int err = sqlite3_open_v2(path, &db, sqliteFlags, NULL);
     if (err != SQLITE_OK) {
         throw_sqlite3_exception_errcode(err, "Could not open database");
         return 0;
@@ -167,11 +172,11 @@ static KLong nativeOpen(KString pathStr, KInt openFlags,
         sqlite3_profile(db, &sqliteProfileCallback, connection);
     }
 
-    ALOGV("Opened connection %p with label '%s'", db, label.c_str());
+    ALOGV("Opened connection %p with label '%s'", db, label);
     return reinterpret_cast<KLong>(connection);
 }
 
-extern "C" KLong Android_Database_SQLiteConnection_nativeOpen(KString pathStr, KInt openFlags,
+extern "C" KLong Android_Database_SQLiteConnection_nativeOpen(KRef thiz, KString pathStr, KInt openFlags,
                                                                                  KString labelStr, KBoolean enableTrace, KBoolean enableProfile)
 {
     return nativeOpen(pathStr, openFlags,
@@ -195,7 +200,7 @@ static void nativeClose(KLong connectionPtr) {
     }
 }
 
-extern "C" void Android_Database_SQLiteConnection_nativeClose(KLong connectionPtr)
+extern "C" void Android_Database_SQLiteConnection_nativeClose(KRef thiz, KLong connectionPtr)
 {
     nativeClose(connectionPtr);
 }
@@ -233,7 +238,7 @@ static KLong nativePrepareStatement(KLong connectionPtr, KString sqlString) {
     return reinterpret_cast<KLong>(statement);
 }
 
-extern "C" KLong Android_Database_SQLiteConnection_nativePrepareStatement(KLong connectionPtr, KString sqlString)
+extern "C" KLong Android_Database_SQLiteConnection_nativePrepareStatement(KRef thiz, KLong connectionPtr, KString sqlString)
 {
     return nativePrepareStatement(connectionPtr, sqlString);
 }
@@ -249,8 +254,8 @@ static void nativeFinalizeStatement(KLong connectionPtr, KLong statementPtr) {
     sqlite3_finalize(statement);
 }
 
-extern "C" void Android_Database_SQLiteConnection_nativeFinalizeStatement(
-    KLong connectionPtr, KLong statementPtr)
+extern "C" void Android_Database_SQLiteConnection_nativeFinalizeStatement(KRef thiz,
+                                                                          KLong connectionPtr, KLong statementPtr)
 {
     nativeFinalizeStatement(connectionPtr, statementPtr);
 }
@@ -261,8 +266,8 @@ static KInt nativeGetParameterCount(KLong connectionPtr, KLong statementPtr) {
     return sqlite3_bind_parameter_count(statement);
 }
 
-extern "C" KInt Android_Database_SQLiteConnection_nativeGetParameterCount(
-    KLong connectionPtr, KLong statementPtr)
+extern "C" KInt Android_Database_SQLiteConnection_nativeGetParameterCount(KRef thiz,
+                                                                          KLong connectionPtr, KLong statementPtr)
 {
     return nativeGetParameterCount(connectionPtr, statementPtr);
 }
@@ -273,8 +278,8 @@ static KBoolean nativeIsReadOnly(KLong connectionPtr, KLong statementPtr) {
     return sqlite3_stmt_readonly(statement) != 0;
 }
 
-extern "C" KBoolean Android_Database_SQLiteConnection_nativeIsReadOnly(
-    KLong connectionPtr, KLong statementPtr)
+extern "C" KBoolean Android_Database_SQLiteConnection_nativeIsReadOnly(KRef thiz,
+                                                                       KLong connectionPtr, KLong statementPtr)
 {
     return nativeIsReadOnly(connectionPtr, statementPtr);
 }
@@ -285,8 +290,8 @@ static KInt nativeGetColumnCount(KLong connectionPtr, KLong statementPtr) {
     return sqlite3_column_count(statement);
 }
 
-extern "C" KInt Android_Database_SQLiteConnection_nativeGetColumnCount(
-    KLong connectionPtr, KLong statementPtr)
+extern "C" KInt Android_Database_SQLiteConnection_nativeGetColumnCount(KRef thiz,
+                                                                       KLong connectionPtr, KLong statementPtr)
 {
     return nativeGetColumnCount(connectionPtr, statementPtr);
 }
@@ -303,7 +308,7 @@ static size_t lengthOfString(const KChar* wstr)
     return len;
 }
 
-extern "C" OBJ_GETTER(Android_Database_SQLiteConnection_nativeGetColumnName, KLong connectionPtr, KLong statementPtr, KInt index){
+extern "C" OBJ_GETTER(Android_Database_SQLiteConnection_nativeGetColumnName, KRef thiz, KLong connectionPtr, KLong statementPtr, KInt index){
     auto * statement = reinterpret_cast<sqlite3_stmt*>(statementPtr);
 
     const auto * name = static_cast<const KChar*>(sqlite3_column_name16(statement, index));
@@ -332,8 +337,8 @@ static void nativeBindNull(KLong connectionPtr, KLong statementPtr, KInt index) 
     }
 }
 
-extern "C" void Android_Database_SQLiteConnection_nativeBindNull(
-    KLong connectionPtr, KLong statementPtr, KInt index)
+extern "C" void Android_Database_SQLiteConnection_nativeBindNull(KRef thiz,
+                                                                 KLong connectionPtr, KLong statementPtr, KInt index)
 {
     nativeBindNull(connectionPtr, statementPtr, index);
 }
@@ -348,8 +353,8 @@ static void nativeBindLong(KLong connectionPtr, KLong statementPtr, KInt index, 
     }
 }
 
-extern "C" void Android_Database_SQLiteConnection_nativeBindLong(
-    KLong connectionPtr, KLong statementPtr, KInt index, KLong value)
+extern "C" void Android_Database_SQLiteConnection_nativeBindLong(KRef thiz,
+                                                                 KLong connectionPtr, KLong statementPtr, KInt index, KLong value)
 {
     nativeBindLong(connectionPtr, statementPtr, index, value);
 }
@@ -364,8 +369,8 @@ static void nativeBindDouble(KLong connectionPtr, KLong statementPtr, KInt index
     }
 }
 
-extern "C" void Android_Database_SQLiteConnection_nativeBindDouble(
-    KLong connectionPtr, KLong statementPtr, KInt index, KDouble value)
+extern "C" void Android_Database_SQLiteConnection_nativeBindDouble(KRef thiz,
+                                                                   KLong connectionPtr, KLong statementPtr, KInt index, KDouble value)
 {
     nativeBindDouble(connectionPtr, statementPtr, index, value);
 }
@@ -385,8 +390,8 @@ static void nativeBindString(KLong connectionPtr, KLong statementPtr, KInt index
     }
 }
 
-extern "C" void Android_Database_SQLiteConnection_nativeBindString(
-    KLong connectionPtr, KLong statementPtr, KInt index, KString valueString)
+extern "C" void Android_Database_SQLiteConnection_nativeBindString(KRef thiz,
+                                                                   KLong connectionPtr, KLong statementPtr, KInt index, KString valueString)
 {
     nativeBindString(connectionPtr, statementPtr, index, valueString);
 }
@@ -407,8 +412,8 @@ static void nativeBindBlob(KLong connectionPtr, KLong statementPtr, KInt index, 
     }
 }
 
-extern "C" void Android_Database_SQLiteConnection_nativeBindBlob(
-    KLong connectionPtr, KLong statementPtr, KInt index, KConstRef valueArray)
+extern "C" void Android_Database_SQLiteConnection_nativeBindBlob(KRef thiz,
+                                                                 KLong connectionPtr, KLong statementPtr, KInt index, KConstRef valueArray)
 {
     nativeBindBlob(connectionPtr, statementPtr, index, valueArray);
 }
@@ -426,8 +431,8 @@ static void nativeResetStatementAndClearBindings(KLong connectionPtr, KLong stat
     }
 }
 
-extern "C" void Android_Database_SQLiteConnection_nativeResetStatementAndClearBindings(
-    KLong connectionPtr, KLong statementPtr)
+extern "C" void Android_Database_SQLiteConnection_nativeResetStatementAndClearBindings(KRef thiz,
+                                                                                       KLong connectionPtr, KLong statementPtr)
 {
     nativeResetStatementAndClearBindings(connectionPtr, statementPtr);
 }
@@ -450,8 +455,8 @@ static void nativeExecute(KLong connectionPtr, KLong statementPtr) {
     executeNonQuery(connection, statement);
 }
 
-extern "C" void Android_Database_SQLiteConnection_nativeExecute(
-    KLong connectionPtr, KLong statementPtr)
+extern "C" void Android_Database_SQLiteConnection_nativeExecute(KRef thiz,
+                                                                KLong connectionPtr, KLong statementPtr)
 {
     nativeExecute(connectionPtr, statementPtr);
 }
@@ -464,8 +469,8 @@ static KInt nativeExecuteForChangedRowCount(KLong connectionPtr, KLong statement
     return err == SQLITE_DONE ? sqlite3_changes(connection->db) : -1;
 }
 
-extern "C" KInt Android_Database_SQLiteConnection_nativeExecuteForChangedRowCount(
-    KLong connectionPtr, KLong statementPtr)
+extern "C" KInt Android_Database_SQLiteConnection_nativeExecuteForChangedRowCount(KRef thiz,
+                                                                                  KLong connectionPtr, KLong statementPtr)
 {
     return nativeExecuteForChangedRowCount(connectionPtr, statementPtr);
 }
@@ -479,8 +484,8 @@ static KLong nativeExecuteForLastInsertedRowId(KLong connectionPtr, KLong statem
             ? sqlite3_last_insert_rowid(connection->db) : -1;
 }
 
-extern "C" KLong Android_Database_SQLiteConnection_nativeExecuteForLastInsertedRowId(
-    KLong connectionPtr, KLong statementPtr)
+extern "C" KLong Android_Database_SQLiteConnection_nativeExecuteForLastInsertedRowId(KRef thiz,
+                                                                                     KLong connectionPtr, KLong statementPtr)
 {
     return nativeExecuteForLastInsertedRowId(connectionPtr, statementPtr);
 }
@@ -504,13 +509,13 @@ static KLong nativeExecuteForLong(KLong connectionPtr, KLong statementPtr) {
     return -1;
 }
 
-extern "C" KLong Android_Database_SQLiteConnection_nativeExecuteForLong(
-    KLong connectionPtr, KLong statementPtr)
+extern "C" KLong Android_Database_SQLiteConnection_nativeExecuteForLong(KRef thiz,
+                                                                        KLong connectionPtr, KLong statementPtr)
 {
     return nativeExecuteForLong(connectionPtr, statementPtr);
 }
 
-extern "C" OBJ_GETTER(Android_Database_SQLiteConnection_nativeExecuteForString, KLong connectionPtr, KLong statementPtr){
+extern "C" OBJ_GETTER(Android_Database_SQLiteConnection_nativeExecuteForString, KRef thiz, KLong connectionPtr, KLong statementPtr){
     auto connection = reinterpret_cast<SQLiteConnection*>(connectionPtr);
     auto statement = reinterpret_cast<sqlite3_stmt*>(statementPtr);
 
@@ -726,8 +731,8 @@ static KLong nativeExecuteForCursorWindow(KLong connectionPtr, KLong statementPt
     return result;
 }
 
-extern "C" KLong Android_Database_SQLiteConnection_nativeExecuteForCursorWindow(
-    KLong connectionPtr, KLong statementPtr, KLong windowPtr,
+extern "C" KLong Android_Database_SQLiteConnection_nativeExecuteForCursorWindow(KRef thiz,
+                                                                                KLong connectionPtr, KLong statementPtr, KLong windowPtr,
                                       KInt startPos, KInt requiredPos, KBoolean countAllRows)
 {
     return nativeExecuteForCursorWindow(
@@ -744,8 +749,8 @@ static KInt nativeGetDbLookaside(KLong connectionPtr) {
     return cur;
 }
 
-extern "C" KInt Android_Database_SQLiteConnection_nativeGetDbLookaside(
-    KLong connectionPtr)
+extern "C" KInt Android_Database_SQLiteConnection_nativeGetDbLookaside(KRef thiz,
+                                                                       KLong connectionPtr)
 {
     return nativeGetDbLookaside(connectionPtr);
 }
@@ -755,8 +760,8 @@ static void nativeCancel(KLong connectionPtr) {
     connection->canceled = true;
 }
 
-extern "C" void Android_Database_SQLiteConnection_nativeCancel(
-    KLong connectionPtr)
+extern "C" void Android_Database_SQLiteConnection_nativeCancel(KRef thiz,
+                                                               KLong connectionPtr)
 {
     nativeCancel(connectionPtr);
 }
@@ -774,8 +779,8 @@ static void nativeResetCancel(KLong connectionPtr,
     }
 }
 
-extern "C" void Android_Database_SQLiteConnection_nativeResetCancel(
-    KLong connectionPtr, KBoolean cancelable)
+extern "C" void Android_Database_SQLiteConnection_nativeResetCancel(KRef thiz,
+                                                                    KLong connectionPtr, KBoolean cancelable)
 {
     nativeResetCancel(connectionPtr, cancelable) ;
 }

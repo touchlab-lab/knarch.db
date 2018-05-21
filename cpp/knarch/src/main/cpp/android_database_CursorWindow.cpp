@@ -78,7 +78,7 @@ static KLong nativeCreate(KString nameObj, KInt cursorWindowSize) {
     return reinterpret_cast<KLong>(window);
 }
 
-extern "C" KLong Android_Database_CursorWindow_nativeCreate(KString nameObj, KInt cursorWindowSize)
+extern "C" KLong Android_Database_CursorWindow_nativeCreate(KRef thiz, KString nameObj, KInt cursorWindowSize)
 {
     return nativeCreate(nameObj, cursorWindowSize);
 }
@@ -91,7 +91,7 @@ static void nativeDispose(KLong windowPtr) {
     }
 }
 
-extern "C" void Android_Database_CursorWindow_nativeDispose(KLong windowPtr)
+extern "C" void Android_Database_CursorWindow_nativeDispose(KRef thiz, KLong windowPtr)
 {
     nativeDispose(windowPtr);
 }
@@ -101,7 +101,7 @@ static KString nativeGetName(KLong windowPtr) {
     return window->name();
 }
 
-extern "C" KString Android_Database_CursorWindow_nativeGetName(KLong windowPtr)
+extern "C" KString Android_Database_CursorWindow_nativeGetName(KRef thiz, KLong windowPtr)
 {
     return nativeGetName(windowPtr);
 }
@@ -115,7 +115,7 @@ static void nativeClear(KLong windowPtr) {
     }
 }
 
-extern "C" void Android_Database_CursorWindow_nativeClear(KLong windowPtr)
+extern "C" void Android_Database_CursorWindow_nativeClear(KRef thiz, KLong windowPtr)
 {
  nativeClear(windowPtr);
 }
@@ -125,7 +125,7 @@ static KInt nativeGetNumRows(KLong windowPtr) {
     return window->getNumRows();
 }
 
-extern "C" KInt Android_Database_CursorWindow_nativeGetNumRows(KLong windowPtr)
+extern "C" KInt Android_Database_CursorWindow_nativeGetNumRows(KRef thiz, KLong windowPtr)
 {
 return nativeGetNumRows(windowPtr);
 }
@@ -136,7 +136,7 @@ static KBoolean nativeSetNumColumns(KLong windowPtr, KInt columnNum) {
     return status == OK;
 }
 
-extern "C" KBoolean Android_Database_CursorWindow_nativeSetNumColumns(KLong windowPtr, KInt columnNum)
+extern "C" KBoolean Android_Database_CursorWindow_nativeSetNumColumns(KRef thiz, KLong windowPtr, KInt columnNum)
 {
     return nativeSetNumColumns(windowPtr, columnNum);
 }
@@ -147,7 +147,7 @@ static KBoolean nativeAllocRow(KLong windowPtr) {
     return status == OK;
 }
 
-extern "C" KBoolean Android_Database_CursorWindow_nativeAllocRow(KLong windowPtr)
+extern "C" KBoolean Android_Database_CursorWindow_nativeAllocRow(KRef thiz, KLong windowPtr)
 {
     return nativeAllocRow(windowPtr);
 }
@@ -157,7 +157,7 @@ static void nativeFreeLastRow(KLong windowPtr) {
     window->freeLastRow();
 }
 
-extern "C" void Android_Database_CursorWindow_nativeFreeLastRow(KLong windowPtr)
+extern "C" void Android_Database_CursorWindow_nativeFreeLastRow(KRef thiz, KLong windowPtr)
 {
     nativeFreeLastRow(windowPtr);
 }
@@ -176,12 +176,12 @@ static KInt nativeGetType(KLong windowPtr, KInt row, KInt column) {
     return window->getFieldSlotType(fieldSlot);
 }
 
-extern "C" KInt Android_Database_CursorWindow_nativeGetType(KLong windowPtr, KInt row, KInt column)
+extern "C" KInt Android_Database_CursorWindow_nativeGetType(KRef thiz, KLong windowPtr, KInt row, KInt column)
 {
     return nativeGetType(windowPtr, row, column);
 }
 
-OBJ_GETTER(Android_Database_CursorWindow_nativeGetBlob, KLong windowPtr, KInt row, KInt column) {
+OBJ_GETTER(Android_Database_CursorWindow_nativeGetBlob, KRef thiz, KLong windowPtr, KInt row, KInt column) {
 
    CursorWindow* window = reinterpret_cast<CursorWindow*>(windowPtr);
    LOG_WINDOW("Getting blob for %d,%d from %p", row, column, window);
@@ -224,7 +224,7 @@ OBJ_GETTER(Android_Database_CursorWindow_nativeGetBlob, KLong windowPtr, KInt ro
    RETURN_OBJ(nullptr);
 }
 
-OBJ_GETTER(Android_Database_CursorWindow_nativeGetString, KLong windowPtr, KInt row, KInt column) {
+OBJ_GETTER(Android_Database_CursorWindow_nativeGetString, KRef thiz, KLong windowPtr, KInt row, KInt column) {
     CursorWindow* window = reinterpret_cast<CursorWindow*>(windowPtr);
     LOG_WINDOW("Getting string for %d,%d from %p", row, column, window);
 
@@ -318,7 +318,7 @@ static KLong nativeGetLong(KLong windowPtr, KInt row, KInt column) {
     }
 }
 
-extern "C" KLong Android_Database_CursorWindow_nativeGetLong(KLong windowPtr, KInt row, KInt column)
+extern "C" KLong Android_Database_CursorWindow_nativeGetLong(KRef thiz, KLong windowPtr, KInt row, KInt column)
 {
     return nativeGetLong(windowPtr, row, column);
 }
@@ -354,7 +354,7 @@ static KDouble nativeGetDouble(KLong windowPtr, KInt row, KInt column) {
     }
 }
 
-extern "C" KDouble Android_Database_CursorWindow_nativeGetDouble(KLong windowPtr, KInt row, KInt column)
+extern "C" KDouble Android_Database_CursorWindow_nativeGetDouble(KRef thiz, KLong windowPtr, KInt row, KInt column)
 {
     return nativeGetDouble(windowPtr, row, column);
 }
@@ -378,12 +378,12 @@ static KBoolean nativePutBlob(KLong windowPtr, KConstRef valueObj, KInt row, KIn
     return true;
 }
 
-extern "C" KBoolean Android_Database_CursorWindow_nativePutBlob(KLong windowPtr, KConstRef valueObj, KInt row, KInt column)
+extern "C" KBoolean Android_Database_CursorWindow_nativePutBlob(KRef thiz, KLong windowPtr, KConstRef valueObj, KInt row, KInt column)
 {
     return nativePutBlob(windowPtr, valueObj, row, column);
 }
 
-extern "C" KBoolean Android_Database_CursorWindow_nativePutString(KLong windowPtr, KString valueObj, KInt row, KInt column){
+extern "C" KBoolean Android_Database_CursorWindow_nativePutString(KRef thiz, KLong windowPtr, KString valueObj, KInt row, KInt column){
     CursorWindow* window = reinterpret_cast<CursorWindow*>(windowPtr);
 
     size_t sizeIncludingNull;
@@ -416,7 +416,7 @@ static KBoolean nativePutLong(KLong windowPtr, KLong value, KInt row, KInt colum
     return true;
 }
 
-extern "C" KBoolean Android_Database_CursorWindow_nativePutLong(KLong windowPtr, KLong value, KInt row, KInt column)
+extern "C" KBoolean Android_Database_CursorWindow_nativePutLong(KRef thiz, KLong windowPtr, KLong value, KInt row, KInt column)
 {
     return nativePutLong(windowPtr, value, row, column);
 }
@@ -434,7 +434,7 @@ static KBoolean nativePutDouble(KLong windowPtr, KDouble value, KInt row, KInt c
     return true;
 }
 
-extern "C" KBoolean Android_Database_CursorWindow_nativePutDouble(KLong windowPtr, KDouble value, KInt row, KInt column)
+extern "C" KBoolean Android_Database_CursorWindow_nativePutDouble(KRef thiz, KLong windowPtr, KDouble value, KInt row, KInt column)
 {
     return nativePutDouble(windowPtr, value, row, column);
 }
@@ -452,7 +452,7 @@ static KBoolean nativePutNull(KLong windowPtr, KInt row, KInt column) {
     return true;
 }
 
-extern "C" KBoolean Android_Database_CursorWindow_nativePutNull(KLong windowPtr, KInt row, KInt column)
+extern "C" KBoolean Android_Database_CursorWindow_nativePutNull(KRef thiz, KLong windowPtr, KInt row, KInt column)
 {
     return nativePutNull(windowPtr, row, column);
 }

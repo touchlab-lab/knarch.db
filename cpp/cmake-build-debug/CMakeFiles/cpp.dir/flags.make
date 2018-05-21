@@ -6,5 +6,5 @@ CXX_FLAGS = -g   -std=gnu++11
 
 CXX_DEFINES = 
 
-CXX_INCLUDES = -I/Users/kgalligan/temp3/kotlin-native/runtime/src/main/cpp -I/Users/kgalligan/temp4/knarch/cpp/knarch/src/main/cpp 
+CXX_INCLUDES = -I/Users/kgalligan/temp4/knarch/cpp/knarch/src/main/cpp -I/Users/kgalligan/temp3/kotlin-native/runtime/src/main/cpp 
 
