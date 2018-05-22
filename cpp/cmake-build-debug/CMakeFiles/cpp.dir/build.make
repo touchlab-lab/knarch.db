@@ -148,9 +148,22 @@ CMakeFiles/cpp.dir/knarch/src/main/cpp/KonanHelper.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/cpp.dir/knarch/src/main/cpp/KonanHelper.cpp.s"
 	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/kgalligan/temp4/knarch/cpp/knarch/src/main/cpp/KonanHelper.cpp -o CMakeFiles/cpp.dir/knarch/src/main/cpp/KonanHelper.cpp.s
 
+CMakeFiles/cpp.dir/knarch/src/main/cpp/NativeHelper.m.o: CMakeFiles/cpp.dir/flags.make
+CMakeFiles/cpp.dir/knarch/src/main/cpp/NativeHelper.m.o: ../knarch/src/main/cpp/NativeHelper.m
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/kgalligan/temp4/knarch/cpp/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_8) "Building C object CMakeFiles/cpp.dir/knarch/src/main/cpp/NativeHelper.m.o"
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/cpp.dir/knarch/src/main/cpp/NativeHelper.m.o   -c /Users/kgalligan/temp4/knarch/cpp/knarch/src/main/cpp/NativeHelper.m
+
+CMakeFiles/cpp.dir/knarch/src/main/cpp/NativeHelper.m.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/cpp.dir/knarch/src/main/cpp/NativeHelper.m.i"
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /Users/kgalligan/temp4/knarch/cpp/knarch/src/main/cpp/NativeHelper.m > CMakeFiles/cpp.dir/knarch/src/main/cpp/NativeHelper.m.i
+
+CMakeFiles/cpp.dir/knarch/src/main/cpp/NativeHelper.m.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/cpp.dir/knarch/src/main/cpp/NativeHelper.m.s"
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /Users/kgalligan/temp4/knarch/cpp/knarch/src/main/cpp/NativeHelper.m -o CMakeFiles/cpp.dir/knarch/src/main/cpp/NativeHelper.m.s
+
 CMakeFiles/cpp.dir/knarch/src/main/cpp/TLAssert.cpp.o: CMakeFiles/cpp.dir/flags.make
 CMakeFiles/cpp.dir/knarch/src/main/cpp/TLAssert.cpp.o: ../knarch/src/main/cpp/TLAssert.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/kgalligan/temp4/knarch/cpp/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_8) "Building CXX object CMakeFiles/cpp.dir/knarch/src/main/cpp/TLAssert.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/kgalligan/temp4/knarch/cpp/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_9) "Building CXX object CMakeFiles/cpp.dir/knarch/src/main/cpp/TLAssert.cpp.o"
 	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/cpp.dir/knarch/src/main/cpp/TLAssert.cpp.o -c /Users/kgalligan/temp4/knarch/cpp/knarch/src/main/cpp/TLAssert.cpp
 
 CMakeFiles/cpp.dir/knarch/src/main/cpp/TLAssert.cpp.i: cmake_force
@@ -163,7 +176,7 @@ CMakeFiles/cpp.dir/knarch/src/main/cpp/TLAssert.cpp.s: cmake_force
 
 CMakeFiles/cpp.dir/knarch/src/main/cpp/Atomic.cpp.o: CMakeFiles/cpp.dir/flags.make
 CMakeFiles/cpp.dir/knarch/src/main/cpp/Atomic.cpp.o: ../knarch/src/main/cpp/Atomic.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/kgalligan/temp4/knarch/cpp/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_9) "Building CXX object CMakeFiles/cpp.dir/knarch/src/main/cpp/Atomic.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/kgalligan/temp4/knarch/cpp/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_10) "Building CXX object CMakeFiles/cpp.dir/knarch/src/main/cpp/Atomic.cpp.o"
 	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/cpp.dir/knarch/src/main/cpp/Atomic.cpp.o -c /Users/kgalligan/temp4/knarch/cpp/knarch/src/main/cpp/Atomic.cpp
 
 CMakeFiles/cpp.dir/knarch/src/main/cpp/Atomic.cpp.i: cmake_force
@@ -183,6 +196,7 @@ cpp_OBJECTS = \
 "CMakeFiles/cpp.dir/knarch/src/main/cpp/AndroidfwCursorWindow.cpp.o" \
 "CMakeFiles/cpp.dir/knarch/src/main/cpp/AtomicData.cpp.o" \
 "CMakeFiles/cpp.dir/knarch/src/main/cpp/KonanHelper.cpp.o" \
+"CMakeFiles/cpp.dir/knarch/src/main/cpp/NativeHelper.m.o" \
 "CMakeFiles/cpp.dir/knarch/src/main/cpp/TLAssert.cpp.o" \
 "CMakeFiles/cpp.dir/knarch/src/main/cpp/Atomic.cpp.o"
 
@@ -196,11 +210,12 @@ cpp: CMakeFiles/cpp.dir/knarch/src/main/cpp/android_database_SQLiteGlobal.cpp.o
 cpp: CMakeFiles/cpp.dir/knarch/src/main/cpp/AndroidfwCursorWindow.cpp.o
 cpp: CMakeFiles/cpp.dir/knarch/src/main/cpp/AtomicData.cpp.o
 cpp: CMakeFiles/cpp.dir/knarch/src/main/cpp/KonanHelper.cpp.o
+cpp: CMakeFiles/cpp.dir/knarch/src/main/cpp/NativeHelper.m.o
 cpp: CMakeFiles/cpp.dir/knarch/src/main/cpp/TLAssert.cpp.o
 cpp: CMakeFiles/cpp.dir/knarch/src/main/cpp/Atomic.cpp.o
 cpp: CMakeFiles/cpp.dir/build.make
 cpp: CMakeFiles/cpp.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/Users/kgalligan/temp4/knarch/cpp/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_10) "Linking CXX executable cpp"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/Users/kgalligan/temp4/knarch/cpp/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_11) "Linking CXX executable cpp"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/cpp.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.

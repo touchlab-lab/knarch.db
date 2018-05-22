@@ -30,6 +30,7 @@ konanArtifacts {
             }
         }
 
+        extraOpts "-tr"
         linkerOpts "-lsqlite3"
         enableMultiplatform true
     }

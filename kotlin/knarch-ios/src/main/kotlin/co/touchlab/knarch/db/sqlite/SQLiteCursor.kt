@@ -5,7 +5,7 @@ import co.touchlab.knarch.db.AbstractWindowedCursor
 import co.touchlab.knarch.db.CursorWindow
 import co.touchlab.knarch.db.DatabaseUtils
 
-class SQLiteCursor/**
+open class SQLiteCursor/**
  * Execute a query and provide access to its result set through a Cursor
  * interface. For a query such as: {@code SELECT name, birth, phone FROM
  * myTable WHERE ... LIMIT 1,20 ORDER BY...} the column names (name, birth,

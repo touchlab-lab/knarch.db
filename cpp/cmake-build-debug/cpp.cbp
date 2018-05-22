@@ -107,6 +107,12 @@
 		<Unit filename="/Users/kgalligan/temp4/knarch/cpp/knarch/src/main/cpp/KonanHelper.h">
 			<Option target="cpp"/>
 		</Unit>
+		<Unit filename="/Users/kgalligan/temp4/knarch/cpp/knarch/src/main/cpp/NativeHelper.h">
+			<Option target="cpp"/>
+		</Unit>
+		<Unit filename="/Users/kgalligan/temp4/knarch/cpp/knarch/src/main/cpp/NativeHelper.m">
+			<Option target="cpp"/>
+		</Unit>
 		<Unit filename="/Users/kgalligan/temp4/knarch/cpp/knarch/src/main/cpp/TLAssert.cpp">
 			<Option target="cpp"/>
 		</Unit>

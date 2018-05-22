@@ -2,8 +2,9 @@ package co.touchlab.knarch.db.sqlite
 
 import co.touchlab.knarch.Log
 import co.touchlab.knarch.db.*
+import co.touchlab.knarch.io.*
 import co.touchlab.knarch.other.Printer
-
+import platform.Foundation.*
 
 class SQLiteDatabase private constructor(path: String, openFlags: Int, cursorFactory: CursorFactory?, errorHandler: DatabaseErrorHandler?) : SQLiteClosable() {
 
@@ -186,7 +187,37 @@ class SQLiteDatabase private constructor(path: String, openFlags: Int, cursorFac
          * @param file The database file path.
          * @return True if the database was successfully deleted.
          */
-        //TODO: Implement or just use what's already in shared kotlin
+        fun deleteDatabase(file:File):Boolean {
+            if (file == null)
+            {
+                throw IllegalArgumentException("file must not be null")
+            }
+            var deleted = false
+            deleted = deleted or file.delete()
+            deleted = deleted or File(file.getPath() + "-journal").delete()
+            deleted = deleted or File(file.getPath() + "-shm").delete()
+            deleted = deleted or File(file.getPath() + "-wal").delete()
+
+            //TODO: Implement file list
+            val dir = file.getParentFile()
+            if (dir != null)
+            {
+                val prefix = file.getName() + "-mj"
+                val files = dir.listFiles(object:FileFilter {
+                    override fun accept(candidate:File):Boolean {
+                        return candidate.getName().startsWith(prefix)
+                    }
+                })
+                if (files != null)
+                {
+                    for (masterJournal in files)
+                    {
+                        deleted = deleted or masterJournal.delete()
+                    }
+                }
+            }
+            return deleted
+        }
         /*public static boolean deleteDatabase(File file) {
             if (file == null) {
                 throw new IllegalArgumentException("file must not be null");
@@ -275,6 +306,11 @@ class SQLiteDatabase private constructor(path: String, openFlags: Int, cursorFac
 
     override fun onAllReferencesReleased() {
 //        dispose(false);
+    }
+
+    //TODO: This needs to get sorted if we don't implement full class stack. This isn't working right, even if tests pass.
+    override fun close(){
+        dispose(false)
     }
 
     private fun dispose(finalized:Boolean) {
@@ -778,9 +814,9 @@ class SQLiteDatabase private constructor(path: String, openFlags: Int, cursorFac
      * {@link Cursor}s are not synchronized, see the documentation for more details.
      * @see Cursor
      */
-    fun query(table:String, columns:Array<String>, selection:String,
-              selectionArgs:Array<String>, groupBy:String, having:String,
-              orderBy:String):Cursor {
+    fun query(table:String, columns:Array<String>?, selection:String?,
+              selectionArgs:Array<String>?, groupBy:String?, having:String?,
+              orderBy:String?):Cursor {
 
         return query(false, table, columns, selection, selectionArgs, groupBy,
                 having, orderBy, null /* limit */);
@@ -816,9 +852,9 @@ class SQLiteDatabase private constructor(path: String, openFlags: Int, cursorFac
      * {@link Cursor}s are not synchronized, see the documentation for more details.
      * @see Cursor
      */
-    fun query(table:String, columns:Array<String>, selection:String,
-              selectionArgs:Array<String>, groupBy:String, having:String,
-              orderBy:String,limit:String) :Cursor {
+    fun query(table:String, columns:Array<String>?, selection:String?,
+              selectionArgs:Array<String>?, groupBy:String?, having:String?,
+              orderBy:String?,limit:String?) :Cursor {
 
         return query(false, table, columns, selection, selectionArgs, groupBy,
                 having, orderBy, limit);
@@ -834,7 +870,7 @@ class SQLiteDatabase private constructor(path: String, openFlags: Int, cursorFac
      * @return A {@link Cursor} object, which is positioned before the first entry. Note that
      * {@link Cursor}s are not synchronized, see the documentation for more details.
      */
-    fun rawQuery(sql:String, selectionArgs:Array<String>):Cursor {
+    fun rawQuery(sql:String, selectionArgs:Array<String>?):Cursor {
         return rawQueryWithFactory(null, sql, selectionArgs, null);
     }
 
@@ -879,7 +915,7 @@ class SQLiteDatabase private constructor(path: String, openFlags: Int, cursorFac
      *            column values
      * @return the row ID of the newly inserted row, or -1 if an error occurred
      */
-    fun insert(table:String, nullColumnHack:String?, values:ContentValues):Long {
+    fun insert(table:String, nullColumnHack:String?, values:ContentValues?):Long {
         try {
             return insertWithOnConflict(table, nullColumnHack, values, CONFLICT_NONE);
         } catch (e:SQLException) {
@@ -905,7 +941,7 @@ class SQLiteDatabase private constructor(path: String, openFlags: Int, cursorFac
      * @throws SQLException
      * @return the row ID of the newly inserted row, or -1 if an error occurred
      */
-    fun insertOrThrow(table:String, nullColumnHack:String?, values:ContentValues):Long {
+    fun insertOrThrow(table:String, nullColumnHack:String?, values:ContentValues?):Long {
         return insertWithOnConflict(table, nullColumnHack, values, CONFLICT_NONE);
     }
 
@@ -977,7 +1013,7 @@ class SQLiteDatabase private constructor(path: String, openFlags: Int, cursorFac
      * OR -1 if any error
      */
     fun insertWithOnConflict(table:String, nullColumnHack:String?,
-                             initialValues:ContentValues, conflictAlgorithm:Int):Long {
+                             initialValues:ContentValues?, conflictAlgorithm:Int):Long {
         acquireReference()
         try
         {
@@ -987,7 +1023,7 @@ class SQLiteDatabase private constructor(path: String, openFlags: Int, cursorFac
             sql.append(" INTO ")
             sql.append(table)
             sql.append('(')
-            val size = initialValues.size()
+            val size = initialValues?.size() ?: 0
 
             val bindArgs = arrayOfNulls<Any>(size)
 
@@ -995,11 +1031,11 @@ class SQLiteDatabase private constructor(path: String, openFlags: Int, cursorFac
             {
 
                 var i = 0
-                for (colName in initialValues.keySet())
+                for (colName in initialValues!!.keySet())
                 {
                     sql.append(if ((i > 0)) "," else "")
                     sql.append(colName)
-                    bindArgs[i++] = initialValues.get(colName)
+                    bindArgs[i++] = initialValues!!.get(colName)
                 }
                 sql.append(')')
                 sql.append(" VALUES (")
@@ -1044,7 +1080,7 @@ class SQLiteDatabase private constructor(path: String, openFlags: Int, cursorFac
      * otherwise. To remove all rows and get a count pass "1" as the
      * whereClause.
      */
-    fun delete(table:String, whereClause:String, whereArgs:Array<String>?):Int {
+    fun delete(table:String, whereClause:String?, whereArgs:Array<String>?):Int {
         acquireReference()
         try
         {
@@ -1053,7 +1089,7 @@ class SQLiteDatabase private constructor(path: String, openFlags: Int, cursorFac
                 whereArgs[i++]})}
 
             val statement = SQLiteStatement(this, ("DELETE FROM " + table +
-                    (if (!whereClause.isEmpty()) " WHERE $whereClause" else "")), anyArgs)
+                    (if (!whereClause.isNullOrEmpty()) " WHERE $whereClause" else "")), anyArgs)
             try
             {
                 return statement.executeUpdateDelete()
@@ -1081,7 +1117,7 @@ class SQLiteDatabase private constructor(path: String, openFlags: Int, cursorFac
      * will be bound as Strings.
      * @return the number of rows affected
      */
-    fun update(table:String, values:ContentValues, whereClause:String, whereArgs:Array<String>):Int {
+    fun update(table:String, values:ContentValues, whereClause:String?, whereArgs:Array<String>?):Int {
         return updateWithOnConflict(table, values, whereClause, whereArgs, CONFLICT_NONE)
     }
     /**
@@ -1321,7 +1357,7 @@ class SQLiteDatabase private constructor(path: String, openFlags: Int, cursorFac
             throwIfNotOpenLocked()
             val oldMaxSqlCacheSize = mConfigurationLocked.maxSqlCacheSize
             mConfigurationLocked.maxSqlCacheSize = cacheSize
-        sqliteSession!!.mConnection.reconfigure(mConfigurationLocked)
+        getThreadSession().mConnection.reconfigure(mConfigurationLocked)
 //        TODO()
         /*    try
             {
@@ -1370,7 +1406,7 @@ class SQLiteDatabase private constructor(path: String, openFlags: Int, cursorFac
                 return
             }
             mConfigurationLocked.foreignKeyConstraintsEnabled = enable
-        sqliteSession!!.mConnection.reconfigure(mConfigurationLocked)
+        getThreadSession().mConnection.reconfigure(mConfigurationLocked)
 //        TODO()
             /*try
             {

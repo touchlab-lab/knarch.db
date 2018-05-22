@@ -415,11 +415,14 @@ class SQLiteConnection private constructor(/*pool:SQLiteConnectionPool,*/
                 bindArguments(statement, bindArgs)
                     changedRows = nativeExecuteForChangedRowCount(
                             mConnectionPtr, statement.mStatementPtr)
+
+                println("SUPERTRACE: changedRows $changedRows")
                     return changedRows
             }
             finally
             {
                 releasePreparedStatement(statement)
+                println("SUPERTRACE: statement released")
             }
         }
         catch (ex:RuntimeException) {
@@ -594,6 +597,7 @@ class SQLiteConnection private constructor(/*pool:SQLiteConnectionPool,*/
             try
             {
                 nativeResetStatementAndClearBindings(mConnectionPtr, statement.mStatementPtr)
+                println("SUPERTRACE: nativeResetStatementAndClearBindings success")
             }
             catch (ex:SQLiteException) {
                 // The statement could not be reset due to an error. Remove it from the cache.
@@ -1150,7 +1154,7 @@ class SQLiteConnection private constructor(/*pool:SQLiteConnectionPool,*/
     }
     companion object {
         private val TAG = "SQLiteConnection"
-        private val DEBUG = false
+        private val DEBUG = true
         private val EMPTY_STRING_ARRAY = arrayOf<String>()
         private val EMPTY_BYTE_ARRAY = ByteArray(0)
 //        private val TRIM_SQL_PATTERN = Pattern.compile("[\\s]*\\n+[\\s]*")

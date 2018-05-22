@@ -6,6 +6,7 @@ file(REMOVE_RECURSE
   "CMakeFiles/cpp.dir/knarch/src/main/cpp/AndroidfwCursorWindow.cpp.o"
   "CMakeFiles/cpp.dir/knarch/src/main/cpp/AtomicData.cpp.o"
   "CMakeFiles/cpp.dir/knarch/src/main/cpp/KonanHelper.cpp.o"
+  "CMakeFiles/cpp.dir/knarch/src/main/cpp/NativeHelper.m.o"
   "CMakeFiles/cpp.dir/knarch/src/main/cpp/TLAssert.cpp.o"
   "CMakeFiles/cpp.dir/knarch/src/main/cpp/Atomic.cpp.o"
   "cpp.pdb"
@@ -13,6 +14,6 @@ file(REMOVE_RECURSE
 )
 
 # Per-language clean rules from dependency scanning.
-foreach(lang CXX)
+foreach(lang C CXX)
   include(CMakeFiles/cpp.dir/cmake_clean_${lang}.cmake OPTIONAL)
 endforeach()

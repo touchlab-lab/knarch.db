@@ -161,7 +161,7 @@ constructor(val mContext:SystemContext, val databaseName:String?,
                 {
                     if (DEBUG_STRICT_READONLY && !writable)
                     {
-                        val path = mContext.getDatabasePath(databaseName)
+                        val path = mContext.getDatabasePath(databaseName).path
                         db = SQLiteDatabase.openDatabase(path, mFactory,
                                 SQLiteDatabase.OPEN_READONLY, mErrorHandler)
                     }
@@ -181,7 +181,7 @@ constructor(val mContext:SystemContext, val databaseName:String?,
                     }
                     Log.e(TAG, ("Couldn't open " + databaseName
                             + " for writing (will try read-only):"), ex)
-                    val path = mContext.getDatabasePath(databaseName)
+                    val path = mContext.getDatabasePath(databaseName).path
                     db = SQLiteDatabase.openDatabase(path, mFactory,
                             SQLiteDatabase.OPEN_READONLY, mErrorHandler)
                 }

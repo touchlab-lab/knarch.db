@@ -231,6 +231,33 @@ knarch/src/main/cpp/KonanHelper.cpp.s:
 	$(MAKE) -f CMakeFiles/cpp.dir/build.make CMakeFiles/cpp.dir/knarch/src/main/cpp/KonanHelper.cpp.s
 .PHONY : knarch/src/main/cpp/KonanHelper.cpp.s
 
+knarch/src/main/cpp/NativeHelper.o: knarch/src/main/cpp/NativeHelper.m.o
+
+.PHONY : knarch/src/main/cpp/NativeHelper.o
+
+# target to build an object file
+knarch/src/main/cpp/NativeHelper.m.o:
+	$(MAKE) -f CMakeFiles/cpp.dir/build.make CMakeFiles/cpp.dir/knarch/src/main/cpp/NativeHelper.m.o
+.PHONY : knarch/src/main/cpp/NativeHelper.m.o
+
+knarch/src/main/cpp/NativeHelper.i: knarch/src/main/cpp/NativeHelper.m.i
+
+.PHONY : knarch/src/main/cpp/NativeHelper.i
+
+# target to preprocess a source file
+knarch/src/main/cpp/NativeHelper.m.i:
+	$(MAKE) -f CMakeFiles/cpp.dir/build.make CMakeFiles/cpp.dir/knarch/src/main/cpp/NativeHelper.m.i
+.PHONY : knarch/src/main/cpp/NativeHelper.m.i
+
+knarch/src/main/cpp/NativeHelper.s: knarch/src/main/cpp/NativeHelper.m.s
+
+.PHONY : knarch/src/main/cpp/NativeHelper.s
+
+# target to generate assembly for a file
+knarch/src/main/cpp/NativeHelper.m.s:
+	$(MAKE) -f CMakeFiles/cpp.dir/build.make CMakeFiles/cpp.dir/knarch/src/main/cpp/NativeHelper.m.s
+.PHONY : knarch/src/main/cpp/NativeHelper.m.s
+
 knarch/src/main/cpp/TLAssert.o: knarch/src/main/cpp/TLAssert.cpp.o
 
 .PHONY : knarch/src/main/cpp/TLAssert.o
@@ -387,6 +414,9 @@ help:
 	@echo "... knarch/src/main/cpp/KonanHelper.o"
 	@echo "... knarch/src/main/cpp/KonanHelper.i"
 	@echo "... knarch/src/main/cpp/KonanHelper.s"
+	@echo "... knarch/src/main/cpp/NativeHelper.o"
+	@echo "... knarch/src/main/cpp/NativeHelper.i"
+	@echo "... knarch/src/main/cpp/NativeHelper.s"
 	@echo "... knarch/src/main/cpp/TLAssert.o"
 	@echo "... knarch/src/main/cpp/TLAssert.i"
 	@echo "... knarch/src/main/cpp/TLAssert.s"

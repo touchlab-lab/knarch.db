@@ -1,8 +1,19 @@
 # The set of languages for which implicit dependencies are needed:
 set(CMAKE_DEPENDS_LANGUAGES
+  "C"
   "CXX"
   )
 # The set of files for implicit dependencies of each language:
+set(CMAKE_DEPENDS_CHECK_C
+  "/Users/kgalligan/temp4/knarch/cpp/knarch/src/main/cpp/NativeHelper.m" "/Users/kgalligan/temp4/knarch/cpp/cmake-build-debug/CMakeFiles/cpp.dir/knarch/src/main/cpp/NativeHelper.m.o"
+  )
+set(CMAKE_C_COMPILER_ID "AppleClang")
+
+# The include file search paths:
+set(CMAKE_C_TARGET_INCLUDE_PATH
+  "/Users/kgalligan/temp3/kotlin-native/runtime/src/main/cpp"
+  "../knarch/src/main/cpp"
+  )
 set(CMAKE_DEPENDS_CHECK_CXX
   "/Users/kgalligan/temp4/knarch/cpp/knarch/src/main/cpp/AndroidfwCursorWindow.cpp" "/Users/kgalligan/temp4/knarch/cpp/cmake-build-debug/CMakeFiles/cpp.dir/knarch/src/main/cpp/AndroidfwCursorWindow.cpp.o"
   "/Users/kgalligan/temp4/knarch/cpp/knarch/src/main/cpp/Atomic.cpp" "/Users/kgalligan/temp4/knarch/cpp/cmake-build-debug/CMakeFiles/cpp.dir/knarch/src/main/cpp/Atomic.cpp.o"

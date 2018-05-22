@@ -85,8 +85,13 @@ struct SQLiteConnection {
 
     volatile bool canceled;
 
+    //TODO: WTF is KStdString?
     SQLiteConnection(sqlite3* db, int openFlags, const KStdString& path, const KStdString& label) :
         db(db), openFlags(openFlags), path(path), label(label), canceled(false) { }
+
+        ~SQLiteConnection(){
+
+    }
 };
 
 // Called each time a statement begins execution, when tracing is enabled.
@@ -228,7 +233,10 @@ static KLong nativePrepareStatement(KLong connectionPtr, KString sqlString) {
 
         size_t utf8size;
         str.append(", while compiling: ");
-        str.append(const_cast<const char *>(CreateCStringFromStringWithSize(sqlString, &utf8size)));
+
+        char* hardString = CreateCStringFromStringWithSize(sqlString, &utf8size);
+        str.append(const_cast<const char *>(hardString));
+        DisposeCStringHelper(hardString);
 
         throw_sqlite3_exception(connection->db, str.c_str());
         return 0;

@@ -19,6 +19,8 @@ add_executable(cpp
         knarch/src/main/cpp/AtomicData.h
         knarch/src/main/cpp/KonanHelper.cpp
         knarch/src/main/cpp/KonanHelper.h
+        knarch/src/main/cpp/NativeHelper.m
+        knarch/src/main/cpp/NativeHelper.h
         knarch/src/main/cpp/TLAssert.cpp
         knarch/src/main/cpp/TLAssert.h
         knarch/src/main/cpp/UtilsErrors.h knarch/src/main/cpp/Atomic.cpp)

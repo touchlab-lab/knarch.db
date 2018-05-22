@@ -248,7 +248,7 @@ extern "C" OBJ_GETTER(Android_Database_CursorWindow_nativeGetString, KRef thiz, 
 
     //TODO: FIGURE OUT UTF8
 //        RETURN_RESULT_OF(CreateStringFromUtf8(value, (uint32_t)(sizeIncludingNull - 1)));
-        RETURN_RESULT_OF(CreateStringFromUtf8, value, sizeIncludingNull);
+        RETURN_RESULT_OF(CreateStringFromUtf8, value, sizeIncludingNull-1);
 //        RETURN_RESULT_OF(CreateStringFromCString, value);
         //TODO: make sure we should be dropping 1
         //TODO: Tricky string magic

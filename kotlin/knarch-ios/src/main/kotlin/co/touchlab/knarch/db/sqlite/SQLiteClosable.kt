@@ -50,7 +50,7 @@ abstract class SQLiteClosable{
      * @see .releaseReference
      * @see .onAllReferencesReleased
      */
-    fun close() {
+    open fun close() {
         releaseReference()
     }
 }

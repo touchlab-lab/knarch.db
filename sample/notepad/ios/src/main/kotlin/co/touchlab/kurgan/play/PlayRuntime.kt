@@ -7,6 +7,12 @@ import konan.worker.*
 import co.touchlab.knarch.*
 import co.touchlab.knarch.db.sqlite.*
 import co.touchlab.knarch.db.*
+import konan.test.*
+import kotlin.test.*
+
+@Test fun runTest() {
+    assertTrue(true)
+}
 
 class PlayRuntime(){
 
@@ -26,6 +32,14 @@ class PlayRuntime(){
         val th = ThreadsHello()
         th.callBack()
     }
+
+    fun testTest()
+    {
+        TestRunner.run(arrayOf("--ktest_filter=*testDelete*"))
+//        TestRunner.run()
+    }
+
+
 
     fun testDb()
     {

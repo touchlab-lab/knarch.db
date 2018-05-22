@@ -8,7 +8,7 @@ class DatabaseUtils {
 
 
         private val TAG = "DatabaseUtils"
-        private val DEBUG = false
+        private val DEBUG = true
         /** One of the values returned by {@link #getSqlStatementType(String)}. */
         val STATEMENT_SELECT = 1
         /** One of the values returned by {@link #getSqlStatementType(String)}. */
