@@ -871,14 +871,16 @@ class SQLiteConnection private constructor(/*pool:SQLiteConnectionPool,*/
     }
 
     private inner class PreparedStatementCache(size:Int):LruCache<String, PreparedStatement>(size) {
-        protected fun entryRemoved(evicted:Boolean, key:String,
-                                   oldValue:PreparedStatement, newValue:PreparedStatement) {
-            oldValue.mInCache = false
-            if (!oldValue.mInUse)
-            {
-                finalizePreparedStatement(oldValue)
+        override fun entryRemoved(evicted:Boolean, key:String,
+                                   oldValue:PreparedStatement?, newValue:PreparedStatement?) {
+            if(oldValue != null) {
+                oldValue.mInCache = false
+                if (!oldValue.mInUse) {
+                    finalizePreparedStatement(oldValue)
+                }
             }
         }
+
         fun dump(printer:Printer) {
             printer.println(" Prepared statement cache:")
             val cache = snapshot()

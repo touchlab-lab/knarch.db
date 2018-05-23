@@ -36,6 +36,12 @@ class SQLiteDatabaseTest {
         mTransactionListenerOnRollbackCalled = false
     }
 
+    fun checkMain()
+    {
+        if(!NSThread.isMainThread())
+            throw RuntimeException("Not in main")
+    }
+
     @AfterEach
     protected fun tearDown() {
         closeAndDeleteDatabase()
@@ -242,6 +248,7 @@ class SQLiteDatabaseTest {
         assertEquals(curMaximumSize + mDatabase!!.getPageSize(), mDatabase!!.getMaximumSize())
         assertTrue(mDatabase!!.getMaximumSize() > curMaximumSize)
     }
+
     @Test
     fun testAccessPageSize() {
         val databaseFile = File(mDatabaseDir, "database.db")
@@ -304,28 +311,16 @@ class SQLiteDatabaseTest {
         deleteStatement.close()
         cursor.close()
     }
+
     @Test
     fun testDelete() {
-        mDatabase!!.execSQL(("CREATE TABLE test (_id INTEGER PRIMARY KEY, " + "name TEXT, age INTEGER, address TEXT);"))
-//        mDatabase!!.execSQL("INSERT INTO test (name, age, address) VALUES ('Mike', 20, 'LA');")
 
-        val sql = "INSERT INTO test (name, age, address) VALUES (?, ?, ?);"
-        val insertStatement = mDatabase!!.compileStatement(sql)
-        DatabaseUtils.bindObjectToProgram(insertStatement, 1, "asdf")
-        DatabaseUtils.bindObjectToProgram(insertStatement, 2, 22)
-        DatabaseUtils.bindObjectToProgram(insertStatement, 3, "1234")
+        mDatabase!!.execSQL("CREATE TABLE test (_id INTEGER PRIMARY KEY, " + "name TEXT, age INTEGER, address TEXT);")
+        mDatabase!!.execSQL("INSERT INTO test (name, age, address) VALUES ('Mike', 20, 'LA');")
+        mDatabase!!.execSQL("INSERT INTO test (name, age, address) VALUES ('Jack', 30, 'London');")
+        mDatabase!!.execSQL("INSERT INTO test (name, age, address) VALUES ('Jim', 35, 'Chicago');")
 
-        mDatabase!!.beginTransaction()
-
-        insertStatement.execute()
-        insertStatement.close()
-
-        mDatabase!!.setTransactionSuccessful()
-        mDatabase!!.endTransaction()
-
-//        mDatabase!!.execSQL("INSERT INTO test (name, age, address) VALUES ('Jack', 30, 'London');")
-//        mDatabase!!.execSQL("INSERT INTO test (name, age, address) VALUES ('Jim', 35, 'Chicago');")
-        /*// delete one record.
+        // delete one record.
         var count = mDatabase!!.delete(TABLE_NAME, "name = 'Mike'", null)
         assertEquals(1, count)
         var cursor = mDatabase!!.query(TABLE_NAME, TEST_PROJECTION, null, null, null, null, null)
@@ -361,8 +356,9 @@ class SQLiteDatabaseTest {
         cursor = mDatabase!!.query(TABLE_NAME, TEST_PROJECTION, null, null, null, null, null)
         assertNotNull(cursor)
         assertEquals(0, cursor.getCount())
-        cursor.close()*/
+        cursor.close()
     }
+
     @Test
     fun testExecSQL() {
         mDatabase!!.execSQL(("CREATE TABLE test (_id INTEGER PRIMARY KEY, " + "name TEXT, age INTEGER, address TEXT);"))
@@ -452,7 +448,6 @@ class SQLiteDatabaseTest {
     private inner class MockSQLiteCursor(db:SQLiteDatabase, driver:SQLiteCursorDriver,
                                          editTable:String, query:SQLiteQuery):SQLiteCursor(db, driver, editTable, query)
 
-
     @Test
     fun testFindEditTable() {
         var tables = "table1 table2 table3"
@@ -468,10 +463,12 @@ class SQLiteDatabaseTest {
         }
         catch (e:IllegalStateException) {}
     }
+
     @Test
     fun testGetPath() {
         assertEquals(mDatabaseFilePath, mDatabase!!.getPath())
     }
+
     @Test
     fun testAccessVersion() {
         mDatabase!!.setVersion(1)
@@ -479,6 +476,7 @@ class SQLiteDatabaseTest {
         mDatabase!!.setVersion(3)
         assertEquals(3, mDatabase!!.getVersion())
     }
+
     @Test
     fun testInsert() {
         mDatabase!!.execSQL(("CREATE TABLE test (_id INTEGER PRIMARY KEY, " + "name TEXT, age INTEGER, address TEXT);"))
@@ -549,12 +547,14 @@ class SQLiteDatabaseTest {
         }
         catch (e:SQLException) {}
     }
+
     @Test
     fun testIsOpen() {
         assertTrue(mDatabase!!.isOpen())
         mDatabase!!.close()
         assertFalse(mDatabase!!.isOpen())
     }
+
     @Test
     fun testIsReadOnly() {
         assertFalse(mDatabase!!.isReadOnly())
@@ -573,6 +573,7 @@ class SQLiteDatabaseTest {
             }
         }
     }
+
     @Test
     fun testReleaseMemory() {
         SQLiteDatabase.releaseMemory()
@@ -652,7 +653,8 @@ class SQLiteDatabaseTest {
         assertNum(3)
         t.join()
     }*/
-//    @Test
+
+    @Test
     fun testQuery() {
         mDatabase!!.execSQL(("CREATE TABLE employee (_id INTEGER PRIMARY KEY, " + "name TEXT, month INTEGER, salary INTEGER);"))
         mDatabase!!.execSQL(("INSERT INTO employee (name, month, salary) " + "VALUES ('Mike', '1', '1000');"))
@@ -661,7 +663,7 @@ class SQLiteDatabaseTest {
         mDatabase!!.execSQL(("INSERT INTO employee (name, month, salary) " + "VALUES ('jack', '3', '1500');"))
         mDatabase!!.execSQL(("INSERT INTO employee (name, month, salary) " + "VALUES ('Jim', '1', '1000');"))
         mDatabase!!.execSQL(("INSERT INTO employee (name, month, salary) " + "VALUES ('Jim', '3', '3500');"))
-        var cursor = mDatabase!!.query(true, "employee", arrayOf<String>("name", "sum(salary)"), null, null, "name", "sum(salary)>1000", "name", null)
+        /*var cursor = mDatabase!!.query(true, "employee", arrayOf<String>("name", "sum(salary)"), null, null, "name", "sum(salary)>1000", "name", null)
         assertNotNull(cursor)
         assertEquals(3, cursor.getCount())
         var COLUMN_NAME_INDEX = 0
@@ -675,7 +677,7 @@ class SQLiteDatabaseTest {
         cursor.moveToNext()
         assertEquals("jack", cursor.getString(COLUMN_NAME_INDEX))
         assertEquals(3500, cursor.getInt(COLUMN_SALARY_INDEX))
-        cursor.close()
+        cursor.close()*/
         val factory = object : SQLiteDatabase.CursorFactory{
             override fun newCursor(db:SQLiteDatabase,
                                    driver:SQLiteCursorDriver, editTable:String,
@@ -684,18 +686,12 @@ class SQLiteDatabaseTest {
             }
         }
 
-        /*var factory = object:CursorFactory() {
-            fun newCursor(db:SQLiteDatabase, masterQuery:SQLiteCursorDriver,
-                          editTable:String, query:SQLiteQuery):Cursor {
-                return MockSQLiteCursor(db, masterQuery, editTable, query)
-            }
-        }*/
-        cursor = mDatabase!!.queryWithFactory(factory, true, "employee",
+        var cursor = mDatabase!!.queryWithFactory(factory, true, "employee",
                 arrayOf<String>("name", "sum(salary)"), null, null, "name", "sum(salary) > 1000", "name", null)
         assertNotNull(cursor)
         assertTrue(cursor is MockSQLiteCursor)
         cursor.moveToFirst()
-        assertEquals("Jim", cursor.getString(COLUMN_NAME_INDEX))
+        /*assertEquals("Jim", cursor.getString(COLUMN_NAME_INDEX))
         assertEquals(4500, cursor.getInt(COLUMN_SALARY_INDEX))
         cursor.moveToNext()
         assertEquals("Mike", cursor.getString(COLUMN_NAME_INDEX))
@@ -745,9 +741,10 @@ class SQLiteDatabaseTest {
         assertEquals(2, cursor.getInt(COLUMN_MONTH_INDEX))
         cursor.moveToNext()
         assertEquals("Jim", cursor.getString(COLUMN_NAME_INDEX))
-        assertEquals(3, cursor.getInt(COLUMN_MONTH_INDEX))
+        assertEquals(3, cursor.getInt(COLUMN_MONTH_INDEX))*/
         cursor.close()
     }
+
     @Test
     fun testReplace() {
         mDatabase!!.execSQL(("CREATE TABLE test (_id INTEGER PRIMARY KEY, " + "name TEXT, age INTEGER, address TEXT);"))
@@ -805,6 +802,7 @@ class SQLiteDatabaseTest {
         }
         catch (e:SQLException) {}
     }
+
     @Test
     fun testUpdate() {
         mDatabase!!.execSQL("CREATE TABLE test (_id INTEGER PRIMARY KEY, data TEXT);")
@@ -829,6 +827,76 @@ class SQLiteDatabaseTest {
         assertTrue(mDatabase!!.needUpgrade(1))
         mDatabase!!.setVersion(1)
         assertFalse(mDatabase!!.needUpgrade(1))
+    }
+
+    @Test
+    fun testOnAllReferencesReleased() {
+        assertTrue(mDatabase!!.isOpen())
+        mDatabase!!.releaseReference()
+        assertFalse(mDatabase!!.isOpen())
+    }
+
+    @Test
+    fun testTransactionWithSQLiteTransactionListener() {
+        mDatabase!!.execSQL("CREATE TABLE test (num INTEGER);")
+        mDatabase!!.execSQL("INSERT INTO test (num) VALUES (0)")
+        assertEquals(mTransactionListenerOnBeginCalled, false)
+        assertEquals(mTransactionListenerOnCommitCalled, false)
+        assertEquals(mTransactionListenerOnRollbackCalled, false)
+        mDatabase!!.beginTransactionWithListener(TestSQLiteTransactionListener())
+        // Assert that the transcation has started
+        assertEquals(mTransactionListenerOnBeginCalled, true)
+        assertEquals(mTransactionListenerOnCommitCalled, false)
+        assertEquals(mTransactionListenerOnRollbackCalled, false)
+        setNum(1)
+        // State shouldn't have changed
+        assertEquals(mTransactionListenerOnBeginCalled, true)
+        assertEquals(mTransactionListenerOnCommitCalled, false)
+        assertEquals(mTransactionListenerOnRollbackCalled, false)
+        // commit the transaction
+        mDatabase!!.setTransactionSuccessful()
+        mDatabase!!.endTransaction()
+        // the listener should have been told that commit was called
+        assertEquals(mTransactionListenerOnBeginCalled, true)
+        assertEquals(mTransactionListenerOnCommitCalled, true)
+        assertEquals(mTransactionListenerOnRollbackCalled, false)
+    }
+
+    @Test
+    fun testRollbackTransactionWithSQLiteTransactionListener() {
+        mDatabase!!.execSQL("CREATE TABLE test (num INTEGER);")
+        mDatabase!!.execSQL("INSERT INTO test (num) VALUES (0)")
+        assertEquals(mTransactionListenerOnBeginCalled, false)
+        assertEquals(mTransactionListenerOnCommitCalled, false)
+        assertEquals(mTransactionListenerOnRollbackCalled, false)
+        mDatabase!!.beginTransactionWithListener(TestSQLiteTransactionListener())
+        // Assert that the transcation has started
+        assertEquals(mTransactionListenerOnBeginCalled, true)
+        assertEquals(mTransactionListenerOnCommitCalled, false)
+        assertEquals(mTransactionListenerOnRollbackCalled, false)
+        setNum(1)
+        // State shouldn't have changed
+        assertEquals(mTransactionListenerOnBeginCalled, true)
+        assertEquals(mTransactionListenerOnCommitCalled, false)
+        assertEquals(mTransactionListenerOnRollbackCalled, false)
+        // commit the transaction
+        mDatabase!!.endTransaction()
+        // the listener should have been told that commit was called
+        assertEquals(mTransactionListenerOnBeginCalled, true)
+        assertEquals(mTransactionListenerOnCommitCalled, false)
+        assertEquals(mTransactionListenerOnRollbackCalled, true)
+    }
+
+    inner class TestSQLiteTransactionListener:SQLiteTransactionListener {
+        override fun onBegin() {
+            mTransactionListenerOnBeginCalled = true
+        }
+        override fun onCommit() {
+            mTransactionListenerOnCommitCalled = true
+        }
+        override fun onRollback() {
+            mTransactionListenerOnRollbackCalled = true
+        }
     }
 
     /*@Throws(IOException::class)

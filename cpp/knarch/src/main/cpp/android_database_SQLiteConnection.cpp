@@ -88,10 +88,6 @@ struct SQLiteConnection {
     //TODO: WTF is KStdString?
     SQLiteConnection(sqlite3* db, int openFlags, const KStdString& path, const KStdString& label) :
         db(db), openFlags(openFlags), path(path), label(label), canceled(false) { }
-
-        ~SQLiteConnection(){
-
-    }
 };
 
 // Called each time a statement begins execution, when tracing is enabled.
