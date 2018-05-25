@@ -62,4 +62,14 @@ void DisposeCStringHelper(char *cstring) {
     if (cstring) konan::free(cstring);
 }
 
+void knarchLog(const char* tag, const char* format, ...){
+    printf(tag);
+    printf(" - ");
+    va_list args;
+    va_start(args, format);
+    vprintf(format, args);
+    va_end(args);
+    printf("\n");
+}
+
 } // extern "C"

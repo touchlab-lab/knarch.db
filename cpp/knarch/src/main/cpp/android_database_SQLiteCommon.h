@@ -22,15 +22,16 @@
 #include "Types.h"
 #include "Porting.h"
 #include "KString.h"
+#include "KonanHelper.h"
 
 // Special log tags defined in SQLiteDebug.java.
 #define SQLITE_LOG_TAG "SQLiteLog"
 #define SQLITE_TRACE_TAG "SQLiteStatements"
 #define SQLITE_PROFILE_TAG "SQLiteTime"
-#define ALOGE(...) konan::consolePrintf(__VA_ARGS__)
-#define ALOGW(...) konan::consolePrintf(__VA_ARGS__)
-#define ALOGV(...) konan::consolePrintf(__VA_ARGS__)
-#define ALOG(...) konan::consolePrintf(__VA_ARGS__)
+#define ALOGE(...) knarchLog("ERROR", __VA_ARGS__)
+#define ALOGW(...) knarchLog("WARN", __VA_ARGS__)
+#define ALOGV(...) knarchLog("VERBOSE", __VA_ARGS__)
+#define ALOG(tag, ...) knarchLog(tag, __VA_ARGS__)
 
 extern "C" {
 RUNTIME_NORETURN void ThrowSql_IllegalStateException(KString str);

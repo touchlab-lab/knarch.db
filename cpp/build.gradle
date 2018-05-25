@@ -38,7 +38,8 @@ ext {
     kotlinReflectModule="org.jetbrains.kotlin:kotlin-reflect:${kotlinVersion}"
     kotlinScriptRuntimeModule="org.jetbrains.kotlin:kotlin-script-runtime:${kotlinVersion}"
 
-    gradlePluginVersion = KonanVersion.CURRENT.gradlePluginVersion
+    konanVersionFull = KonanVersion.Companion.CURRENT
+    gradlePluginVersion = konanVersionFull.toString()
 }
 
 allprojects {

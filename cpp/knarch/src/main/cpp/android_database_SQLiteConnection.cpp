@@ -173,7 +173,8 @@ static KLong nativeOpen(KString pathStr, KInt openFlags,
         sqlite3_profile(db, &sqliteProfileCallback, connection);
     }
 
-    ALOGV("Opened connection %p with label '%s'", db, label);
+    printf("Opened connection %p with label '%s'", db, label);
+    ALOG("ASDF", "Opened connection %p with label '%s'", db, label);
     return reinterpret_cast<KLong>(connection);
 }
 

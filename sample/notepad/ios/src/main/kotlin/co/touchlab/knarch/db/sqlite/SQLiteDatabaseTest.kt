@@ -6,6 +6,7 @@ import co.touchlab.knarch.io.*
 import co.touchlab.knarch.db.sqlite.*
 import kotlin.test.*
 import platform.Foundation.*
+import kotlinx.cinterop.*
 
 class SQLiteDatabaseTest {
     private var mDatabase:SQLiteDatabase?=null
@@ -445,7 +446,7 @@ class SQLiteDatabaseTest {
         fun run()
     }
 
-    private inner class MockSQLiteCursor(db:SQLiteDatabase, driver:SQLiteCursorDriver,
+    private class MockSQLiteCursor(db:SQLiteDatabase, driver:SQLiteCursorDriver,
                                          editTable:String, query:SQLiteQuery):SQLiteCursor(db, driver, editTable, query)
 
     @Test
@@ -658,11 +659,18 @@ class SQLiteDatabaseTest {
     fun testQuery() {
         mDatabase!!.execSQL(("CREATE TABLE employee (_id INTEGER PRIMARY KEY, " + "name TEXT, month INTEGER, salary INTEGER);"))
         mDatabase!!.execSQL(("INSERT INTO employee (name, month, salary) " + "VALUES ('Mike', '1', '1000');"))
-        mDatabase!!.execSQL(("INSERT INTO employee (name, month, salary) " + "VALUES ('Mike', '2', '3000');"))
-        mDatabase!!.execSQL(("INSERT INTO employee (name, month, salary) " + "VALUES ('jack', '1', '2000');"))
+//        mDatabase!!.execSQL(("INSERT INTO employee (name, month, salary) " + "VALUES ('Mike', '2', '3000');"))
+//        mDatabase!!.execSQL(("INSERT INTO employee (name, month, salary) " + "VALUES ('jack', '1', '2000');"))
         mDatabase!!.execSQL(("INSERT INTO employee (name, month, salary) " + "VALUES ('jack', '3', '1500');"))
         mDatabase!!.execSQL(("INSERT INTO employee (name, month, salary) " + "VALUES ('Jim', '1', '1000');"))
-        mDatabase!!.execSQL(("INSERT INTO employee (name, month, salary) " + "VALUES ('Jim', '3', '3500');"))
+        mDatabase!!.execSQL(("INSERT INTO employee (name, month, salary) " + "VALUES ('Jim2', '1', '1000');"))
+        mDatabase!!.execSQL(("INSERT INTO employee (name, month, salary) " + "VALUES ('Jim3', '1', '2000');"))
+        mDatabase!!.execSQL(("INSERT INTO employee (name, month, salary) " + "VALUES ('Jim4', '1', '2000');"))
+        mDatabase!!.execSQL(("INSERT INTO employee (name, month, salary) " + "VALUES ('Jim5', '1', '2000');"))
+        mDatabase!!.execSQL(("INSERT INTO employee (name, month, salary) " + "VALUES ('Jim5', '1', '2000');"))
+        mDatabase!!.execSQL(("INSERT INTO employee (name, month, salary) " + "VALUES ('Jim7', '1', '1000');"))
+        mDatabase!!.execSQL(("INSERT INTO employee (name, month, salary) " + "VALUES ('Jim8', '1', '1000');"))
+//        mDatabase!!.execSQL(("INSERT INTO employee (name, month, salary) " + "VALUES ('Jim', '3', '3500');"))
         /*var cursor = mDatabase!!.query(true, "employee", arrayOf<String>("name", "sum(salary)"), null, null, "name", "sum(salary)>1000", "name", null)
         assertNotNull(cursor)
         assertEquals(3, cursor.getCount())
@@ -687,10 +695,19 @@ class SQLiteDatabaseTest {
         }
 
         var cursor = mDatabase!!.queryWithFactory(factory, true, "employee",
-                arrayOf<String>("name", "sum(salary)"), null, null, "name", "sum(salary) > 1000", "name", null)
+                arrayOf<String>("name", "sum(salary)", "avg(month)"), null, null, "name", "sum(salary) > 1000", "name", null)
         assertNotNull(cursor)
         assertTrue(cursor is MockSQLiteCursor)
+
+        println("Cursort count ${cursor.getCount()}")
+
+
         cursor.moveToFirst()
+
+        do{
+            println("Name: ${cursor.getString(0)}/Sum: ${cursor.getInt(1)}/Avg: ${cursor.getDouble(2)}")
+        }while (cursor.moveToNext())
+
         /*assertEquals("Jim", cursor.getString(COLUMN_NAME_INDEX))
         assertEquals(4500, cursor.getInt(COLUMN_SALARY_INDEX))
         cursor.moveToNext()

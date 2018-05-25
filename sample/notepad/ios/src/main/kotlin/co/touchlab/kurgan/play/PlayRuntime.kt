@@ -36,11 +36,9 @@ class PlayRuntime(){
     fun testTest()
     {
 //        TestRunner.run(arrayOf("--ktest_filter=*LruCacheTest*"))
-//        TestRunner.run(arrayOf("--ktest_filter=*testDelete*"))
-        TestRunner.run()
+        TestRunner.run(arrayOf("--ktest_filter=*testQuery*"))
+//        TestRunner.run()
     }
-
-
 
     fun testDb()
     {

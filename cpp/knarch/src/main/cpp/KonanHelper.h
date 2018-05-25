@@ -29,6 +29,8 @@ extern "C" {
 char* CreateCStringFromStringWithSize(KString kstring, size_t* utf8Size);
 void DisposeCStringHelper(char* cstring);
 
+void knarchLog(const char* tag, const char* format, ...);
+
 #ifdef __cplusplus
 }
 #endif

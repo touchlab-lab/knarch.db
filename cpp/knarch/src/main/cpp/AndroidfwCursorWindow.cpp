@@ -159,7 +159,7 @@ status_t CursorWindow::allocRow() {
     FieldSlot* fieldDir = static_cast<FieldSlot*>(offsetToPtr(fieldDirOffset));
     memset(fieldDir, 0, fieldDirSize);
 
-    LOG_WINDOW("Allocated row %u, rowSlot is at offset %u, fieldDir is %d bytes at offset %u\n",
+    LOG_WINDOW("Allocated row %u, rowSlot is at offset %u, fieldDir is %u bytes at offset %u\n",
             mHeader->numRows - 1, offsetFromPtr(rowSlot), fieldDirSize, fieldDirOffset);
     rowSlot->offset = fieldDirOffset;
     return OK;
