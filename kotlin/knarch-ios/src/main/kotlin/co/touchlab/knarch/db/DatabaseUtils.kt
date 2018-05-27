@@ -368,7 +368,7 @@ class DatabaseUtils {
             if (!cursor.isNull(colIndex)) {
                 values.put(key, cursor.getInt(colIndex))
             } else {
-                values.put(key, null!!.toInt())
+                values.remove(key)
             }
         }
 
@@ -398,7 +398,7 @@ class DatabaseUtils {
                 val value = cursor.getLong(colIndex)
                 values.put(key, value)
             } else {
-                values.put(key, null!!.toLong())
+                values.remove(key)
             }
         }
 
@@ -427,7 +427,7 @@ class DatabaseUtils {
             if (!cursor.isNull(colIndex)) {
                 values.put(key, cursor.getDouble(colIndex))
             } else {
-                values.put(key, null!!.toDouble())
+                values.remove(key)
             }
         }
 

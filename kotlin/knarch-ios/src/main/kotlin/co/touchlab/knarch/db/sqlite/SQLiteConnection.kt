@@ -416,13 +416,12 @@ class SQLiteConnection private constructor(/*pool:SQLiteConnectionPool,*/
                     changedRows = nativeExecuteForChangedRowCount(
                             mConnectionPtr, statement.mStatementPtr)
 
-                println("SUPERTRACE: changedRows $changedRows")
-                    return changedRows
+
+                return changedRows
             }
             finally
             {
                 releasePreparedStatement(statement)
-                println("SUPERTRACE: statement released")
             }
         }
         catch (ex:RuntimeException) {
@@ -597,7 +596,6 @@ class SQLiteConnection private constructor(/*pool:SQLiteConnectionPool,*/
             try
             {
                 nativeResetStatementAndClearBindings(mConnectionPtr, statement.mStatementPtr)
-                println("SUPERTRACE: nativeResetStatementAndClearBindings success")
             }
             catch (ex:SQLiteException) {
                 // The statement could not be reset due to an error. Remove it from the cache.
@@ -976,7 +974,7 @@ class SQLiteConnection private constructor(/*pool:SQLiteConnectionPool,*/
 //            synchronized (mOperations) {
                 if (endOperationDeferLogLocked(cookie))
                 {
-                    logOperationLocked(cookie, null!!)
+                    logOperationLocked(cookie, null)
                 }
 //            }
         }

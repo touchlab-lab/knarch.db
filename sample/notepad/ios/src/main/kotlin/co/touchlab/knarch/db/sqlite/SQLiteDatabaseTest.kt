@@ -61,7 +61,7 @@ class SQLiteDatabaseTest {
     fun testOpenDatabase() {
         val factory = object : SQLiteDatabase.CursorFactory{
             override fun newCursor(db:SQLiteDatabase,
-                                   driver:SQLiteCursorDriver, editTable:String,
+                                   driver:SQLiteCursorDriver, editTable:String?,
                                        query:SQLiteQuery):Cursor{
                 return MockSQLiteCursor(db, driver, editTable, query)
             }
@@ -447,7 +447,7 @@ class SQLiteDatabaseTest {
     }
 
     private class MockSQLiteCursor(db:SQLiteDatabase, driver:SQLiteCursorDriver,
-                                         editTable:String, query:SQLiteQuery):SQLiteCursor(db, driver, editTable, query)
+                                         editTable:String?, query:SQLiteQuery):SQLiteCursor(db, driver, editTable, query)
 
     @Test
     fun testFindEditTable() {
@@ -655,21 +655,127 @@ class SQLiteDatabaseTest {
         t.join()
     }*/
 
+//    @Test
+//    fun testQuery() {
+//        mDatabase!!.execSQL(("CREATE TABLE employee (_id INTEGER PRIMARY KEY, " + "name TEXT, month INTEGER, salary INTEGER);"))
+//        mDatabase!!.execSQL(("INSERT INTO employee (name, month, salary) " + "VALUES ('Mike', '1', '1000');"))
+//        mDatabase!!.execSQL(("INSERT INTO employee (name, month, salary) " + "VALUES ('Mike', '2', '3000');"))
+//        mDatabase!!.execSQL(("INSERT INTO employee (name, month, salary) " + "VALUES ('jack', '1', '2000');"))
+//        mDatabase!!.execSQL(("INSERT INTO employee (name, month, salary) " + "VALUES ('jack', '3', '1500');"))
+//        mDatabase!!.execSQL(("INSERT INTO employee (name, month, salary) " + "VALUES ('Jim', '1', '1000');"))
+//        mDatabase!!.execSQL(("INSERT INTO employee (name, month, salary) " + "VALUES ('Jim', '3', '3500');"))
+//        var cursor = mDatabase!!.query(true, "employee", arrayOf<String>("name", "sum(salary)"), null, null, "name", "sum(salary)>1000", "name", null)
+//        assertNotNull(cursor)
+//        assertEquals(3, cursor.getCount())
+//        var COLUMN_NAME_INDEX = 0
+//        var COLUMN_SALARY_INDEX = 1
+//        cursor.moveToFirst()
+//        assertEquals("Jim", cursor.getString(COLUMN_NAME_INDEX))
+//        assertEquals(4500, cursor.getInt(COLUMN_SALARY_INDEX))
+//        cursor.moveToNext()
+//        assertEquals("Mike", cursor.getString(COLUMN_NAME_INDEX))
+//        assertEquals(4000, cursor.getInt(COLUMN_SALARY_INDEX))
+//        cursor.moveToNext()
+//        assertEquals("jack", cursor.getString(COLUMN_NAME_INDEX))
+//        assertEquals(3500, cursor.getInt(COLUMN_SALARY_INDEX))
+//        cursor.close()
+//        /*var factory = object:CursorFactory() {
+//            fun newCursor(db:SQLiteDatabase, masterQuery:SQLiteCursorDriver,
+//                          editTable:String, query:SQLiteQuery):Cursor {
+//                return GoGoSQLiteCursor(db, masterQuery, editTable, query)
+//            }
+//        }*/
+//
+//        val factory = MockCursorFacory()/*object : SQLiteDatabase.CursorFactory{
+//            override fun newCursor(db:SQLiteDatabase,
+//                                   driver:SQLiteCursorDriver, editTable:String?,
+//                                   query:SQLiteQuery):Cursor{
+//                return MockSQLiteCursor(db, driver, editTable, query)
+//            }
+//        }*/
+//        cursor = mDatabase!!.queryWithFactory(factory, true, "employee",
+//                arrayOf<String>("name", "sum(salary)"), null, null, "name", "sum(salary) > 1000", "name", null)
+//        assertNotNull(cursor)
+////        assertTrue(cursor is MockSQLiteCursor)
+//        cursor.moveToFirst()
+//        assertEquals("Jim", cursor.getString(COLUMN_NAME_INDEX))
+//        assertEquals(4500, cursor.getInt(COLUMN_SALARY_INDEX))
+//        cursor.moveToNext()
+//        assertEquals("Mike", cursor.getString(COLUMN_NAME_INDEX))
+//        assertEquals(4000, cursor.getInt(COLUMN_SALARY_INDEX))
+//        cursor.moveToNext()
+//        assertEquals("jack", cursor.getString(COLUMN_NAME_INDEX))
+//        assertEquals(3500, cursor.getInt(COLUMN_SALARY_INDEX))
+//        cursor.close()
+//        cursor = mDatabase!!.query("employee", arrayOf<String>("name", "sum(salary)"), null, null, "name", "sum(salary) <= 4000", "name")
+//        assertNotNull(cursor)
+//        assertEquals(2, cursor.getCount())
+//        cursor.moveToFirst()
+//        assertEquals("Mike", cursor.getString(COLUMN_NAME_INDEX))
+//        assertEquals(4000, cursor.getInt(COLUMN_SALARY_INDEX))
+//        cursor.moveToNext()
+//        assertEquals("jack", cursor.getString(COLUMN_NAME_INDEX))
+//        assertEquals(3500, cursor.getInt(COLUMN_SALARY_INDEX))
+//        cursor.close()
+//        cursor = mDatabase!!.query("employee", arrayOf<String>("name", "sum(salary)"), null, null, "name", "sum(salary) > 1000", "name", "2")
+//        assertNotNull(cursor)
+//        assertEquals(2, cursor.getCount())
+//        cursor.moveToFirst()
+//        assertEquals("Jim", cursor.getString(COLUMN_NAME_INDEX))
+//        assertEquals(4500, cursor.getInt(COLUMN_SALARY_INDEX))
+//        cursor.moveToNext()
+//        assertEquals("Mike", cursor.getString(COLUMN_NAME_INDEX))
+//        assertEquals(4000, cursor.getInt(COLUMN_SALARY_INDEX))
+//        cursor.close()
+//        var sql = "SELECT name, month FROM employee WHERE salary > ?;"
+//        cursor = mDatabase!!.rawQuery(sql, arrayOf<String>("2000"))
+//        assertNotNull(cursor)
+//        assertEquals(2, cursor.getCount())
+//        var COLUMN_MONTH_INDEX = 1
+//        cursor.moveToFirst()
+//        assertEquals("Mike", cursor.getString(COLUMN_NAME_INDEX))
+//        assertEquals(2, cursor.getInt(COLUMN_MONTH_INDEX))
+//        cursor.moveToNext()
+//        assertEquals("Jim", cursor.getString(COLUMN_NAME_INDEX))
+//        assertEquals(3, cursor.getInt(COLUMN_MONTH_INDEX))
+//        cursor.close()
+//        cursor = mDatabase!!.rawQueryWithFactory(factory, sql, arrayOf<String>("2000"), null)
+//        assertNotNull(cursor)
+//        assertEquals(2, cursor.getCount())
+////        assertTrue(cursor is MockSQLiteCursor)
+//        cursor.moveToFirst()
+//        assertEquals("Mike", cursor.getString(COLUMN_NAME_INDEX))
+//        assertEquals(2, cursor.getInt(COLUMN_MONTH_INDEX))
+//        cursor.moveToNext()
+//        assertEquals("Jim", cursor.getString(COLUMN_NAME_INDEX))
+//        assertEquals(3, cursor.getInt(COLUMN_MONTH_INDEX))
+//        cursor.close()
+//    }
+
+
+    class MockCursorFactory():SQLiteDatabase.CursorFactory{
+        override fun newCursor(db:SQLiteDatabase,
+                               driver:SQLiteCursorDriver, editTable:String?,
+                               query:SQLiteQuery):Cursor{
+            return MockSQLiteCursor(db, driver, editTable, query)
+        }
+    }
+    
     @Test
     fun testQuery() {
         mDatabase!!.execSQL(("CREATE TABLE employee (_id INTEGER PRIMARY KEY, " + "name TEXT, month INTEGER, salary INTEGER);"))
-        mDatabase!!.execSQL(("INSERT INTO employee (name, month, salary) " + "VALUES ('Mike', '1', '1000');"))
+//        mDatabase!!.execSQL(("INSERT INTO employee (name, month, salary) " + "VALUES ('Mike', '1', '1000');"))
 //        mDatabase!!.execSQL(("INSERT INTO employee (name, month, salary) " + "VALUES ('Mike', '2', '3000');"))
 //        mDatabase!!.execSQL(("INSERT INTO employee (name, month, salary) " + "VALUES ('jack', '1', '2000');"))
         mDatabase!!.execSQL(("INSERT INTO employee (name, month, salary) " + "VALUES ('jack', '3', '1500');"))
-        mDatabase!!.execSQL(("INSERT INTO employee (name, month, salary) " + "VALUES ('Jim', '1', '1000');"))
-        mDatabase!!.execSQL(("INSERT INTO employee (name, month, salary) " + "VALUES ('Jim2', '1', '1000');"))
-        mDatabase!!.execSQL(("INSERT INTO employee (name, month, salary) " + "VALUES ('Jim3', '1', '2000');"))
-        mDatabase!!.execSQL(("INSERT INTO employee (name, month, salary) " + "VALUES ('Jim4', '1', '2000');"))
+//        mDatabase!!.execSQL(("INSERT INTO employee (name, month, salary) " + "VALUES ('Jim', '1', '1000');"))
+//        mDatabase!!.execSQL(("INSERT INTO employee (name, month, salary) " + "VALUES ('Jim2', '1', '1000');"))
+//        mDatabase!!.execSQL(("INSERT INTO employee (name, month, salary) " + "VALUES ('Jim3', '1', '2000');"))
+//        mDatabase!!.execSQL(("INSERT INTO employee (name, month, salary) " + "VALUES ('Jim4', '1', '2000');"))
         mDatabase!!.execSQL(("INSERT INTO employee (name, month, salary) " + "VALUES ('Jim5', '1', '2000');"))
-        mDatabase!!.execSQL(("INSERT INTO employee (name, month, salary) " + "VALUES ('Jim5', '1', '2000');"))
-        mDatabase!!.execSQL(("INSERT INTO employee (name, month, salary) " + "VALUES ('Jim7', '1', '1000');"))
-        mDatabase!!.execSQL(("INSERT INTO employee (name, month, salary) " + "VALUES ('Jim8', '1', '1000');"))
+//        mDatabase!!.execSQL(("INSERT INTO employee (name, month, salary) " + "VALUES ('Jim5', '1', '2000');"))
+//        mDatabase!!.execSQL(("INSERT INTO employee (name, month, salary) " + "VALUES ('Jim7', '1', '1000');"))
+//        mDatabase!!.execSQL(("INSERT INTO employee (name, month, salary) " + "VALUES ('Jim8', '1', '1000');"))
 //        mDatabase!!.execSQL(("INSERT INTO employee (name, month, salary) " + "VALUES ('Jim', '3', '3500');"))
         /*var cursor = mDatabase!!.query(true, "employee", arrayOf<String>("name", "sum(salary)"), null, null, "name", "sum(salary)>1000", "name", null)
         assertNotNull(cursor)
@@ -686,28 +792,30 @@ class SQLiteDatabaseTest {
         assertEquals("jack", cursor.getString(COLUMN_NAME_INDEX))
         assertEquals(3500, cursor.getInt(COLUMN_SALARY_INDEX))
         cursor.close()*/
-        val factory = object : SQLiteDatabase.CursorFactory{
+        /*val factory = object : SQLiteDatabase.CursorFactory{
             override fun newCursor(db:SQLiteDatabase,
                                    driver:SQLiteCursorDriver, editTable:String,
                                    query:SQLiteQuery):Cursor{
-                return MockSQLiteCursor(db, driver, editTable, query)
+                return GoGoSQLiteCursor(db, driver, editTable, query)
             }
-        }
+        }*/
+
+        var factory = MockCursorFactory()
 
         var cursor = mDatabase!!.queryWithFactory(factory, true, "employee",
-                arrayOf<String>("name", "sum(salary)", "avg(month)"), null, null, "name", "sum(salary) > 1000", "name", null)
-        assertNotNull(cursor)
-        assertTrue(cursor is MockSQLiteCursor)
+                arrayOf<String>("name"), null, null, null, null, null, null)
+//        assertNotNull(cursor)
+//        assertTrue(cursor is MockSQLiteCursor)
 
         println("Cursort count ${cursor.getCount()}")
 
 
-        cursor.moveToFirst()
+        /*cursor.moveToFirst()
 
         do{
             println("Name: ${cursor.getString(0)}/Sum: ${cursor.getInt(1)}/Avg: ${cursor.getDouble(2)}")
         }while (cursor.moveToNext())
-
+*/
         /*assertEquals("Jim", cursor.getString(COLUMN_NAME_INDEX))
         assertEquals(4500, cursor.getInt(COLUMN_SALARY_INDEX))
         cursor.moveToNext()
@@ -915,6 +1023,8 @@ class SQLiteDatabaseTest {
             mTransactionListenerOnRollbackCalled = true
         }
     }
+
+
 
     /*@Throws(IOException::class)
     fun testDeleteDatabase() {
@@ -2190,3 +2300,6 @@ class SQLiteDatabaseTest {
         )
     }
 }
+
+class HockSQLiteCursor(db:SQLiteDatabase, driver:SQLiteCursorDriver,
+                       editTable:String, query:SQLiteQuery):SQLiteCursor(db, driver, editTable, query)

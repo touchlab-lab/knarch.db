@@ -11,7 +11,7 @@ set(CMAKE_C_COMPILER_ID "AppleClang")
 
 # The include file search paths:
 set(CMAKE_C_TARGET_INCLUDE_PATH
-  "/Users/kgalligan/temp3/kotlin-native/runtime/src/main/cpp"
+  "/Users/kgalligan/temp4/kotlin-native/runtime/src/main/cpp"
   "../knarch/src/main/cpp"
   )
 set(CMAKE_DEPENDS_CHECK_CXX
@@ -29,7 +29,7 @@ set(CMAKE_CXX_COMPILER_ID "AppleClang")
 
 # The include file search paths:
 set(CMAKE_CXX_TARGET_INCLUDE_PATH
-  "/Users/kgalligan/temp3/kotlin-native/runtime/src/main/cpp"
+  "/Users/kgalligan/temp4/kotlin-native/runtime/src/main/cpp"
   "../knarch/src/main/cpp"
   )
 

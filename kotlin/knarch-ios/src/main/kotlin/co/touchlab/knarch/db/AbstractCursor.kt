@@ -7,8 +7,9 @@ abstract class AbstractCursor:CrossProcessCursor {
     var position:Int = 0
         protected set
 
-    var isClosed:Boolean = false
-        protected set
+    var closed:Boolean = false
+
+    override fun isClosed():Boolean = closed
 
     /* -------------------------------------------------------- */
     /* These need to be implemented by subclasses */
@@ -88,7 +89,7 @@ abstract class AbstractCursor:CrossProcessCursor {
     }
 
     override fun close() {
-        isClosed = true
+        closed = true
         onDeactivateOrClose()
     }
 
@@ -219,7 +220,7 @@ abstract class AbstractCursor:CrossProcessCursor {
     protected fun finalize() {
         try
         {
-            if (!isClosed) close()
+            if (!isClosed()) close()
         }
         catch (e:Exception) {}
     }

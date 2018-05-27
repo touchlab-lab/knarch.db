@@ -3,7 +3,7 @@ project(cpp)
 
 set(CMAKE_CXX_STANDARD 11)
 
-include_directories(/Users/kgalligan/temp3/kotlin-native/runtime/src/main/cpp)
+include_directories(/Users/kgalligan/temp4/kotlin-native/runtime/src/main/cpp)
 include_directories(knarch/src/main/cpp)
 
 

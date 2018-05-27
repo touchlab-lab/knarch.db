@@ -3,15 +3,14 @@
 
 # compile C with /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc
 # compile CXX with /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++
-C_FLAGS = -g  
+C_FLAGS = -g
 
-C_DEFINES = 
+C_DEFINES =
 
-C_INCLUDES = -I/Users/kgalligan/temp3/kotlin-native/runtime/src/main/cpp -I/Users/kgalligan/temp4/knarch/cpp/knarch/src/main/cpp 
+C_INCLUDES = -I/Users/kgalligan/temp4/kotlin-native/runtime/src/main/cpp -I/Users/kgalligan/temp4/knarch/cpp/knarch/src/main/cpp
 
 CXX_FLAGS = -g   -std=gnu++11
 
-CXX_DEFINES = 
+CXX_DEFINES =
 
-CXX_INCLUDES = -I/Users/kgalligan/temp3/kotlin-native/runtime/src/main/cpp -I/Users/kgalligan/temp4/knarch/cpp/knarch/src/main/cpp 
-
+CXX_INCLUDES = -I/Users/kgalligan/temp4/kotlin-native/runtime/src/main/cpp -I/Users/kgalligan/temp4/knarch/cpp/knarch/src/main/cpp 

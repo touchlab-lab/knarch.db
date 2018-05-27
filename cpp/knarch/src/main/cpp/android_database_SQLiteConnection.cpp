@@ -80,28 +80,35 @@ struct SQLiteConnection {
 
     sqlite3* const db;
     const int openFlags;
-    const KStdString path;
-    const KStdString label;
+    char* path;
+    char* label;
 
     volatile bool canceled;
 
     //TODO: WTF is KStdString?
-    SQLiteConnection(sqlite3* db, int openFlags, const KStdString& path, const KStdString& label) :
+    SQLiteConnection(sqlite3* db, int openFlags, char* path, char* label) :
         db(db), openFlags(openFlags), path(path), label(label), canceled(false) { }
+
+        ~SQLiteConnection(){
+        if(path != nullptr)
+            DisposeCStringHelper(path);
+        if(label != nullptr)
+            DisposeCStringHelper(label);
+    }
 };
 
 // Called each time a statement begins execution, when tracing is enabled.
 static void sqliteTraceCallback(void *data, const char *sql) {
     SQLiteConnection* connection = static_cast<SQLiteConnection*>(data);
     ALOGV("%s: \"%s\"\n",
-            connection->label.c_str(), sql);
+            connection->label, sql);
 }
 
 // Called each time a statement finishes execution, when profiling is enabled.
 static void sqliteProfileCallback(void *data, const char *sql, sqlite3_uint64 tm) {
     SQLiteConnection* connection = static_cast<SQLiteConnection*>(data);
     ALOGV("%s: \"%s\" took %0.3f ms\n",
-            connection->label.c_str(), sql, tm * 0.000001f);
+            connection->label, sql, tm * 0.000001f);
 }
 
 // Called after each SQLite VM instruction when cancelation is enabled.

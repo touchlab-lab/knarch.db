@@ -1586,7 +1586,7 @@ class SQLiteDatabase private constructor(path: String, openFlags: Int, cursorFac
          * See {@link SQLiteCursor#SQLiteCursor(SQLiteCursorDriver, String, SQLiteQuery)}.
          */
         fun newCursor(db:SQLiteDatabase,
-                      masterQuery:SQLiteCursorDriver, editTable:String,
+                      masterQuery:SQLiteCursorDriver, editTable:String?,
                       query:SQLiteQuery):Cursor
     }
     /**

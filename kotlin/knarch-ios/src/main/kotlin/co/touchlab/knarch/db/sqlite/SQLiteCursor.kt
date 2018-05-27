@@ -15,7 +15,7 @@ open class SQLiteCursor/**
  * @param editTable the name of the table used for this query
  * @param query the {@link SQLiteQuery} object associated with this cursor object.
  */
-(driver:SQLiteCursorDriver, editTable:String, query:SQLiteQuery):AbstractWindowedCursor() {
+(driver:SQLiteCursorDriver, editTable:String?, query:SQLiteQuery):AbstractWindowedCursor() {
     override fun getPosition(): Int = position
 
     override fun isFirst(): Boolean = isFirst
@@ -30,12 +30,10 @@ open class SQLiteCursor/**
 
     override fun getColumnCount(): Int = columnCount
 
-    override fun isClosed(): Boolean = isClosed
-
     override fun getCount(): Int = count
 
     /** The name of the table to edit */
-    private val mEditTable:String
+    private val mEditTable:String?
     /** The names of the columns in the rows */
     override val columnNames:Array<String>
     /** The query object for the cursor */
@@ -80,7 +78,7 @@ open class SQLiteCursor/**
      */
     @Deprecated("use {@link #SQLiteCursor(SQLiteCursorDriver, String, SQLiteQuery)} instead")
     constructor(db:SQLiteDatabase, driver:SQLiteCursorDriver,
-                editTable:String, query:SQLiteQuery) : this(driver, editTable, query) {}
+                editTable:String?, query:SQLiteQuery) : this(driver, editTable, query) {}
     init{
         mDriver = driver
         mEditTable = editTable
@@ -188,3 +186,6 @@ open class SQLiteCursor/**
         internal val NO_COUNT = -1
     }
 }
+
+class GoGoSQLiteCursor(db:SQLiteDatabase, driver:SQLiteCursorDriver,
+                               editTable:String?, query:SQLiteQuery):SQLiteCursor(db, driver, editTable, query)
