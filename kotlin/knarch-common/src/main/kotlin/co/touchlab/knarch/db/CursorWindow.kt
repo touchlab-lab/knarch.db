@@ -1,5 +1,7 @@
 package co.touchlab.knarch.db
 
+import co.touchlab.knarch.db.native.CppCursorWindow
+import co.touchlab.knarch.db.native.NativeCursorWindow
 import co.touchlab.knarch.db.sqlite.SQLiteClosable
 
 class CursorWindow/**
@@ -12,13 +14,11 @@ class CursorWindow/**
  * @param name The name of the cursor window, or null if none.
  */
 (initName:String? = null):SQLiteClosable() {
-    /**
-     * The native CursorWindow object pointer. (FOR INTERNAL USE ONLY)
-     * @hide
-     */
-    var mWindowPtr:Long = 0
 
+    val nativeCursorWindow:NativeCursorWindow
     var name:String
+
+
     /**
      * Gets the start position of this cursor window.
      * <p>
@@ -49,58 +49,22 @@ class CursorWindow/**
             acquireReference()
             try
             {
-                return nativeGetNumRows(mWindowPtr)
+                return nativeCursorWindow.implGetNumRows()
             }
             finally
             {
                 releaseReference()
             }
         }
-    init{
-        startPosition = 0
-        this.name = if (initName != null && initName.isNotEmpty()) initName else "<unnamed>"
-        if (sCursorWindowSize < 0)
-        {
-            /** The cursor window size. resource xml file specifies the value in kB.
-             * convert it to bytes here by multiplying with 1024.
-             */
-            // sCursorWindowSize = Resources.getSystem().getInteger(
-            // com.android.internal.R.integer.config_cursorWindowSize) * 1024;
-            sCursorWindowSize = 2048 * 1024
-        }
-        mWindowPtr = nativeCreate(this.name, sCursorWindowSize)
-        if (mWindowPtr == 0L)
-        {
-            throw CursorWindowAllocationException(("Cursor window allocation of " +
-                    (sCursorWindowSize / 1024) + " kb failed. " /*+ printStats()*/))
-        }
 
+    init{
+        this.name = if (initName != null && initName.isNotEmpty()) initName else "<unnamed>"
+        nativeCursorWindow = CppCursorWindow(this.name)
         // recordNewWindow(Binder.getCallingPid(), mWindowPtr);
     }
-    /**
-     * Creates a new empty cursor window.
-     * <p>
-     * The cursor initially has no rows or columns. Call {@link #setNumColumns(int)} to
-     * set the number of columns before adding any rows to the cursor.
-     * </p>
-     *
-     * @param localWindow True if this window will be used in this process only,
-     * false if it might be sent to another processes. This argument is ignored.
-     *
-     * @deprecated There is no longer a distinction between local and remote
-     * cursor windows. Use the {@link #CursorWindow(String)} constructor instead.
-     */
-    @Deprecated("There is no longer a distinction between local and remote\n"+
-            " cursor windows. Use the {@link #CursorWindow(String)} constructor instead.")
-    constructor(localWindow:Boolean) : this((null as String?)!!) {}
 
     private fun dispose() {
-        if (mWindowPtr != 0L)
-        {
-            // recordClosingOfWindow(mWindowPtr);
-            nativeDispose(mWindowPtr)
-            mWindowPtr = 0
-        }
+        nativeCursorWindow.implDispose()
     }
     /**
      * Clears out the existing contents of the window, making it safe to reuse
@@ -115,7 +79,7 @@ class CursorWindow/**
         try
         {
             startPosition = 0
-            nativeClear(mWindowPtr)
+            nativeCursorWindow.implClear()
         }
         finally
         {
@@ -137,7 +101,7 @@ class CursorWindow/**
         acquireReference()
         try
         {
-            return nativeSetNumColumns(mWindowPtr, columnNum)
+            return nativeCursorWindow.implSetNumColumns(columnNum)
         }
         finally
         {
@@ -153,7 +117,7 @@ class CursorWindow/**
         acquireReference()
         try
         {
-            return nativeAllocRow(mWindowPtr)
+            return nativeCursorWindow.implAllocRow()
         }
         finally
         {
@@ -167,7 +131,7 @@ class CursorWindow/**
         acquireReference()
         try
         {
-            nativeFreeLastRow(mWindowPtr)
+            nativeCursorWindow.implFreeLastRow()
         }
         finally
         {
@@ -187,6 +151,7 @@ class CursorWindow/**
     fun isNull(row:Int, column:Int):Boolean {
         return getType(row, column) == Cursor.FIELD_TYPE_NULL
     }
+
     /**
      * Returns true if the field at the specified row and column index
      * has type {@link Cursor#FIELD_TYPE_BLOB} or {@link Cursor#FIELD_TYPE_NULL}.
@@ -264,7 +229,7 @@ class CursorWindow/**
         acquireReference()
         try
         {
-            return nativeGetType(mWindowPtr, row - startPosition, column)
+            return nativeCursorWindow.implGetType(row - startPosition, column)
         }
         finally
         {
@@ -296,7 +261,7 @@ class CursorWindow/**
         acquireReference()
         try
         {
-            return nativeGetBlob(mWindowPtr, row - startPosition, column)
+            return nativeCursorWindow.implGetBlob(row - startPosition, column)
         }
         finally
         {
@@ -333,7 +298,7 @@ class CursorWindow/**
         acquireReference()
         try
         {
-            return nativeGetString(mWindowPtr, row - startPosition, column)
+            return nativeCursorWindow.implGetString(row - startPosition, column)
         }
         finally
         {
@@ -367,7 +332,7 @@ class CursorWindow/**
         acquireReference()
         try
         {
-            return nativeGetLong(mWindowPtr, row - startPosition, column)
+            return nativeCursorWindow.implGetLong(row - startPosition, column)
         }
         finally
         {
@@ -401,7 +366,7 @@ class CursorWindow/**
         acquireReference()
         try
         {
-            return nativeGetDouble(mWindowPtr, row - startPosition, column)
+            return nativeCursorWindow.implGetDouble(row - startPosition, column)
         }
         finally
         {
@@ -465,7 +430,7 @@ class CursorWindow/**
         acquireReference()
         try
         {
-            return nativePutBlob(mWindowPtr, value, row - startPosition, column)
+            return nativeCursorWindow.implPutBlob(value, row - startPosition, column)
         }
         finally
         {
@@ -484,7 +449,7 @@ class CursorWindow/**
         acquireReference()
         try
         {
-            return nativePutString(mWindowPtr, value, row - startPosition, column)
+            return nativeCursorWindow.implPutString(value, row - startPosition, column)
         }
         finally
         {
@@ -503,7 +468,7 @@ class CursorWindow/**
         acquireReference()
         try
         {
-            return nativePutLong(mWindowPtr, value, row - startPosition, column)
+            return nativeCursorWindow.implPutLong(value, row - startPosition, column)
         }
         finally
         {
@@ -523,7 +488,7 @@ class CursorWindow/**
         acquireReference()
         try
         {
-            return nativePutDouble(mWindowPtr, value, row - startPosition, column)
+            return nativeCursorWindow.implPutDouble(value, row - startPosition, column)
         }
         finally
         {
@@ -541,7 +506,7 @@ class CursorWindow/**
         acquireReference()
         try
         {
-            return nativePutNull(mWindowPtr, row - startPosition, column)
+            return nativeCursorWindow.implPutNull(row - startPosition, column)
         }
         finally
         {
@@ -611,52 +576,8 @@ class CursorWindow/**
 //        return "# Open Cursors=$total$s"
 //    }
     override fun toString():String {
-        return name + " {" + mWindowPtr.toString(16) + "}"
+        return name + nativeCursorWindow.toString()
     }
-    companion object {
-        private val STATS_TAG = "CursorWindowStats"
-        // This static member will be evaluated when first used.
-        private var sCursorWindowSize = -1
 
-        @SymbolName("Android_Database_CursorWindow_nativeCreate")
-        private external fun nativeCreate(name:String, cursorWindowSize:Int):Long
-        @SymbolName("Android_Database_CursorWindow_nativeDispose")
-        private external fun nativeDispose(windowPtr:Long)
-        @SymbolName("Android_Database_CursorWindow_nativeClear")
-        private external fun nativeClear(windowPtr:Long)
-        @SymbolName("Android_Database_CursorWindow_nativeGetNumRows")
-        private external fun nativeGetNumRows(windowPtr:Long):Int
-        @SymbolName("Android_Database_CursorWindow_nativeSetNumColumns")
-        private external fun nativeSetNumColumns(windowPtr:Long, columnNum:Int):Boolean
-        @SymbolName("Android_Database_CursorWindow_nativeAllocRow")
-        private external fun nativeAllocRow(windowPtr:Long):Boolean
-        @SymbolName("Android_Database_CursorWindow_nativeFreeLastRow")
-        private external fun nativeFreeLastRow(windowPtr:Long)
-        @SymbolName("Android_Database_CursorWindow_nativeGetType")
-        private external fun nativeGetType(windowPtr:Long, row:Int, column:Int):Int
-
-        @SymbolName("Android_Database_CursorWindow_nativeGetBlob")
-        private external fun nativeGetBlob(windowPtr:Long, row:Int, column:Int):ByteArray
-        @SymbolName("Android_Database_CursorWindow_nativeGetString")
-        private external fun nativeGetString(windowPtr:Long, row:Int, column:Int):String
-
-        @SymbolName("Android_Database_CursorWindow_nativeGetLong")
-        private external fun nativeGetLong(windowPtr:Long, row:Int, column:Int):Long
-        @SymbolName("Android_Database_CursorWindow_nativeGetDouble")
-        private external fun nativeGetDouble(windowPtr:Long, row:Int, column:Int):Double
-        @SymbolName("Android_Database_CursorWindow_nativePutBlob")
-        private external fun nativePutBlob(windowPtr:Long, value:ByteArray, row:Int, column:Int):Boolean
-        @SymbolName("Android_Database_CursorWindow_nativePutString")
-        private external fun nativePutString(windowPtr:Long, value:String, row:Int, column:Int):Boolean
-        @SymbolName("Android_Database_CursorWindow_nativePutLong")
-        private external fun nativePutLong(windowPtr:Long, value:Long, row:Int, column:Int):Boolean
-        @SymbolName("Android_Database_CursorWindow_nativePutDouble")
-        private external fun nativePutDouble(windowPtr:Long, value:Double, row:Int, column:Int):Boolean
-        @SymbolName("Android_Database_CursorWindow_nativePutNull")
-        private external fun nativePutNull(windowPtr:Long, row:Int, column:Int):Boolean
-        @SymbolName("Android_Database_CursorWindow_nativeGetName")
-        private external fun nativeGetName(windowPtr:Long):String
-    }
 }
 
-class CursorWindowAllocationException(description:String):RuntimeException(description)

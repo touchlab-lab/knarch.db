@@ -1,3 +1,4 @@
+set -e
 pushd cpp
 ./gradlew $1
 popd

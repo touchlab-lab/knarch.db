@@ -3,6 +3,7 @@ package co.touchlab.knarch.db.sqlite
 import co.touchlab.knarch.db.Cursor
 import co.touchlab.knarch.db.CursorWindow
 import co.touchlab.knarch.db.DatabaseUtils
+import co.touchlab.knarch.db.native.*
 import co.touchlab.knarch.other.LruCache
 import co.touchlab.knarch.other.Printer
 import co.touchlab.knarch.Log
@@ -513,8 +514,10 @@ class SQLiteConnection private constructor(/*pool:SQLiteConnectionPool,*/
                 try {
                     bindArguments(statement, bindArgs)
 
+                    val ncw = window.nativeCursorWindow as CppCursorWindow
+
                     val result = nativeExecuteForCursorWindow(
-                            mConnectionPtr, statement.mStatementPtr, window.mWindowPtr,
+                            mConnectionPtr, statement.mStatementPtr, ncw.mWindowPtr,
                             startPos, requiredPos, countAllRows)
                     actualPos = (result shr 32).toInt()
                     countedRows = result.toInt()

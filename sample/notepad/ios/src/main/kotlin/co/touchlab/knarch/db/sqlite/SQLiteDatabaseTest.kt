@@ -757,7 +757,7 @@ class SQLiteDatabaseTest {
         override fun newCursor(db:SQLiteDatabase,
                                driver:SQLiteCursorDriver, editTable:String?,
                                query:SQLiteQuery):Cursor{
-            return MockSQLiteCursor(db, driver, editTable, query)
+            return GoGoSQLiteCursor(db, driver, editTable, query)
         }
     }
     
