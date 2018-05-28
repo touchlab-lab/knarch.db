@@ -9,5 +9,5 @@ fun ThrowSql_IllegalStateException(message: String): Unit =
 
 @ExportForCppRuntime
 fun ThrowSql_SQLiteException(exceptionClass:String, message:String): Unit =
-        throw SQLException("$exceptionClass - $message")
+        throw SQLiteException("$exceptionClass - $message")
 

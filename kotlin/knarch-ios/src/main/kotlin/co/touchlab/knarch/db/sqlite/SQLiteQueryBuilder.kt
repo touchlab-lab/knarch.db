@@ -21,6 +21,13 @@ class SQLiteQueryBuilder {
      * @param inTables the list of tables to query on
      */
     var tables :String?= ""
+
+    fun setTables(t:String?){
+        tables = t
+    }
+
+    fun getTables() = tables
+
     private var mWhereClause:StringBuilder? = null // lazily created
     private var mDistinct:Boolean = false
     private var mFactory:SQLiteDatabase.CursorFactory? = null
@@ -87,7 +94,7 @@ class SQLiteQueryBuilder {
      *
      * @param columnMap maps from the user column names to the database column names
      */
-    fun setProjectionMap(columnMap:Map<String, String>) {
+    fun setProjectionMap(columnMap:Map<String, String>?) {
         mProjectionMap = columnMap
     }
     /**
@@ -298,12 +305,12 @@ class SQLiteQueryBuilder {
     fun buildUnionSubQuery(
             typeDiscriminatorColumn:String,
             unionColumns:Array<String>,
-            columnsPresentInTable:Set<String>,
+            columnsPresentInTable:Set<String>?,
             computedColumnsOffset:Int,
             typeDiscriminatorValue:String,
             selection:String,
-            groupBy:String,
-            having:String):String {
+            groupBy:String?,
+            having:String?):String {
         val unionColumnsCount = unionColumns.size
         val projectionIn = Array(unionColumnsCount, {""})
         for (i in 0 until unionColumnsCount)
@@ -314,7 +321,7 @@ class SQLiteQueryBuilder {
                 projectionIn[i] = ("'" + typeDiscriminatorValue + "' AS "
                         + typeDiscriminatorColumn)
             }
-            else if ((i <= computedColumnsOffset || columnsPresentInTable.contains(unionColumn)))
+            else if ((i <= computedColumnsOffset || (columnsPresentInTable != null && columnsPresentInTable.contains(unionColumn))))
             {
                 projectionIn[i] = unionColumn
             }
@@ -343,7 +350,7 @@ class SQLiteQueryBuilder {
      *
      * @return the resulting SQL SELECT statement
      */
-    fun buildUnionQuery(subQueries:Array<String>, sortOrder:String, limit:String):String {
+    fun buildUnionQuery(subQueries:Array<String>, sortOrder:String?, limit:String?):String {
         val query = StringBuilder(128)
         val subQueryCount = subQueries.size
         val unionOperator = if (mDistinct) " UNION " else " UNION ALL "

@@ -187,5 +187,5 @@ open class SQLiteCursor/**
     }
 }
 
-class GoGoSQLiteCursor(db:SQLiteDatabase, driver:SQLiteCursorDriver,
+open class GoGoSQLiteCursor(db:SQLiteDatabase, driver:SQLiteCursorDriver,
                                editTable:String?, query:SQLiteQuery):SQLiteCursor(db, driver, editTable, query)

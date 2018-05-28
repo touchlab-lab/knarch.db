@@ -17,6 +17,7 @@
 #ifndef _ANDROID__DATABASE_WINDOW_H
 #define _ANDROID__DATABASE_WINDOW_H
 
+#include <inttypes.h>
 #include <stddef.h>
 #include <stdint.h>
 #include "UtilsErrors.h"
@@ -55,141 +56,151 @@ namespace android {
  *
  * Strings are stored in UTF-8.
  */
-class CursorWindow {
+    class CursorWindow {
     CursorWindow(const KString& name,
-            void* data, size_t size, bool readOnly);
+                     void* data, size_t size, bool readOnly);
 
-public:
-    /* Field types. */
-    enum {
-        FIELD_TYPE_NULL = 0,
-        FIELD_TYPE_INTEGER = 1,
-        FIELD_TYPE_FLOAT = 2,
-        FIELD_TYPE_STRING = 3,
-        FIELD_TYPE_BLOB = 4,
-    };
+    public:
+        /* Field types. */
+        enum {
+            FIELD_TYPE_NULL = 0,
+            FIELD_TYPE_INTEGER = 1,
+            FIELD_TYPE_FLOAT = 2,
+            FIELD_TYPE_STRING = 3,
+            FIELD_TYPE_BLOB = 4,
+        };
 
-    /* Opaque type that describes a field slot. */
-    struct FieldSlot {
-    private:
-        int32_t type;
-        union {
-            double d;
-            int64_t l;
-            struct {
-                uint32_t offset;
-                uint32_t size;
-            } buffer;
-        } data;
+        /* Opaque type that describes a field slot. */
+        struct FieldSlot {
+        private:
+            int32_t type;
+            union {
+                double d;
+                int64_t l;
+                struct {
+                    uint32_t offset;
+                    uint32_t size;
+                } buffer;
+            } data;
 
-        friend class CursorWindow;
-    } __attribute((packed));
+            friend class CursorWindow;
+        } __attribute((packed));
 
-    ~CursorWindow();
+        ~CursorWindow();
 
     static status_t create(const KString& name, size_t size, CursorWindow** outCursorWindow);
 
     inline KString name() { return mName; }
-    inline size_t size() { return mSize; }
-    inline size_t freeSpace() { return mSize - mHeader->freeOffset; }
-    inline uint32_t getNumRows() { return mHeader->numRows; }
-    inline uint32_t getNumColumns() { return mHeader->numColumns; }
+        inline size_t size() { return mSize; }
+        inline size_t freeSpace() { return mSize - mHeader->freeOffset; }
+        inline uint32_t getNumRows() { return mHeader->numRows; }
+        inline uint32_t getNumColumns() { return mHeader->numColumns; }
 
-    status_t clear();
-    status_t setNumColumns(uint32_t numColumns);
+        status_t clear();
+        status_t setNumColumns(uint32_t numColumns);
 
-    /**
-     * Allocate a row slot and its directory.
-     * The row is initialized will null entries for each field.
-     */
-    status_t allocRow();
-    status_t freeLastRow();
+        /**
+         * Allocate a row slot and its directory.
+         * The row is initialized will null entries for each field.
+         */
+        status_t allocRow();
+        status_t freeLastRow();
 
-    status_t putBlob(uint32_t row, uint32_t column, const void* value, size_t size);
-    status_t putString(uint32_t row, uint32_t column, const char* value, size_t sizeIncludingNull);
+        status_t putBlob(uint32_t row, uint32_t column, const void* value, size_t size);
+        status_t putString(uint32_t row, uint32_t column, const char* value, size_t sizeIncludingNull);
     status_t putLong(uint32_t row, uint32_t column, KLong value);
     status_t putDouble(uint32_t row, uint32_t column, KDouble value);
-    status_t putNull(uint32_t row, uint32_t column);
+        status_t putNull(uint32_t row, uint32_t column);
 
-    /**
-     * Gets the field slot at the specified row and column.
-     * Returns null if the requested row or column is not in the window.
-     */
-    FieldSlot* getFieldSlot(uint32_t row, uint32_t column);
+        /**
+         * Gets the field slot at the specified row and column.
+         * Returns null if the requested row or column is not in the window.
+         */
+        FieldSlot* getFieldSlot(uint32_t row, uint32_t column);
 
-    inline int32_t getFieldSlotType(FieldSlot* fieldSlot) {
-        return fieldSlot->type;
-    }
+        inline int32_t getFieldSlotType(FieldSlot* fieldSlot) {
+            return fieldSlot->type;
+        }
 
-    inline int64_t getFieldSlotValueLong(FieldSlot* fieldSlot) {
-        return fieldSlot->data.l;
-    }
+        inline int64_t getFieldSlotValueLong(FieldSlot* fieldSlot) {
+            return fieldSlot->data.l;
+        }
 
-    inline double getFieldSlotValueDouble(FieldSlot* fieldSlot) {
-        return fieldSlot->data.d;
-    }
+        inline double getFieldSlotValueDouble(FieldSlot* fieldSlot) {
+            return fieldSlot->data.d;
+        }
 
-    inline const char* getFieldSlotValueString(FieldSlot* fieldSlot,
-            size_t* outSizeIncludingNull) {
-        *outSizeIncludingNull = fieldSlot->data.buffer.size;
-        return static_cast<char*>(offsetToPtr(fieldSlot->data.buffer.offset));
-    }
+        inline const char* getFieldSlotValueString(FieldSlot* fieldSlot,
+                                                   size_t* outSizeIncludingNull) {
+            *outSizeIncludingNull = fieldSlot->data.buffer.size;
+            return static_cast<char*>(offsetToPtr(
+                    fieldSlot->data.buffer.offset, fieldSlot->data.buffer.size));
+        }
 
-    inline const void* getFieldSlotValueBlob(FieldSlot* fieldSlot, size_t* outSize) {
-        *outSize = fieldSlot->data.buffer.size;
-        return offsetToPtr(fieldSlot->data.buffer.offset);
-    }
+        inline const void* getFieldSlotValueBlob(FieldSlot* fieldSlot, size_t* outSize) {
+            *outSize = fieldSlot->data.buffer.size;
+            return offsetToPtr(fieldSlot->data.buffer.offset, fieldSlot->data.buffer.size);
+        }
 
-private:
-    static const size_t ROW_SLOT_CHUNK_NUM_ROWS = 100;
+    private:
+        static const size_t ROW_SLOT_CHUNK_NUM_ROWS = 100;
 
-    struct Header {
-        // Offset of the lowest unused byte in the window.
-        uint32_t freeOffset;
+        struct Header {
+            // Offset of the lowest unused byte in the window.
+            uint32_t freeOffset;
 
-        // Offset of the first row slot chunk.
-        uint32_t firstChunkOffset;
+            // Offset of the first row slot chunk.
+            uint32_t firstChunkOffset;
 
-        uint32_t numRows;
-        uint32_t numColumns;
-    };
+            uint32_t numRows;
+            uint32_t numColumns;
+        };
 
-    struct RowSlot {
-        uint32_t offset;
-    };
+        struct RowSlot {
+            uint32_t offset;
+        };
 
-    struct RowSlotChunk {
-        RowSlot slots[ROW_SLOT_CHUNK_NUM_ROWS];
-        uint32_t nextChunkOffset;
-    };
+        struct RowSlotChunk {
+            RowSlot slots[ROW_SLOT_CHUNK_NUM_ROWS];
+            uint32_t nextChunkOffset;
+        };
 
     KString mName;
-    void* mData;
-    size_t mSize;
-    bool mReadOnly;
-    Header* mHeader;
+        void* mData;
+        size_t mSize;
+        bool mReadOnly;
+        Header* mHeader;
 
-    inline void* offsetToPtr(uint32_t offset) {
-        return static_cast<uint8_t*>(mData) + offset;
-    }
+        inline void* offsetToPtr(uint32_t offset, uint32_t bufferSize = 0) {
+            if (offset >= mSize) {
+                ALOGE("Offset %" PRIu32 " out of bounds, max value %zu", offset, mSize);
+                return NULL;
+            }
+            if (offset + bufferSize > mSize) {
+                ALOGE("End offset %" PRIu32 " out of bounds, max value %zu",
+                      offset + bufferSize, mSize);
+                return NULL;
+            }
+            return static_cast<uint8_t*>(mData) + offset;
+        }
 
-    inline uint32_t offsetFromPtr(void* ptr) {
-        return static_cast<uint8_t*>(ptr) - static_cast<uint8_t*>(mData);
-    }
+        inline uint32_t offsetFromPtr(void* ptr) {
+            return static_cast<uint8_t*>(ptr) - static_cast<uint8_t*>(mData);
+        }
 
-    /**
-     * Allocate a portion of the window. Returns the offset
-     * of the allocation, or 0 if there isn't enough space.
-     * If aligned is true, the allocation gets 4 byte alignment.
-     */
-    uint32_t alloc(size_t size, bool aligned = false);
+        /**
+         * Allocate a portion of the window. Returns the offset
+         * of the allocation, or 0 if there isn't enough space.
+         * If aligned is true, the allocation gets 4 byte alignment.
+         */
+        uint32_t alloc(size_t size, bool aligned = false);
 
-    RowSlot* getRowSlot(uint32_t row);
-    RowSlot* allocRowSlot();
+        RowSlot* getRowSlot(uint32_t row);
+        RowSlot* allocRowSlot();
 
-    status_t putBlobOrString(uint32_t row, uint32_t column,
-            const void* value, size_t size, int32_t type);
-};
+        status_t putBlobOrString(uint32_t row, uint32_t column,
+                                 const void* value, size_t size, int32_t type);
+    };
 
 }; // namespace android
 

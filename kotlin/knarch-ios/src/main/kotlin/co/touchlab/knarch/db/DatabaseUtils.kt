@@ -1,5 +1,6 @@
 package co.touchlab.knarch.db
 
+import co.touchlab.knarch.*
 import co.touchlab.knarch.db.sqlite.*
 import kotlin.math.max
 
@@ -211,7 +212,7 @@ class DatabaseUtils {
         /**
          * Appends an Object to an SQL string with the proper escaping, etc.
          */
-        fun appendValueToSql(sql: StringBuilder, value: Any) {
+        fun appendValueToSql(sql: StringBuilder, value: Any?) {
             if (value == null) {
                 sql.append("NULL")
             } else if (value is Boolean) {
@@ -671,6 +672,31 @@ class DatabaseUtils {
             }
         }
 
+        /**
+         * Creates a db and populates it with the sql statements in sqlStatements.
+         *
+         * @param context the context to use to create the db
+         * @param dbName the name of the db to create
+         * @param dbVersion the version to set on the db
+         * @param sqlStatements the statements to use to populate the db. This should be a single string
+         * of the form returned by sqlite3's <tt>.dump</tt> command (statements separated by
+         * semicolons)
+         */
+        fun createDbFromSqlStatements(
+                context:SystemContext, dbName:String, dbVersion:Int, sqlStatements:String) {
+            val db = context.openOrCreateDatabase(dbName, 0, null, null)
+            // TODO: this is not quite safe since it assumes that all semicolons at the end of a line
+            // terminate statements. It is possible that a text field contains ;\n. We will have to fix
+            // this if that turns out to be a problem.
+            val statements = sqlStatements.split(";\n")
+            for (statement in statements)
+            {
+                if (statement.isEmpty()) continue
+                db.execSQL(statement)
+            }
+            db.setVersion(dbVersion)
+            db.close()
+        }
 
         /**
          * Returns one of the following which represent the type of the given SQL statement.

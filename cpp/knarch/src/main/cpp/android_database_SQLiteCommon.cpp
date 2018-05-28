@@ -149,7 +149,7 @@ void throw_sqlite3_exception(int errcode,
                 //Can (probably) just go from std::string to KString
                 makeKString(fullMessage.c_str()));
     } else {
-        ThrowSql_SQLiteException(makeKString(exceptionClass), makeKString(message));
+        ThrowSql_SQLiteException(makeKString(exceptionClass), makeKString(message ? message : ""));
     }
 }
 

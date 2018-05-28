@@ -67,6 +67,8 @@ interface SystemContext{
         val MODE_ENABLE_WRITE_AHEAD_LOGGING = 0x0008
     }
 
+    fun getDir(folder:String, mode:Int):File
+
     fun getDatabasePath(databaseName:String):File
 
     fun openOrCreateDatabase(name:String,

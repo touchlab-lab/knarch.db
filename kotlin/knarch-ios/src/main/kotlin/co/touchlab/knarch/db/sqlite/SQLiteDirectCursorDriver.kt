@@ -14,14 +14,11 @@ class SQLiteDirectCursorDriver(db:SQLiteDatabase, sql:String, editTable:String?)
     }
 
     override fun query(factory:SQLiteDatabase.CursorFactory?, selectionArgs:Array<String>?):Cursor {
-        print("A 1")
         val query = SQLiteQuery(mDatabase, mSql)
-        print("A 2")
         val cursor:Cursor
         try
         {
             query.bindAllArgsAsStrings(selectionArgs)
-            print("A 3")
             if (factory == null)
             {
                 cursor = SQLiteCursor(this, mEditTable, query)
@@ -30,7 +27,6 @@ class SQLiteDirectCursorDriver(db:SQLiteDatabase, sql:String, editTable:String?)
             {
                 cursor = factory.newCursor(mDatabase, this, mEditTable, query)
             }
-            print("A 4")
         }
         catch (ex:RuntimeException) {
             query.close()

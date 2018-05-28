@@ -65,6 +65,10 @@ constructor(val mContext:SystemContext, val databaseName:String?,
                 return getDatabaseLocked(true)
 //            }
         }
+
+    fun getWritableDatabase():SQLiteDatabase = writableDatabase
+    fun getReadableDatabase():SQLiteDatabase = readableDatabase
+
     /**
      * Create and/or open a database. This will be the same object returned by
      * {@link #getWritableDatabase} unless some problem, such as a full disk,
@@ -266,7 +270,7 @@ constructor(val mContext:SystemContext, val databaseName:String?,
      *
      * @param db The database.
      */
-    fun onConfigure(db:SQLiteDatabase) {}
+    open fun onConfigure(db:SQLiteDatabase) {}
     /**
      * Called when the database is created for the first time. This is where the
      * creation of tables and the initial population of the tables should happen.
@@ -311,7 +315,7 @@ constructor(val mContext:SystemContext, val databaseName:String?,
      * @param oldVersion The old database version.
      * @param newVersion The new database version.
      */
-    fun onDowngrade(db:SQLiteDatabase, oldVersion:Int, newVersion:Int) {
+    open fun onDowngrade(db:SQLiteDatabase, oldVersion:Int, newVersion:Int) {
         throw SQLiteException(("Can't downgrade database from version " +
                 oldVersion + " to " + newVersion))
     }
@@ -328,7 +332,7 @@ constructor(val mContext:SystemContext, val databaseName:String?,
      *
      * @param db The database.
      */
-    fun onOpen(db:SQLiteDatabase) {}
+    open fun onOpen(db:SQLiteDatabase) {}
     companion object {
         private val TAG = "SQLiteOpenHelper"
         // When true, getReadableDatabase returns a read-only database if it is just being opened.

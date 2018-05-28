@@ -9,11 +9,11 @@ import kotlin.collections.List
 
 class DefaultSystemContext:SystemContext{
 
-    private fun getDatabaseDirPath():String{
+    private fun getDirPath(folder:String):String{
         val paths = NSSearchPathForDirectoriesInDomains(NSApplicationSupportDirectory, NSUserDomainMask, true);
         val documentsDirectory = paths[0] as String;
 
-        val databaseDirectory = documentsDirectory + "/databases"
+        val databaseDirectory = documentsDirectory + "/$folder"
 
         val fileManager = NSFileManager.defaultManager()
 
@@ -21,6 +21,12 @@ class DefaultSystemContext:SystemContext{
             fileManager.createDirectoryAtPath(databaseDirectory, true, null, null); //Create folder
 
         return databaseDirectory
+    }
+
+    private fun getDatabaseDirPath():String = getDirPath("databases")
+
+    override fun getDir(folder:String, mode:Int):File {
+        return File(getDirPath(folder))
     }
 
     override fun getDatabasePath(databaseName:String):File{

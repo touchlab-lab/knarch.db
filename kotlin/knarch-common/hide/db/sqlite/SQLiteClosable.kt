@@ -47,10 +47,12 @@ abstract class SQLiteClosable{
      *
      * Calling this method is equivalent to calling [.releaseReference].
      *
+     * Open for testing
+     *
      * @see .releaseReference
      * @see .onAllReferencesReleased
      */
-    fun close() {
+    open fun close() {
         releaseReference()
     }
 }

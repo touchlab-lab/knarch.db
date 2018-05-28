@@ -4,7 +4,7 @@ import co.touchlab.knarch.db.native.CppCursorWindow
 import co.touchlab.knarch.db.native.NativeCursorWindow
 import co.touchlab.knarch.db.sqlite.SQLiteClosable
 
-class CursorWindow/**
+open class CursorWindow/**
  * Creates a new empty cursor window and gives it a name.
  * <p>
  * The cursor initially has no rows or columns. Call {@link #setNumColumns(int)} to

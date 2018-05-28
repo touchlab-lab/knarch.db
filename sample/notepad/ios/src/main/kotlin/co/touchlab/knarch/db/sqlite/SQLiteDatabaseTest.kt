@@ -758,9 +758,12 @@ class SQLiteDatabaseTest {
                                driver:SQLiteCursorDriver, editTable:String?,
                                query:SQLiteQuery):Cursor{
             return GoGoSQLiteCursor(db, driver, editTable, query)
+//            return MockSQLiteCursor(db, driver, editTable, query)
         }
     }
-    
+
+    var factory = MockCursorFactory()
+
     @Test
     fun testQuery() {
         mDatabase!!.execSQL(("CREATE TABLE employee (_id INTEGER PRIMARY KEY, " + "name TEXT, month INTEGER, salary INTEGER);"))
@@ -799,8 +802,6 @@ class SQLiteDatabaseTest {
                 return GoGoSQLiteCursor(db, driver, editTable, query)
             }
         }*/
-
-        var factory = MockCursorFactory()
 
         var cursor = mDatabase!!.queryWithFactory(factory, true, "employee",
                 arrayOf<String>("name"), null, null, null, null, null, null)
