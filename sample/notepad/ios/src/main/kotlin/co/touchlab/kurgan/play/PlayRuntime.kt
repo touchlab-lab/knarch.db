@@ -14,7 +14,11 @@ import kotlin.test.*
     assertTrue(true)
 }
 
+class MyData(var a:String, var b:Int)
+
 class PlayRuntime(){
+
+    var heya:Atomic<MyData>? = null
 
     fun testAtomicBox(){
         memScoped {
@@ -35,10 +39,72 @@ class PlayRuntime(){
 
     fun testTest()
     {
-        TestRunner.run(arrayOf("--ktest_filter=*DatabaseUtilsTest*"))
-//        TestRunner.run(arrayOf("--ktest_filter=*testQuery*"))
+        TestRunner.run(arrayOf("--ktest_filter=*testCursorDoubleToCursorValues*"))
+//        TestRunner.run(arrayOf("--ktest_filter=*testExecSQL*"))
 //        TestRunner.run()
+
+        /*if(heya == null){
+            heya = Atomic(MyData("asdf", 123)).freeze()
+        } else {
+            val md = heya!!.getValue()
+            println("md a val before ${md.a}")
+
+            md.a = "qwert"
+            println("md a val after ${md.a}")
+        }*/
+
     }
+
+
+    fun testAtomic()
+    {
+        val atom = Atomic(MyData("asdf", 0)).freeze()
+        runFooWorkers(atom)
+        /*atom.access{
+            println("b is ${it.b}")
+        }*/
+
+    }
+
+    fun runFooWorkers(atom:Atomic<MyData>){
+        val COUNT = 10
+        val workers = Array(COUNT, { _ -> startWorker()})
+
+        for (attempt in 1 .. 2) {
+//        var workerCount = 0
+
+            val futures = Array(workers.size, { workerIndex ->
+                workers[workerIndex].schedule(TransferMode.CHECKED,
+                    {atom}
+            ) {latom ->
+                for(i in 0 until 50000) {
+                    latom.access{md->
+                        md.b= md.b+1
+                        if(md.b % 100000 == 0)
+                        {
+                            println("Count md.b ${md.b}")
+                        }
+                    }
+                }
+            }
+            })
+            val futureSet = futures.toSet()
+            var consumed = 0
+            while (consumed < futureSet.size) {
+                val ready = futureSet.waitForMultipleFutures(100000)
+                ready.forEach {
+                    it.consume {consumed++}
+                }
+            }
+            atom.access{
+                println("b is ${it.b}")
+            }
+        }
+        workers.forEach {
+            it.requestTermination().consume { _ -> }
+        }
+    }
+
 
     fun testDb()
     {

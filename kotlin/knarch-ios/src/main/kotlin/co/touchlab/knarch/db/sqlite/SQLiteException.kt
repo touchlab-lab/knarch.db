@@ -1,3 +1,5 @@
 package co.touchlab.knarch.db.sqlite
 
-open class SQLiteException(message: String?=null, cause: Throwable?=null) : RuntimeException(message, cause)
+import co.touchlab.knarch.db.*
+
+open class SQLiteException(message: String?=null, cause: Throwable?=null) : SQLException(message, cause)

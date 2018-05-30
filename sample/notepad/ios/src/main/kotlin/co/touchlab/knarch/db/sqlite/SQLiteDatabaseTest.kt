@@ -766,7 +766,105 @@ class SQLiteDatabaseTest {
 
     @Test
     fun testQuery() {
+
         mDatabase!!.execSQL(("CREATE TABLE employee (_id INTEGER PRIMARY KEY, " + "name TEXT, month INTEGER, salary INTEGER);"))
+        mDatabase!!.execSQL(("INSERT INTO employee (name, month, salary) " + "VALUES ('Mike', '1', '1000');"))
+        mDatabase!!.execSQL(("INSERT INTO employee (name, month, salary) " + "VALUES ('Mike', '2', '3000');"))
+        mDatabase!!.execSQL(("INSERT INTO employee (name, month, salary) " + "VALUES ('jack', '1', '2000');"))
+        mDatabase!!.execSQL(("INSERT INTO employee (name, month, salary) " + "VALUES ('jack', '3', '1500');"))
+        mDatabase!!.execSQL(("INSERT INTO employee (name, month, salary) " + "VALUES ('Jim', '1', '1000');"))
+        mDatabase!!.execSQL(("INSERT INTO employee (name, month, salary) " + "VALUES ('Jim', '3', '3500');"))
+        var cursor = mDatabase!!.query(true, "employee", arrayOf<String>("name", "sum(salary)"), null, null, "name", "sum(salary)>1000", "name", null)
+        assertNotNull(cursor)
+        assertEquals(3, cursor.getCount())
+        val COLUMN_NAME_INDEX = 0
+        val COLUMN_SALARY_INDEX = 1
+        cursor.moveToFirst()
+        assertEquals("Jim", cursor.getString(COLUMN_NAME_INDEX))
+        assertEquals(4500, cursor.getInt(COLUMN_SALARY_INDEX))
+        cursor.moveToNext()
+        assertEquals("Mike", cursor.getString(COLUMN_NAME_INDEX))
+        assertEquals(4000, cursor.getInt(COLUMN_SALARY_INDEX))
+        cursor.moveToNext()
+        assertEquals("jack", cursor.getString(COLUMN_NAME_INDEX))
+        assertEquals(3500, cursor.getInt(COLUMN_SALARY_INDEX))
+        cursor.close()
+        /*val factory = object:CursorFactory() {
+            fun newCursor(db:SQLiteDatabase, masterQuery:SQLiteCursorDriver,
+                          editTable:String, query:SQLiteQuery):Cursor {
+                return MockSQLiteCursor(db, masterQuery, editTable, query)
+            }
+        }*/
+        cursor = mDatabase!!.queryWithFactory(factory, true, "employee",
+                arrayOf<String>("name", "sum(salary)"), null, null, "name", "sum(salary) > 1000", "name", null)
+        assertNotNull(cursor)
+        assertTrue(cursor is MockSQLiteCursor)
+        cursor.moveToFirst()
+        assertEquals("Jim", cursor.getString(COLUMN_NAME_INDEX))
+        assertEquals(4500, cursor.getInt(COLUMN_SALARY_INDEX))
+        cursor.moveToNext()
+        assertEquals("Mike", cursor.getString(COLUMN_NAME_INDEX))
+        assertEquals(4000, cursor.getInt(COLUMN_SALARY_INDEX))
+        cursor.moveToNext()
+        assertEquals("jack", cursor.getString(COLUMN_NAME_INDEX))
+        assertEquals(3500, cursor.getInt(COLUMN_SALARY_INDEX))
+        cursor.close()
+        cursor = mDatabase!!.query("employee", arrayOf<String>("name", "sum(salary)"), null, null, "name", "sum(salary) <= 4000", "name")
+        assertNotNull(cursor)
+        assertEquals(2, cursor.getCount())
+        cursor.moveToFirst()
+        assertEquals("Mike", cursor.getString(COLUMN_NAME_INDEX))
+        assertEquals(4000, cursor.getInt(COLUMN_SALARY_INDEX))
+        cursor.moveToNext()
+        assertEquals("jack", cursor.getString(COLUMN_NAME_INDEX))
+        assertEquals(3500, cursor.getInt(COLUMN_SALARY_INDEX))
+        cursor.close()
+        cursor = mDatabase!!.query("employee", arrayOf<String>("name", "sum(salary)"), null, null, "name", "sum(salary) > 1000", "name", "2")
+        assertNotNull(cursor)
+        assertEquals(2, cursor.getCount())
+        cursor.moveToFirst()
+        assertEquals("Jim", cursor.getString(COLUMN_NAME_INDEX))
+        assertEquals(4500, cursor.getInt(COLUMN_SALARY_INDEX))
+        cursor.moveToNext()
+        assertEquals("Mike", cursor.getString(COLUMN_NAME_INDEX))
+        assertEquals(4000, cursor.getInt(COLUMN_SALARY_INDEX))
+        cursor.close()
+        var sql = "SELECT name, month FROM employee WHERE salary > ?;"
+        cursor = mDatabase!!.rawQuery(sql, arrayOf<String>("2000"))
+        assertNotNull(cursor)
+        assertEquals(2, cursor.getCount())
+        val COLUMN_MONTH_INDEX = 1
+        cursor.moveToFirst()
+        assertEquals("Mike", cursor.getString(COLUMN_NAME_INDEX))
+        assertEquals(2, cursor.getInt(COLUMN_MONTH_INDEX))
+        cursor.moveToNext()
+        assertEquals("Jim", cursor.getString(COLUMN_NAME_INDEX))
+        assertEquals(3, cursor.getInt(COLUMN_MONTH_INDEX))
+        cursor.close()
+        cursor = mDatabase!!.rawQueryWithFactory(factory, sql, arrayOf<String>("2000"), null)
+        assertNotNull(cursor)
+        assertEquals(2, cursor.getCount())
+        assertTrue(cursor is MockSQLiteCursor)
+        cursor.moveToFirst()
+        assertEquals("Mike", cursor.getString(COLUMN_NAME_INDEX))
+        assertEquals(2, cursor.getInt(COLUMN_MONTH_INDEX))
+        cursor.moveToNext()
+        assertEquals("Jim", cursor.getString(COLUMN_NAME_INDEX))
+        assertEquals(3, cursor.getInt(COLUMN_MONTH_INDEX))
+        cursor.close()
+
+
+
+
+
+
+
+
+
+
+        //Testing issue below
+
+        /*mDatabase!!.execSQL(("CREATE TABLE employee (_id INTEGER PRIMARY KEY, " + "name TEXT, month INTEGER, salary INTEGER);"))
 //        mDatabase!!.execSQL(("INSERT INTO employee (name, month, salary) " + "VALUES ('Mike', '1', '1000');"))
 //        mDatabase!!.execSQL(("INSERT INTO employee (name, month, salary) " + "VALUES ('Mike', '2', '3000');"))
 //        mDatabase!!.execSQL(("INSERT INTO employee (name, month, salary) " + "VALUES ('jack', '1', '2000');"))
@@ -780,6 +878,9 @@ class SQLiteDatabaseTest {
 //        mDatabase!!.execSQL(("INSERT INTO employee (name, month, salary) " + "VALUES ('Jim7', '1', '1000');"))
 //        mDatabase!!.execSQL(("INSERT INTO employee (name, month, salary) " + "VALUES ('Jim8', '1', '1000');"))
 //        mDatabase!!.execSQL(("INSERT INTO employee (name, month, salary) " + "VALUES ('Jim', '3', '3500');"))
+*/
+
+
         /*var cursor = mDatabase!!.query(true, "employee", arrayOf<String>("name", "sum(salary)"), null, null, "name", "sum(salary)>1000", "name", null)
         assertNotNull(cursor)
         assertEquals(3, cursor.getCount())
@@ -803,12 +904,12 @@ class SQLiteDatabaseTest {
             }
         }*/
 
-        var cursor = mDatabase!!.queryWithFactory(factory, true, "employee",
+        /*var cursor = mDatabase!!.queryWithFactory(factory, true, "employee",
                 arrayOf<String>("name"), null, null, null, null, null, null)
 //        assertNotNull(cursor)
 //        assertTrue(cursor is MockSQLiteCursor)
 
-        println("Cursort count ${cursor.getCount()}")
+        println("Cursort count ${cursor.getCount()}")*/
 
 
         /*cursor.moveToFirst()
@@ -868,7 +969,7 @@ class SQLiteDatabaseTest {
         cursor.moveToNext()
         assertEquals("Jim", cursor.getString(COLUMN_NAME_INDEX))
         assertEquals(3, cursor.getInt(COLUMN_MONTH_INDEX))*/
-        cursor.close()
+//        cursor.close()
     }
 
     @Test

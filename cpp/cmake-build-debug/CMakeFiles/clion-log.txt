@@ -1,6 +1,6 @@
 "/Applications/CLion 2018.2 EAP.app/Contents/bin/cmake/bin/cmake" -DCMAKE_BUILD_TYPE=Debug -G "CodeBlocks - Unix Makefiles" /Users/kgalligan/temp4/knarch/cpp
 -- Configuring done
-CMake Error at CMakeLists.txt:10 (add_executable):
+CMake Error at CMakeLists.txt:9 (add_executable):
   Cannot find source file:
 
     knarch/src/main/cpp/NativeHelper.m
@@ -9,7 +9,7 @@ CMake Error at CMakeLists.txt:10 (add_executable):
   .hpp .hxx .in .txx
 
 
-CMake Error at CMakeLists.txt:10 (add_executable):
+CMake Error at CMakeLists.txt:9 (add_executable):
   No SOURCES given to target: cpp
 
 

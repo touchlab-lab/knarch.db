@@ -15,62 +15,50 @@
  */
 
 #include "android_database_SQLiteCommon.h"
-#include <cstdio>
-#include <string>
-#include "KonanHelper.h"
+
+#include <utils/String8.h>
 
 namespace android {
 
-    KString makeKString(char* str){
-        return makeKString(const_cast<const char*>(str));
-    }
-
-    KString makeKString(const char* str){
-        ObjHolder hold;
-        ObjHeader* res = CreateStringFromCString(str, hold.slot());
-        res->container()->incRefCount<false>();
-        return reinterpret_cast<KString>(res);
-    }
-
 /* throw a SQLiteException with a message appropriate for the error in handle */
-void throw_sqlite3_exception(sqlite3* handle) {
-    throw_sqlite3_exception(handle, NULL);
+void throw_sqlite3_exception(JNIEnv* env, sqlite3* handle) {
+    throw_sqlite3_exception(env, handle, NULL);
 }
 
 /* throw a SQLiteException with the given message */
-void throw_sqlite3_exception(const char* message) {
-    throw_sqlite3_exception(NULL, message);
+void throw_sqlite3_exception(JNIEnv* env, const char* message) {
+    throw_sqlite3_exception(env, NULL, message);
 }
 
 /* throw a SQLiteException with a message appropriate for the error in handle
    concatenated with the given message
  */
-void throw_sqlite3_exception(sqlite3* handle, const char* message) {
+void throw_sqlite3_exception(JNIEnv* env, sqlite3* handle, const char* message) {
     if (handle) {
         // get the error code and message from the SQLite connection
         // the error message may contain more information than the error code
         // because it is based on the extended error code rather than the simplified
         // error code that SQLite normally returns.
-        throw_sqlite3_exception(sqlite3_extended_errcode(handle),
+        throw_sqlite3_exception(env, sqlite3_extended_errcode(handle),
                 sqlite3_errmsg(handle), message);
     } else {
         // we use SQLITE_OK so that a generic SQLiteException is thrown;
         // any code not specified in the switch statement below would do.
-        throw_sqlite3_exception(SQLITE_OK, "unknown error", message);
+        throw_sqlite3_exception(env, SQLITE_OK, "unknown error", message);
     }
 }
 
 /* throw a SQLiteException for a given error code
  * should only be used when the database connection is not available because the
  * error information will not be quite as rich */
-void throw_sqlite3_exception_errcode(int errcode, const char* message) {
-    throw_sqlite3_exception(errcode, "unknown error", message);
+void throw_sqlite3_exception_errcode(JNIEnv* env, int errcode, const char* message) {
+    throw_sqlite3_exception(env, errcode, "unknown error", message);
 }
 
 /* throw a SQLiteException for a given error code, sqlite3message, and
    user message
  */
-void throw_sqlite3_exception(int errcode,
+void throw_sqlite3_exception(JNIEnv* env, int errcode,
                              const char* sqlite3Message, const char* message) {
     const char* exceptionClass;
     switch (errcode & 0xff) { /* mask off extended error code */
@@ -133,20 +121,16 @@ void throw_sqlite3_exception(int errcode,
     }
 
     if (sqlite3Message) {
-        std::string fullMessage;
+        String8 fullMessage;
         fullMessage.append(sqlite3Message);
-        char buff[20];
-        snprintf(buff, sizeof(buff), " (code %d)", errcode);
-        fullMessage.append(buff);
+        fullMessage.appendFormat(" (code %d)", errcode); // print extended error code
         if (message) {
             fullMessage.append(": ");
             fullMessage.append(message);
         }
-        ThrowSql_SQLiteException(makeKString(exceptionClass),
-                //Can (probably) just go from std::string to KString
-                makeKString(fullMessage.c_str()));
+        jniThrowException(env, exceptionClass, fullMessage.string());
     } else {
-        ThrowSql_SQLiteException(makeKString(exceptionClass), makeKString(message ? message : ""));
+        jniThrowException(env, exceptionClass, message);
     }
 }
 

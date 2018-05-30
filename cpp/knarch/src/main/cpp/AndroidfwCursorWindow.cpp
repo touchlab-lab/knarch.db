@@ -37,7 +37,7 @@ CursorWindow::CursorWindow(const KString& name,
 
     CursorWindow::~CursorWindow() {
 
-    konan::free(mData);
+    free(mData);
     //::munmap(mData, mSize);
     //::close(mAshmemFd);
     }
@@ -47,7 +47,7 @@ CursorWindow::CursorWindow(const KString& name,
         ashmemName.append(name);*/
 
         status_t result;
-        void* data = konan::calloc(size, sizeof(KByte));
+    void* data = malloc(size);
         if(data == NULL)
         {
             //NO_MEMORY maybe?
