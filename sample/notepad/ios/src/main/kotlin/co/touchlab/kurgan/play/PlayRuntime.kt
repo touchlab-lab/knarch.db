@@ -39,9 +39,9 @@ class PlayRuntime(){
 
     fun testTest()
     {
-        TestRunner.run(arrayOf("--ktest_filter=*testCursorDoubleToCursorValues*"))
+//        TestRunner.run(arrayOf("--ktest_filter=*testStatementConstraint*"))
 //        TestRunner.run(arrayOf("--ktest_filter=*testExecSQL*"))
-//        TestRunner.run()
+        TestRunner.run()
 
         /*if(heya == null){
             heya = Atomic(MyData("asdf", 123)).freeze()

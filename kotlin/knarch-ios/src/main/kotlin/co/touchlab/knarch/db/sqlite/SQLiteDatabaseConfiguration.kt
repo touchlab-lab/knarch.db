@@ -56,6 +56,22 @@ class SQLiteDatabaseConfiguration{
     var foreignKeyConstraintsEnabled = false
 
     /**
+     * The size in bytes of each lookaside slot
+     *
+     *
+     * If negative, the default lookaside configuration will be used
+     */
+    var lookasideSlotSize = -1
+
+    /**
+     * The total number of lookaside memory slots per database connection
+     *
+     *
+     * If negative, the default lookaside configuration will be used
+     */
+    var lookasideSlotCount = -1
+
+    /**
      * Creates a database configuration with the required parameters for opening a
      * database and default values for all other parameters.
      *

@@ -42,6 +42,7 @@ CursorWindow::CursorWindow(const KString& name,
     //::close(mAshmemFd);
     }
 
+    //TODO: Figure out memory for name
     status_t CursorWindow::create(const KString& name, size_t size, CursorWindow** outCursorWindow) {
         /*String8 ashmemName("CursorWindow: ");
         ashmemName.append(name);*/

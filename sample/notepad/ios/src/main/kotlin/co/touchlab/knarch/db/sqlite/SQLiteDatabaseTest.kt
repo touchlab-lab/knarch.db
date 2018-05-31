@@ -752,18 +752,6 @@ class SQLiteDatabaseTest {
 //        cursor.close()
 //    }
 
-
-    class MockCursorFactory():SQLiteDatabase.CursorFactory{
-        override fun newCursor(db:SQLiteDatabase,
-                               driver:SQLiteCursorDriver, editTable:String?,
-                               query:SQLiteQuery):Cursor{
-            return GoGoSQLiteCursor(db, driver, editTable, query)
-//            return MockSQLiteCursor(db, driver, editTable, query)
-        }
-    }
-
-    var factory = MockCursorFactory()
-
     @Test
     fun testQuery() {
 
@@ -789,16 +777,19 @@ class SQLiteDatabaseTest {
         assertEquals("jack", cursor.getString(COLUMN_NAME_INDEX))
         assertEquals(3500, cursor.getInt(COLUMN_SALARY_INDEX))
         cursor.close()
-        /*val factory = object:CursorFactory() {
-            fun newCursor(db:SQLiteDatabase, masterQuery:SQLiteCursorDriver,
-                          editTable:String, query:SQLiteQuery):Cursor {
-                return MockSQLiteCursor(db, masterQuery, editTable, query)
+        val factory = object:SQLiteDatabase.CursorFactory {
+            override fun newCursor(db:SQLiteDatabase,
+                                   driver:SQLiteCursorDriver, editTable:String?,
+                                   query:SQLiteQuery):Cursor{
+                return GoGoSQLiteCursor(db, driver, editTable, query)
+//            return MockSQLiteCursor(db, driver, editTable, query)
             }
-        }*/
+        }
         cursor = mDatabase!!.queryWithFactory(factory, true, "employee",
                 arrayOf<String>("name", "sum(salary)"), null, null, "name", "sum(salary) > 1000", "name", null)
         assertNotNull(cursor)
-        assertTrue(cursor is MockSQLiteCursor)
+        assertTrue(cursor is GoGoSQLiteCursor)
+//        assertTrue(cursor is MockSQLiteCursor)
         cursor.moveToFirst()
         assertEquals("Jim", cursor.getString(COLUMN_NAME_INDEX))
         assertEquals(4500, cursor.getInt(COLUMN_SALARY_INDEX))
@@ -844,7 +835,8 @@ class SQLiteDatabaseTest {
         cursor = mDatabase!!.rawQueryWithFactory(factory, sql, arrayOf<String>("2000"), null)
         assertNotNull(cursor)
         assertEquals(2, cursor.getCount())
-        assertTrue(cursor is MockSQLiteCursor)
+        assertTrue(cursor is GoGoSQLiteCursor)
+//        assertTrue(cursor is MockSQLiteCursor)
         cursor.moveToFirst()
         assertEquals("Mike", cursor.getString(COLUMN_NAME_INDEX))
         assertEquals(2, cursor.getInt(COLUMN_MONTH_INDEX))

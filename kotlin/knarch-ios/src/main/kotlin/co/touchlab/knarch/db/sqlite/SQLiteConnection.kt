@@ -56,7 +56,8 @@ class SQLiteConnection private constructor(/*pool:SQLiteConnectionPool,*/
     private fun open() {
         mConnectionPtr = nativeOpen(mConfiguration.path, mConfiguration.openFlags,
                 mConfiguration.label,
-                SQLiteDebug.DEBUG_SQL_STATEMENTS, SQLiteDebug.DEBUG_SQL_TIME)
+                SQLiteDebug.DEBUG_SQL_STATEMENTS, SQLiteDebug.DEBUG_SQL_TIME,
+                mConfiguration.lookasideSlotSize, mConfiguration.lookasideSlotCount)
         setPageSize()
         setForeignKeyModeFromConfiguration()
         setWalModeFromConfiguration()
@@ -871,12 +872,14 @@ class SQLiteConnection private constructor(/*pool:SQLiteConnectionPool,*/
         var mInUse:Boolean = false
     }
 
-    private inner class PreparedStatementCache(size:Int):LruCache<String, PreparedStatement>(size) {
+    private inner class
+    PreparedStatementCache(size:Int):LruCache<String, PreparedStatement>(size) {
         override fun entryRemoved(evicted:Boolean, key:String,
                                    oldValue:PreparedStatement?, newValue:PreparedStatement?) {
             if(oldValue != null) {
                 oldValue.mInCache = false
                 if (!oldValue.mInUse) {
+
                     finalizePreparedStatement(oldValue)
                 }
             }
@@ -1163,7 +1166,8 @@ class SQLiteConnection private constructor(/*pool:SQLiteConnectionPool,*/
 //        private val TRIM_SQL_PATTERN = Pattern.compile("[\\s]*\\n+[\\s]*")
         @SymbolName("Android_Database_SQLiteConnection_nativeOpen")
         private external fun nativeOpen(path:String, openFlags:Int, label:String,
-                                        enableTrace:Boolean, enableProfile:Boolean):Long
+                                        enableTrace:Boolean, enableProfile:Boolean,
+                                        lookasideSlotSize:Int, lookasideSlotCount:Int):Long
         @SymbolName("Android_Database_SQLiteConnection_nativeClose")
         private external fun nativeClose(connectionPtr:Long)
 //        @SymbolName("")

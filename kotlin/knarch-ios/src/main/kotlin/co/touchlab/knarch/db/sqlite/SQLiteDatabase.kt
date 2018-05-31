@@ -303,14 +303,8 @@ class SQLiteDatabase private constructor(path: String, openFlags: Int, cursorFac
     // INVARIANT: Guarded by mLock.
     private val mConfigurationLocked: SQLiteDatabaseConfiguration
 
-
     override fun onAllReferencesReleased() {
-//        dispose(false);
-    }
-
-    //TODO: This needs to get sorted if we don't implement full class stack. This isn't working right, even if tests pass.
-    override fun close(){
-        dispose(false)
+        dispose(false);
     }
 
     private fun dispose(finalized:Boolean) {

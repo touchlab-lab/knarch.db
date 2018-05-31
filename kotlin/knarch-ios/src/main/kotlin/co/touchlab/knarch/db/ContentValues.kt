@@ -397,7 +397,16 @@ class ContentValues{
         catch (e:ClassCastException) {
             if (value is CharSequence)
             {
-                return value.toString().toBoolean()
+                val sval = value.toString()
+                val iOrNull = sval.toIntOrNull()
+                if(iOrNull == null)
+                {
+                    return sval.toBoolean()
+                }
+                else
+                {
+                    return iOrNull > 0
+                }
             }
             else if (value is Number)
             {

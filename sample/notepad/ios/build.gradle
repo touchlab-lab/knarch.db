@@ -9,24 +9,17 @@ konanArtifacts {
         /*target('iphone') {
             libraries {
                 klib 'kurgan'
-                klib 'objcsrc'
                 nativeLibraries '/Users/kgalligan/temp3/kotlin-native/tlruntime/build/ios_arm64/tlruntime.bc'
 
-//                useRepo 'klibrepo/ios_arm64'
                 useRepo '../../../calculator/kurgan-ios/build/konan/libs/ios_arm64'
-//                useRepo '/Users/kgalligan/temp3/kotlin-native/tlruntime/build/ios_arm64'
             }
         }*/
 
         target('iphone_sim') {
             libraries {
                 klib 'kurgan'
-//                klib 'objcsrc'
                 nativeLibraries '../../../cpp/knarch/build/ios_x64/tlruntime.bc'
-
-//                useRepo 'klibrepo/ios_x64'
                 useRepo '../../../kotlin/knarch-ios/build/konan/libs/ios_x64'
-//                useRepo '/Users/kgalligan/temp3/kotlin-native/tlruntime/build/ios_x64'
             }
         }
 

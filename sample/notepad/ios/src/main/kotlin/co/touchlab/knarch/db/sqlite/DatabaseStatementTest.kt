@@ -262,6 +262,7 @@ class DatabaseStatementTest{
         catch (e:SQLiteException) {
             // expected
         }
+
         // Make sure the statement can still be used
         statement.bindLong(1, 1)
         statement.execute()

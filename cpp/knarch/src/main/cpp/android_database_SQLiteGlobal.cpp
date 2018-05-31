@@ -34,14 +34,18 @@ static const int SOFT_HEAP_LIMIT = 8 * 1024 * 1024;
 
 
 // Called each time a message is logged.
-static void sqliteLogCallback(void* data, int iErrCode, const char* zMsg) {
+static void sqliteLogCallback(void* data, int err, const char* msg) {
     bool verboseLog = !!data;
-    if (iErrCode == 0 || iErrCode == SQLITE_CONSTRAINT || iErrCode == SQLITE_SCHEMA) {
+    int errType = err & 255;
+    if (errType == 0 || errType == SQLITE_CONSTRAINT || errType == SQLITE_SCHEMA
+        || errType == SQLITE_NOTICE || err == SQLITE_WARNING_AUTOINDEX) {
         if (verboseLog) {
-//            ALOG(LOG_VERBOSE, SQLITE_LOG_TAG, "(%d) %s\n", iErrCode, zMsg);
+            ALOGV("(%d) %s\n", err, msg);
         }
+    } else if (errType == SQLITE_WARNING) {
+        ALOGV("(%d) %s\n", err, msg);
     } else {
-//        ALOG(LOG_ERROR, SQLITE_LOG_TAG, "(%d) %s\n", iErrCode, zMsg);
+        ALOGV("(%d) %s\n", err, msg);
     }
 }
 
@@ -54,6 +58,8 @@ static void sqliteInitialize() {
     sqlite3_config(SQLITE_CONFIG_MULTITHREAD);
 
     // Redirect SQLite log messages to the Android log.
+
+    //TODO: Sort out log stuff
     bool verboseLog = false;//android_util_Log_isVerboseLogEnabled(SQLITE_LOG_TAG);
     sqlite3_config(SQLITE_CONFIG_LOG, &sqliteLogCallback, verboseLog ? (void*)1 : NULL);
 
@@ -70,16 +76,10 @@ static KInt nativeReleaseMemory() {
     return sqlite3_release_memory(SOFT_HEAP_LIMIT);
 }
 
-
 extern "C" KInt Android_Database_SQLiteGlobal_nativeReleaseMemory()
 {
     return nativeReleaseMemory();
 }
-
-const int MUTEX_CACHE_SIZE = 20;
-mutex cacheMutex;
-int cacheCount = 0;
-vector<mutex> mutexCache(MUTEX_CACHE_SIZE);
 
 int register_android_database_SQLiteGlobal()
 {

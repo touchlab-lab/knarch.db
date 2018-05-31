@@ -40,14 +40,14 @@
 #else
 
 #define IF_LOG_WINDOW() IF_ALOG(LOG_DEBUG, "CursorWindow")
-#define LOG_WINDOW(...) ALOG(/*LOG_DEBUG, */"CursorWindow", __VA_ARGS__)
+#define LOG_WINDOW(...) //ALOG(/*LOG_DEBUG, */"CursorWindow", __VA_ARGS__)
 
 #endif
 
 namespace android {
 
 /**
- * This class stores a set of rows from a database in a buffer. The begining of the
+ * This class stores a set of rows from a database in a buffer. The begining of Android_Database_CursorWindow_nativeCreatethe
  * window has first chunk of RowSlots, which are offsets to the row directory, followed by
  * an offset to the next chunk in a linked-list of additional chunk of RowSlots in case
  * the pre-allocated chunk isn't big enough to refer to all rows. Each row directory has a

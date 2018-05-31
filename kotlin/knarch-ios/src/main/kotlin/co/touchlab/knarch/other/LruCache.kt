@@ -171,16 +171,13 @@ open class LruCache<K, V>/**
             throw NullPointerException("key == null")
         }
         var previous:V?=null
-//        synchronized (this) {
+        if(map.containsKey(key)) {
             previous = map.remove(key)
-            if (previous != null)
-            {
-                size -= safeSizeOf(key, previous)
-            }
-//        }
+        }
         if (previous != null)
         {
-            entryRemoved(false, key, previous, null!!)
+            size -= safeSizeOf(key, previous)
+            entryRemoved(false, key, previous, null)
         }
         return previous
     }
