@@ -1,36 +1,46 @@
 buildscript {
+    ext.kotlin_version = '1.2.41'
     repositories {
         mavenCentral()
         maven { url "https://dl.bintray.com/jetbrains/kotlin-native-dependencies" }
     }
 
     dependencies {
-        classpath "org.jetbrains.kotlin:kotlin-native-gradle-plugin:${project.property('konan.plugin.version')}"
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+//        classpath "org.jetbrains.kotlin:kotlin-native-gradle-plugin:${project.property('konan.plugin.version')}"
     }
 }
 
-apply plugin: 'konan'
+//apply plugin: 'konan'
+apply plugin: 'kotlin-platform-common'
 
-konan.targets = ['iphone', 'iphone_sim'/*, 'macos_x64'*/]
+//konan.targets = ['iphone', 'iphone_sim'/*, 'macos_x64'*/]
 
 //def j2objcRuntime = System.getenv('J2OBJC_RUNTIME')
 
+/*
 konanArtifacts {
+    */
 /*interop ("objcsrc"){
         includeDirs ".", "${j2objcRuntime}/include", "dbarch"
         linkerOpts "-L${j2objcRuntime}/lib", "-Ldbarch/Build/Products/Debug-universal"
-    }*/
+    }*//*
+
 
     library("kurgan"){
+        */
 /*libraries {
             artifact 'objcsrc'
-        }*/
+        }*//*
+
         enableMultiplatform true
     }
 }
+*/
 
 dependencies {
-    expectedBy project(':knarch-common')
+//    expectedBy project(':knarch-common')
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-common:$kotlin_version"
 }
 
 repositories {

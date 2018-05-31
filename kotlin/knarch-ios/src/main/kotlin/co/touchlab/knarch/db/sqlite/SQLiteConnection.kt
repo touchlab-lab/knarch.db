@@ -10,40 +10,21 @@ import co.touchlab.knarch.Log
 import kotlin.system.*
 
 class SQLiteConnection private constructor(/*pool:SQLiteConnectionPool,*/
-                                           configuration:SQLiteDatabaseConfiguration,
-                                           connectionId:Int, primaryConnection:Boolean) {
+        private val mConfiguration:SQLiteDatabaseConfiguration,
+                                           val connectionId:Int, val primaryConnection:Boolean) {
     /*private val mPool:SQLiteConnectionPool*/
-    private val mConfiguration:SQLiteDatabaseConfiguration
-    /**
-     * Gets the unique id of this connection.
-     * @return The connection id.
-     */
-    var connectionId:Int = 0
-    /**
-     * Returns true if this is the primary database connection.
-     * @return True if this is the primary database connection.
-     */
-    var isPrimaryConnection:Boolean = false
-    private var mIsReadOnlyConnection:Boolean = false
+
+
+    private val mIsReadOnlyConnection:Boolean = false
     private val mPreparedStatementCache:PreparedStatementCache
     private var mPreparedStatementPool:PreparedStatement?=null
     // The recent operations log.
     private val mRecentOperations = OperationLog()
     // The native SQLiteConnection pointer. (FOR INTERNAL USE ONLY)
     private var mConnectionPtr:Long = 0
-    // The number of times attachCancellationSignal has been called.
-    // Because SQLite statement execution can be reentrant, we keep track of how many
-    // times we have attempted to attach a cancellation signal to the connection so that
-    // we can ensure that we detach the signal at the right time.
-    private val mCancellationSignalAttachCount:Int = 0
-    init{
 
-        mConfiguration = SQLiteDatabaseConfiguration(configuration)
-        this.connectionId = connectionId
-        isPrimaryConnection = primaryConnection
-        mIsReadOnlyConnection = (configuration.openFlags and SQLiteDatabase.OPEN_READONLY) !== 0
-        mPreparedStatementCache = PreparedStatementCache(
-                mConfiguration.maxSqlCacheSize)
+    init{
+        mPreparedStatementCache = PreparedStatementCache(mConfiguration.maxSqlCacheSize)
     }
 
     // Called by SQLiteConnectionPool only.
@@ -193,7 +174,7 @@ class SQLiteConnection private constructor(/*pool:SQLiteConnectionPool,*/
     }
 
     // Called by SQLiteConnectionPool only.
-    internal fun reconfigure(configuration:SQLiteDatabaseConfiguration) {
+    /*internal fun reconfigure(configuration:SQLiteDatabaseConfiguration) {
 
         // Remember what changed.
         val foreignKeyModeChanged = (configuration.foreignKeyConstraintsEnabled !== mConfiguration.foreignKeyConstraintsEnabled)
@@ -212,7 +193,7 @@ class SQLiteConnection private constructor(/*pool:SQLiteConnectionPool,*/
         {
             setWalModeFromConfiguration()
         }
-    }
+    }*/
 
     // Called by SQLiteConnectionPool only.
     // Returns true if the prepared statement cache contains the specified SQL.
@@ -709,7 +690,7 @@ class SQLiteConnection private constructor(/*pool:SQLiteConnectionPool,*/
         {
             printer.println(" connectionPtr: 0x" + mConnectionPtr.toString(16))
         }
-        printer.println(" isPrimaryConnection: $isPrimaryConnection")
+        printer.println(" primaryConnection: $primaryConnection")
         mRecentOperations.dump(printer, verbose)
         if (verbose)
         {
@@ -802,7 +783,7 @@ class SQLiteConnection private constructor(/*pool:SQLiteConnectionPool,*/
         // The prepared statement cache is thread-safe so we can access its statistics
         // even if we do not own the database connection.
         var label = mConfiguration.path
-        if (!isPrimaryConnection)
+        if (!primaryConnection)
         {
             label += " ($connectionId)"
         }

@@ -18,18 +18,21 @@ fun <T> Atomic<T>.putValue(target:T){
     atomicGetCounter(this).theData = target
 }
 
-fun <T> Atomic<T>.access(proc:(T) -> Unit):Unit {
-    mutex.lock()
-    try {
-        runProc<T>(proc)
-    } finally {
-        mutex.unlock()
-    }
-}
+
 
 internal fun <T> Atomic<T>.runProc(proc:(T) -> Unit){
     val ac = atomicGetCounter(this)
     proc(ac.theData as T)
+}
+
+internal fun <T, W> Atomic<T>.runProcWith(proc:(T, W) -> Unit, data: W){
+    val ac = atomicGetCounter(this)
+    proc(ac.theData as T, data)
+}
+
+internal fun <T, R> Atomic<T>.runProcForResult(proc:(T) -> R):R{
+    val ac = atomicGetCounter(this)
+    return proc(ac.theData as T)
 }
 
 @SymbolName("Atomic_atomicGetCounter")

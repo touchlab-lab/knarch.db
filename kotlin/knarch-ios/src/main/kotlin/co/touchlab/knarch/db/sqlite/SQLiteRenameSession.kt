@@ -3,20 +3,18 @@ package co.touchlab.knarch.db.sqlite
 import co.touchlab.knarch.Log
 import co.touchlab.knarch.db.CursorWindow
 import co.touchlab.knarch.db.DatabaseUtils
-import co.touchlab.knarch.db.sqlite.SQLiteDatabase.Companion.TAG
-import platform.Foundation.*
 
 /**
  * Creates a session bound to the specified connection pool.
  *
  * @param connectionPool The connection pool.
  */
-class SQLiteSession(val mConnection:SQLiteConnection) {
+class SQLiteRenameSession(val mConnection:SQLiteConnection) {
     private val mConnectionFlags:Int = 0
     private var mConnectionUseCount:Int = 0
     private var mTransactionPool:Transaction? = null
     private var mTransactionStack:Transaction? = null
-    private val transLock = NSRecursiveLock()
+//    private val transLock = NSLock()
 
     /**
      * Returns true if the session has a transaction in progress.
@@ -93,7 +91,7 @@ class SQLiteSession(val mConnection:SQLiteConnection) {
             if (mTransactionStack == null)
             {
                 // Execute SQL might throw a runtime exception.
-                transLock.lock()
+//                transLock.lock()
                 when (transactionMode) {
                     TRANSACTION_MODE_IMMEDIATE -> mConnection.execute("BEGIN IMMEDIATE;", null) // might throw
                     TRANSACTION_MODE_EXCLUSIVE -> mConnection.execute("BEGIN EXCLUSIVE;", null) // might throw
@@ -125,7 +123,7 @@ class SQLiteSession(val mConnection:SQLiteConnection) {
         {
             if (mTransactionStack == null)
             {
-                transLock.unlock()
+                transactionUnlock()
                 releaseConnection() // might throw
             }
         }
@@ -134,10 +132,10 @@ class SQLiteSession(val mConnection:SQLiteConnection) {
     private fun transactionUnlock()
     {
         try {
-            transLock.unlock()
+//            transLock.unlock()
         } catch (e: Exception) {
             //Presumably we weren't locked
-            Log.w(TAG, "Failed unlock", e)
+            Log.w("SQLiteSession", "Failed unlock", e)
         }
     }
     /**

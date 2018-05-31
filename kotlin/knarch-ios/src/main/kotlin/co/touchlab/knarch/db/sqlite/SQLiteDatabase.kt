@@ -5,6 +5,7 @@ import co.touchlab.knarch.db.*
 import co.touchlab.knarch.io.*
 import co.touchlab.knarch.other.Printer
 import platform.Foundation.*
+import konan.worker.*
 
 class SQLiteDatabase private constructor(path: String, openFlags: Int, cursorFactory: CursorFactory?, errorHandler: DatabaseErrorHandler?) : SQLiteClosable() {
 
@@ -168,8 +169,8 @@ class SQLiteDatabase private constructor(path: String, openFlags: Int, cursorFac
         fun openDatabase(path:String , factory:CursorFactory?, flags:Int,
                          errorHandler:DatabaseErrorHandler? = null):SQLiteDatabase {
             val db = SQLiteDatabase(path, flags, factory, errorHandler);
-            db.open();
-            return db;
+            db.open()
+            return db
         }
 
         /**
@@ -188,10 +189,6 @@ class SQLiteDatabase private constructor(path: String, openFlags: Int, cursorFac
          * @return True if the database was successfully deleted.
          */
         fun deleteDatabase(file:File):Boolean {
-            if (file == null)
-            {
-                throw IllegalArgumentException("file must not be null")
-            }
             var deleted = false
             deleted = deleted or file.delete()
             deleted = deleted or File(file.getPath() + "-journal").delete()
@@ -289,7 +286,7 @@ class SQLiteDatabase private constructor(path: String, openFlags: Int, cursorFac
         }
     }
 
-    var sqliteSession :SQLiteSession?=null
+    var sqliteSession :SQLiteSessionAtomic?=null
 
     // The optional factory to use when creating new Cursors.  May be null.
     // INVARIANT: Immutable.
@@ -301,7 +298,7 @@ class SQLiteDatabase private constructor(path: String, openFlags: Int, cursorFac
 
     // The database configuration.
     // INVARIANT: Guarded by mLock.
-    private val mConfigurationLocked: SQLiteDatabaseConfiguration
+    private var mConfigurationLocked: SQLiteDatabaseConfiguration
 
     override fun onAllReferencesReleased() {
         dispose(false);
@@ -342,7 +339,7 @@ class SQLiteDatabase private constructor(path: String, openFlags: Int, cursorFac
      * @throws IllegalStateException if the thread does not yet have a session and
      * the database is not open.
      */
-    fun getThreadSession():SQLiteSession {
+    fun getThreadSession():SQLiteSessionAtomic {
 //        kotlin.assert(sqliteSession != null, {"Must call open before trying to use db"})
         if(sqliteSession == null)
             openInner()
@@ -569,14 +566,14 @@ class SQLiteDatabase private constructor(path: String, openFlags: Int, cursorFac
 
 //        TODO("Need to figure out pools")
         // Reopen the database in read-write mode.
-        val oldOpenFlags = mConfigurationLocked.openFlags;
-        mConfigurationLocked.openFlags = (mConfigurationLocked.openFlags.and(OPEN_READ_MASK.inv())).or(OPEN_READWRITE)
+
+        mConfigurationLocked = mConfigurationLocked.copy(openFlags = (mConfigurationLocked.openFlags.and(OPEN_READ_MASK.inv())).or(OPEN_READWRITE))
         forceClose()
         open()
     }
 
     fun forceClose(){
-        sqliteSession?.mConnection?.close()
+        sqliteSession?.closeConnection()
         sqliteSession = null
     }
 
@@ -596,16 +593,11 @@ class SQLiteDatabase private constructor(path: String, openFlags: Int, cursorFac
     }
 
     fun openInner() {
-        val sqliteConnection = SQLiteConnection.open(mConfigurationLocked, 0, true)
-        sqliteSession = SQLiteSession(sqliteConnection)
-        //TODO: Where's assert?
-//            assert(mConnectionPoolLocked == null)
-        //TODO: OPEN Session
-//        mConnectionPoolLocked = SQLiteConnectionPool.open(mConfigurationLocked);
-
+        val coldConfig = mConfigurationLocked.copy().freeze()
+        sqliteSession = SQLiteSessionAtomic {
+            SQLiteSession(SQLiteConnection.open(coldConfig, 0, true))
+        }
     }
-
-
 
     /**
      * Gets the database version.
@@ -1342,16 +1334,18 @@ class SQLiteDatabase private constructor(path: String, openFlags: Int, cursorFac
      * @param cacheSize the size of the cache. can be (0 to {@link #MAX_SQL_CACHE_SIZE})
      * @throws IllegalStateException if input cacheSize > {@link #MAX_SQL_CACHE_SIZE}.
      */
-    fun setMaxSqlCacheSize(cacheSize:Int) {
-        if (cacheSize > MAX_SQL_CACHE_SIZE || cacheSize < 0)
-        {
+    fun setMaxSqlCacheSize(cacheSize: Int) {
+        if (cacheSize > MAX_SQL_CACHE_SIZE || cacheSize < 0) {
             throw IllegalStateException(
                     "expected value between 0 and " + MAX_SQL_CACHE_SIZE)
         }
-            throwIfNotOpenLocked()
-            val oldMaxSqlCacheSize = mConfigurationLocked.maxSqlCacheSize
-            mConfigurationLocked.maxSqlCacheSize = cacheSize
-        getThreadSession().mConnection.reconfigure(mConfigurationLocked)
+        throwIfNotOpenLocked()
+        val oldMaxSqlCacheSize = mConfigurationLocked.maxSqlCacheSize
+        mConfigurationLocked = mConfigurationLocked.copy(maxSqlCacheSize = cacheSize)
+
+        forceClose()
+        open()
+//        getThreadSession().mConnection.reconfigure(mConfigurationLocked)
 //        TODO()
         /*    try
             {
@@ -1393,23 +1387,26 @@ class SQLiteDatabase private constructor(path: String, openFlags: Int, cursorFac
      * @throws IllegalStateException if the are transactions is in progress
      * when this method is called.
      */
-    fun setForeignKeyConstraintsEnabled(enable:Boolean) {
-            throwIfNotOpenLocked()
-            if (mConfigurationLocked.foreignKeyConstraintsEnabled == enable)
-            {
-                return
-            }
-            mConfigurationLocked.foreignKeyConstraintsEnabled = enable
-        getThreadSession().mConnection.reconfigure(mConfigurationLocked)
+    fun setForeignKeyConstraintsEnabled(enable: Boolean) {
+        throwIfNotOpenLocked()
+        if (mConfigurationLocked.foreignKeyConstraintsEnabled == enable) {
+            return
+        }
+        mConfigurationLocked = mConfigurationLocked.copy(foreignKeyConstraintsEnabled = enable)
+
+        forceClose()
+        open()
+
+//        getThreadSession().mConnection.reconfigure(mConfigurationLocked)
 //        TODO()
-            /*try
-            {
-                mConnectionPoolLocked.reconfigure(mConfigurationLocked)
-            }
-            catch (ex:RuntimeException) {
-                mConfigurationLocked.foreignKeyConstraintsEnabled = !enable
-                throw ex
-            }*/
+        /*try
+        {
+            mConnectionPoolLocked.reconfigure(mConfigurationLocked)
+        }
+        catch (ex:RuntimeException) {
+            mConfigurationLocked.foreignKeyConstraintsEnabled = !enable
+            throw ex
+        }*/
     }
     /**
      * This method enables parallel execution of queries from multiple threads on the
@@ -1485,37 +1482,34 @@ class SQLiteDatabase private constructor(path: String, openFlags: Int, cursorFac
      * @see #ENABLE_WRITE_AHEAD_LOGGING
      * @see #disableWriteAheadLogging
      */
-    fun enableWriteAheadLogging():Boolean {
+    fun enableWriteAheadLogging(): Boolean {
+        throwIfNotOpenLocked()
+        if ((mConfigurationLocked.openFlags and ENABLE_WRITE_AHEAD_LOGGING) != 0) {
+            return true
+        }
+        if (isReadOnlyLocked()) {
+            // WAL doesn't make sense for readonly-databases.
+            // TODO: True, but connection pooling does still make sense...
+            return false
+        }
+        if (mConfigurationLocked.isInMemoryDb()) {
+            Log.i(TAG, "can't enable WAL for memory databases.")
+            return false
+        }
 
-            throwIfNotOpenLocked()
-            if ((mConfigurationLocked.openFlags and ENABLE_WRITE_AHEAD_LOGGING) != 0)
-            {
-                return true
-            }
-            if (isReadOnlyLocked())
-            {
-                // WAL doesn't make sense for readonly-databases.
-                // TODO: True, but connection pooling does still make sense...
-                return false
-            }
-            if (mConfigurationLocked.isInMemoryDb())
-            {
-                Log.i(TAG, "can't enable WAL for memory databases.")
-                return false
-            }
+        mConfigurationLocked = mConfigurationLocked.copy(openFlags = mConfigurationLocked.openFlags or ENABLE_WRITE_AHEAD_LOGGING)
 
-            mConfigurationLocked.openFlags = mConfigurationLocked.openFlags or ENABLE_WRITE_AHEAD_LOGGING
         forceClose()
         open()
 //        TODO()
-            /*try
-            {
-                mConnectionPoolLocked.reconfigure(mConfigurationLocked)
-            }
-            catch (ex:RuntimeException) {
-                mConfigurationLocked.openFlags = mConfigurationLocked.openFlags and ENABLE_WRITE_AHEAD_LOGGING.inv()
-                throw ex
-            }*/
+        /*try
+        {
+            mConnectionPoolLocked.reconfigure(mConfigurationLocked)
+        }
+        catch (ex:RuntimeException) {
+            mConfigurationLocked.openFlags = mConfigurationLocked.openFlags and ENABLE_WRITE_AHEAD_LOGGING.inv()
+            throw ex
+        }*/
         return true
     }
     /**
@@ -1528,24 +1522,24 @@ class SQLiteDatabase private constructor(path: String, openFlags: Int, cursorFac
      * @see #enableWriteAheadLogging
      */
     fun disableWriteAheadLogging() {
-            throwIfNotOpenLocked()
-            if ((mConfigurationLocked.openFlags and ENABLE_WRITE_AHEAD_LOGGING) == 0)
-            {
-                return
-            }
-            mConfigurationLocked.openFlags = mConfigurationLocked.openFlags and ENABLE_WRITE_AHEAD_LOGGING.inv()
+        throwIfNotOpenLocked()
+        if ((mConfigurationLocked.openFlags and ENABLE_WRITE_AHEAD_LOGGING) == 0) {
+            return
+        }
+        mConfigurationLocked = mConfigurationLocked.copy(openFlags = mConfigurationLocked.openFlags and ENABLE_WRITE_AHEAD_LOGGING.inv())
+
         forceClose()
         open()
 //        TODO()
-            /*try
-            {
-                mConnectionPoolLocked.reconfigure(mConfigurationLocked)
-            }
-            catch (ex:RuntimeException) {
-                mConfigurationLocked.openFlags = mConfigurationLocked.openFlags or ENABLE_WRITE_AHEAD_LOGGING
-                throw ex
-            }*/
+        /*try
+        {
+            mConnectionPoolLocked.reconfigure(mConfigurationLocked)
         }
+        catch (ex:RuntimeException) {
+            mConfigurationLocked.openFlags = mConfigurationLocked.openFlags or ENABLE_WRITE_AHEAD_LOGGING
+            throw ex
+        }*/
+    }
     /**
      * Returns true if write-ahead logging has been enabled for this database.
      *
