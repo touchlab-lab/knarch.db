@@ -27,6 +27,19 @@ konanArtifacts {
         linkerOpts "-lsqlite3"
         enableMultiplatform true
     }
+
+    /*program('TestMain'){
+        target('macos_x64') {
+            libraries {
+                klib 'kurgan'
+                nativeLibraries '../../../cpp/knarch/build/macos_x64/tlruntime.bc'
+                useRepo '../../../kotlin/knarch-ios/build/konan/libs/ios_x64'
+            }
+        }
+        extraOpts "-tr"
+        linkerOpts "-lsqlite3"
+        enableMultiplatform true
+    }*/
 }
 
 dependencies {

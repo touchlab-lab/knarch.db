@@ -11,7 +11,7 @@ buildscript {
 
 apply plugin: 'konan'
 
-konan.targets = ['iphone', 'iphone_sim']
+konan.targets = ['iphone', 'iphone_sim'/*, 'macos_x64'*/]
 
 //def j2objcRuntime = System.getenv('J2OBJC_RUNTIME')
 
