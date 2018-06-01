@@ -125,7 +125,7 @@ class SQLiteSession(val mConnection:SQLiteConnection) {
         {
             if (mTransactionStack == null)
             {
-                transLock.unlock()
+                transactionUnlock()
                 releaseConnection() // might throw
             }
         }
