@@ -9,8 +9,7 @@ import co.touchlab.knarch.other.Printer
 import co.touchlab.knarch.Log
 import kotlin.system.*
 
-class SQLiteConnection private constructor(/*pool:SQLiteConnectionPool,*/
-        private val mConfiguration:SQLiteDatabaseConfiguration,
+class SQLiteConnection(private val mConfiguration:SQLiteDatabaseConfiguration,
                                            val connectionId:Int, val primaryConnection:Boolean) {
     /*private val mPool:SQLiteConnectionPool*/
 
@@ -25,6 +24,14 @@ class SQLiteConnection private constructor(/*pool:SQLiteConnectionPool,*/
 
     init{
         mPreparedStatementCache = PreparedStatementCache(mConfiguration.maxSqlCacheSize)
+        try
+        {
+            open()
+        }
+        catch (ex:SQLiteException) {
+            dispose(false)
+            throw ex
+        }
     }
 
     // Called by SQLiteConnectionPool only.
@@ -1205,22 +1212,7 @@ class SQLiteConnection private constructor(/*pool:SQLiteConnectionPool,*/
         private external fun nativeCancel(connectionPtr:Long)
         @SymbolName("Android_Database_SQLiteConnection_nativeResetCancel")
         private external fun nativeResetCancel(connectionPtr:Long, cancelable:Boolean)
-        // Called by SQLiteConnectionPool only.
-        internal fun open(/*pool:SQLiteConnectionPool,*/
-                          configuration:SQLiteDatabaseConfiguration,
-                          connectionId:Int, primaryConnection:Boolean):SQLiteConnection {
-            val connection = SQLiteConnection(/*pool, */configuration,
-                    connectionId, primaryConnection)
-            try
-            {
-                connection.open()
-                return connection
-            }
-            catch (ex:SQLiteException) {
-                connection.dispose(false)
-                throw ex
-            }
-        }
+
         private fun canonicalizeSyncMode(value:String):String {
             if (value == "0")
             {
@@ -1236,6 +1228,7 @@ class SQLiteConnection private constructor(/*pool:SQLiteConnectionPool,*/
             }
             return value
         }
+
         private fun isCacheable(statementType:Int):Boolean {
             if ((statementType == DatabaseUtils.STATEMENT_UPDATE || statementType == DatabaseUtils.STATEMENT_SELECT))
             {
@@ -1243,6 +1236,7 @@ class SQLiteConnection private constructor(/*pool:SQLiteConnectionPool,*/
             }
             return false
         }
+
         private fun trimSqlForDisplay(sql:String):String {
             //TODO: Maybe fix
             return sql//TRIM_SQL_PATTERN.matcher(sql).replaceAll(" ")

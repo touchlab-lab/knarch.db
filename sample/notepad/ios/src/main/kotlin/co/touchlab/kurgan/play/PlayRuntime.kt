@@ -40,8 +40,9 @@ class PlayRuntime(){
     fun testTest()
     {
 //        TestRunner.run(arrayOf("--ktest_filter=*testStatementConstraint*"))
-//        TestRunner.run(arrayOf("--ktest_filter=*testExecSQL*"))
-        TestRunner.run()
+        TestRunner.run(arrayOf("--ktest_filter=*cycleOperations*"))
+//        TestRunner.run(arrayOf("--ktest_filter=*AtomicTest*"))
+//        TestRunner.run()
 
         /*if(heya == null){
             heya = Atomic(MyData("asdf", 123)).freeze()

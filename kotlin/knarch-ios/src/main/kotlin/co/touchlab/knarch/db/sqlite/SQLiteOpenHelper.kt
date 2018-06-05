@@ -236,7 +236,7 @@ constructor(val mContext:SystemContext, val databaseName:String?,
         finally
         {
             mIsInitializing = false
-            if (db != null && db !== mDatabase)
+            if (db != null && db != mDatabase)
             {
                 db.close()
             }

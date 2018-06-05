@@ -17,6 +17,15 @@ fun <T> Atomic<T>.access(proc:(T) -> Unit):Unit {
     }
 }
 
+fun <T> Atomic<T>.accessUpdate(proc:(T) -> T):Unit {
+    mutex.lock()
+    try {
+        runProcUpdate(proc)
+    } finally {
+        mutex.unlock()
+    }
+}
+
 fun <T, W> Atomic<T>.accessWith(producer:()->W, proc:(T, W) -> Unit):Unit {
     mutex.lock()
     try {

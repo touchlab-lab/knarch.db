@@ -16,7 +16,7 @@ class SQLiteSession(val mConnection:SQLiteConnection) {
     private var mConnectionUseCount:Int = 0
     private var mTransactionPool:Transaction? = null
     private var mTransactionStack:Transaction? = null
-    private val transLock = NSRecursiveLock()
+
 
     /**
      * Returns true if the session has a transaction in progress.
@@ -34,14 +34,7 @@ class SQLiteSession(val mConnection:SQLiteConnection) {
     fun hasNestedTransaction():Boolean {
         return mTransactionStack != null && mTransactionStack!!.mParent != null
     }
-    /**
-     * Returns true if the session has an active database connection.
-     *
-     * @return True if the session has an active database connection.
-     */
-    fun hasConnection():Boolean {
-        return mConnection != null
-    }
+
     /**
      * Begins a transaction.
      * <p>
@@ -93,7 +86,7 @@ class SQLiteSession(val mConnection:SQLiteConnection) {
             if (mTransactionStack == null)
             {
                 // Execute SQL might throw a runtime exception.
-                transLock.lock()
+
                 when (transactionMode) {
                     TRANSACTION_MODE_IMMEDIATE -> mConnection.execute("BEGIN IMMEDIATE;", null) // might throw
                     TRANSACTION_MODE_EXCLUSIVE -> mConnection.execute("BEGIN EXCLUSIVE;", null) // might throw
@@ -110,7 +103,6 @@ class SQLiteSession(val mConnection:SQLiteConnection) {
                 catch (ex:RuntimeException) {
                     if (mTransactionStack == null)
                     {
-                        transactionUnlock()
                         mConnection.execute("ROLLBACK;", null) // might throw
                     }
                     throw ex
@@ -125,21 +117,11 @@ class SQLiteSession(val mConnection:SQLiteConnection) {
         {
             if (mTransactionStack == null)
             {
-                transactionUnlock()
                 releaseConnection() // might throw
             }
         }
     }
 
-    private fun transactionUnlock()
-    {
-        try {
-            transLock.unlock()
-        } catch (e: Exception) {
-            //Presumably we weren't locked
-            Log.w(TAG, "Failed unlock", e)
-        }
-    }
     /**
      * Marks the current transaction as having completed successfully.
      * <p>
@@ -182,12 +164,12 @@ class SQLiteSession(val mConnection:SQLiteConnection) {
      */
     fun endTransaction() {
         //*Always* call, even if we got here some weird way and there's no lock
-        transactionUnlock()
         throwIfNoTransaction()
         //Won't matter till we get pools back
 //        assert(mConnection != null)
         endTransactionUnchecked( false)
     }
+
     private fun endTransactionUnchecked(yielding:Boolean) {
         val top = mTransactionStack
         var successful = (top!!.mMarkedSuccessful || yielding) && !top.mChildFailed
@@ -552,7 +534,7 @@ class SQLiteSession(val mConnection:SQLiteConnection) {
     private fun throwIfNoTransaction() {
         if (mTransactionStack == null)
         {
-            throw IllegalStateException(("Cannot perform this operation because " + "there is no current transaction."))
+            throw IllegalStateException(("Cannot perform this operation because there is no current transaction."))
         }
     }
     private fun throwIfTransactionMarkedSuccessful() {
@@ -566,7 +548,7 @@ class SQLiteSession(val mConnection:SQLiteConnection) {
     private fun throwIfNestedTransaction() {
         if (hasNestedTransaction())
         {
-            throw IllegalStateException(("Cannot perform this operation because " + "a nested transaction is in progress."))
+            throw IllegalStateException(("Cannot perform this operation because a nested transaction is in progress."))
         }
     }
     private fun obtainTransaction(mode:Int, listener:SQLiteTransactionListener?):Transaction {

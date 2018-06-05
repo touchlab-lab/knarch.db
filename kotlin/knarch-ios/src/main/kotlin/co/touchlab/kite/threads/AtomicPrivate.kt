@@ -25,6 +25,12 @@ internal fun <T> Atomic<T>.runProc(proc:(T) -> Unit){
     proc(ac.theData as T)
 }
 
+internal fun <T> Atomic<T>.runProcUpdate(proc:(T) -> T){
+    val ac = atomicGetCounter(this)
+    val result = proc(ac.theData as T)
+    ac.theData = result
+}
+
 internal fun <T, W> Atomic<T>.runProcWith(proc:(T, W) -> Unit, data: W){
     val ac = atomicGetCounter(this)
     proc(ac.theData as T, data)
