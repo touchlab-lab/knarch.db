@@ -8,6 +8,7 @@ import co.touchlab.knarch.other.LruCache
 import co.touchlab.knarch.other.Printer
 import co.touchlab.knarch.Log
 import kotlin.system.*
+import konan.worker.*
 
 class SQLiteConnection(private val mConfiguration:SQLiteDatabaseConfiguration,
                                            val connectionId:Int, val primaryConnection:Boolean) {
@@ -16,7 +17,7 @@ class SQLiteConnection(private val mConfiguration:SQLiteDatabaseConfiguration,
 
     private val mIsReadOnlyConnection:Boolean = false
     private val mPreparedStatementCache:PreparedStatementCache
-    private var mPreparedStatementPool:PreparedStatement?=null
+
     // The recent operations log.
     private val mRecentOperations = OperationLog()
     // The native SQLiteConnection pointer. (FOR INTERNAL USE ONLY)
@@ -232,6 +233,7 @@ class SQLiteConnection(private val mConfiguration:SQLiteDatabaseConfiguration,
      * @throws SQLiteException if an error occurs, such as a syntax error.
      */
     fun prepare(sql:String, outStatementInfo:SQLiteStatementInfo?) {
+        println("connection prepare mConnectionPtr $mConnectionPtr")
         val cookie = mRecentOperations.beginOperation("prepare", sql, null)
         try
         {
@@ -804,17 +806,7 @@ class SQLiteConnection(private val mConfiguration:SQLiteDatabaseConfiguration,
     }
     private fun obtainPreparedStatement(sql:String, statementPtr:Long,
                                         numParameters:Int, type:Int, readOnly:Boolean):PreparedStatement {
-        var statement = mPreparedStatementPool
-        if (statement != null)
-        {
-            mPreparedStatementPool = statement.mPoolNext
-            statement.mPoolNext = null
-            statement.mInCache = false
-        }
-        else
-        {
-            statement = PreparedStatement()
-        }
+        var statement = PreparedStatement()
         statement.mSql = sql
         statement.mStatementPtr = statementPtr
         statement.mNumParameters = numParameters
@@ -822,10 +814,9 @@ class SQLiteConnection(private val mConfiguration:SQLiteDatabaseConfiguration,
         statement.mReadOnly = readOnly
         return statement
     }
+
     private fun recyclePreparedStatement(statement:PreparedStatement) {
-        statement.mSql = null
-        statement.mPoolNext = mPreparedStatementPool
-        mPreparedStatementPool = statement
+
     }
     /**
      * Holder type for a prepared statement.
@@ -902,162 +893,42 @@ class SQLiteConnection(private val mConfiguration:SQLiteDatabaseConfiguration,
         }
     }
     private class OperationLog {
-        private val mOperations = arrayOfNulls<Operation>(MAX_RECENT_OPERATIONS)
+//        private val mOperations = arrayOfNulls<Operation>(MAX_RECENT_OPERATIONS)
         private var mIndex:Int = 0
         private var mGeneration:Int = 0
         fun beginOperation(kind:String, sql:String?, bindArgs:Array<Any?>?):Int {
-//            synchronized (mOperations) {
-                val index = (mIndex + 1) % MAX_RECENT_OPERATIONS
-                var operation = mOperations[index]
-                if (operation == null)
-                {
-                    operation = Operation()
-                    mOperations[index] = operation
-                }
-                else
-                {
-                    operation.mFinished = false
-                    operation.mException = null
-                    if (operation.mBindArgs != null)
-                    {
-                        operation.mBindArgs!!.clear()
-                    }
-                }
-                operation.mStartTime = getTimeMillis()
-                operation.mKind = kind
-                operation.mSql = sql
-                if (bindArgs != null)
-                {
-                    if (operation.mBindArgs == null)
-                    {
-                        operation.mBindArgs = ArrayList()
-                    }
-                    else
-                    {
-                        operation.mBindArgs!!.clear()
-                    }
-                    for (i in bindArgs.indices)
-                    {
-                        val arg = bindArgs[i]
-                        if (arg != null && arg is ByteArray)
-                        {
-                            // Don't hold onto the real byte array longer than necessary.
-                            operation.mBindArgs!!.add(EMPTY_BYTE_ARRAY)
-                        }
-                        else
-                        {
-                            operation.mBindArgs!!.add(arg)
-                        }
-                    }
-                }
-                operation.mCookie = newOperationCookieLocked(index)
-                mIndex = index
-                return operation.mCookie
-//            }
+            return 0
         }
         fun failOperation(cookie:Int, ex:Exception) {
-//            synchronized (mOperations) {
-                val operation = getOperationLocked(cookie)
-                if (operation != null)
-                {
-                    operation.mException = ex
-                }
-//            }
+
         }
         fun endOperation(cookie:Int) {
-//            synchronized (mOperations) {
-                if (endOperationDeferLogLocked(cookie))
-                {
-                    logOperationLocked(cookie, null)
-                }
-//            }
+
         }
         fun endOperationDeferLog(cookie:Int):Boolean {
-//            synchronized (mOperations) {
                 return endOperationDeferLogLocked(cookie)
-//            }
         }
         fun logOperation(cookie:Int, detail:String) {
-//            synchronized (mOperations) {
-                logOperationLocked(cookie, detail)
-//            }
+
         }
+
         private fun endOperationDeferLogLocked(cookie:Int):Boolean {
-            val operation = getOperationLocked(cookie)
-            if (operation != null)
-            {
-                operation.mEndTime = getTimeMillis()
-                operation.mFinished = true
-                return (SQLiteDebug.DEBUG_LOG_SLOW_QUERIES && SQLiteDebug.shouldLogSlowQuery(
-                        operation.mEndTime - operation.mStartTime))
-            }
             return false
         }
+
         private fun logOperationLocked(cookie:Int, detail:String?) {
-            val operation = getOperationLocked(cookie)
-            val msg = StringBuilder()
-            operation!!.describe(msg, false)
-            if (detail != null)
-            {
-                msg.append(", ").append(detail)
-            }
-            Log.d(TAG, msg.toString())
+
         }
         private fun newOperationCookieLocked(index:Int):Int {
-            val generation = mGeneration++
-            return (generation shl COOKIE_GENERATION_SHIFT) or index
+            return 0
         }
-        private fun getOperationLocked(cookie:Int):Operation? {
-            val index = cookie and COOKIE_INDEX_MASK
-            val operation = mOperations[index]
-            return if (operation!!.mCookie == cookie) operation else null
-        }
+
         fun describeCurrentOperation():String? {
-//            synchronized (mOperations) {
-                val operation = mOperations[mIndex]
-                if (operation != null && !operation.mFinished)
-                {
-                    val msg = StringBuilder()
-                    operation.describe(msg, false)
-                    return msg.toString()
-                }
-                return null
-//            }
+            return null
         }
+
         fun dump(printer:Printer, verbose:Boolean) {
-//            synchronized (mOperations) {
-                printer.println(" Most recently executed operations:")
-                var index = mIndex
-                var operation = mOperations[index]
-                if (operation != null)
-                {
-                    var n = 0
-                    do
-                    {
-                        val msg = StringBuilder()
-                        msg.append(" ").append(n).append(": [")
-                        msg.append(operation!!.formattedStartTime)
-                        msg.append("] ")
-                        operation.describe(msg, verbose)
-                        printer.println(msg.toString())
-                        if (index > 0)
-                        {
-                            index -= 1
-                        }
-                        else
-                        {
-                            index = MAX_RECENT_OPERATIONS - 1
-                        }
-                        n += 1
-                        operation = mOperations[index]
-                    }
-                    while (operation != null && n < MAX_RECENT_OPERATIONS)
-                }
-                else
-                {
-                    printer.println(" <none>")
-                }
-//            }
+
         }
         companion object {
             private val MAX_RECENT_OPERATIONS = 20
@@ -1065,87 +936,7 @@ class SQLiteConnection(private val mConfiguration:SQLiteDatabaseConfiguration,
             private val COOKIE_INDEX_MASK = 0xff
         }
     }
-    private class Operation {
-        var mStartTime:Long = 0
-        var mEndTime:Long = 0
-        var mKind:String?=null
-        var mSql:String? = null
-        var mBindArgs:ArrayList<Any?>?=null
-        var mFinished:Boolean = false
-        var mException:Exception? = null
-        var mCookie:Int = 0
-        private val status:String
-            get() {
-                if (!mFinished)
-                {
-                    return "running"
-                }
-                return if (mException != null) "failed" else "succeeded"
-            }
 
-        val formattedStartTime:String
-            get() {
-                //TODO: If we figure out date stuff
-                return getTimeMillis().toString()//sDateFormat.format(Date(mStartTime))
-            }
-
-        fun describe(msg:StringBuilder, verbose:Boolean) {
-            msg.append(mKind)
-            if (mFinished)
-            {
-                msg.append(" took ").append(mEndTime - mStartTime).append("ms")
-            }
-            else
-            {
-                msg.append(" started ").append(kotlin.system.getTimeMillis() - mStartTime)
-                        .append("ms ago")
-            }
-            msg.append(" - ").append(status)
-            if (mSql != null)
-            {
-                msg.append(", sql=\"").append(trimSqlForDisplay(mSql!!)).append("\"")
-            }
-            val ba = mBindArgs
-            if (verbose && ba != null && ba.size != 0)
-            {
-                msg.append(", bindArgs=[")
-                val count = ba.size
-                for (i in 0 until count)
-                {
-                    val arg = ba.get(i)
-                    if (i != 0)
-                    {
-                        msg.append(", ")
-                    }
-                    if (arg == null)
-                    {
-                        msg.append("null")
-                    }
-                    else if (arg is ByteArray)
-                    {
-                        msg.append("<byte[]>")
-                    }
-                    else if (arg is String)
-                    {
-                        msg.append("\"").append(arg as String).append("\"")
-                    }
-                    else
-                    {
-                        msg.append(arg)
-                    }
-                }
-                msg.append("]")
-            }
-            if (mException != null)
-            {
-                msg.append(", exception=\"").append(mException!!.message).append("\"")
-            }
-        }
-        companion object {
-            //TODO: Date stuff needs a solution
-//            private val sDateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS")
-        }
-    }
     companion object {
         private val TAG = "SQLiteConnection"
         private val DEBUG = true

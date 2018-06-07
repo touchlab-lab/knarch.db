@@ -285,7 +285,7 @@ class SQLiteDatabase private constructor(path: String, openFlags: Int, cursorFac
         }
     }
 
-    private val sqliteSession = SQLiteSessionStateAtomic(null, SQLiteDatabaseConfiguration(path, openFlags))
+    private val sqliteSession = SQLiteSessionStateAtomic(SQLiteDatabaseConfiguration(path, openFlags))
 
     // The optional factory to use when creating new Cursors.  May be null.
     // INVARIANT: Immutable.
@@ -563,7 +563,7 @@ class SQLiteDatabase private constructor(path: String, openFlags: Int, cursorFac
         // Reopen the database in read-write mode.
 
         sqliteSession.dbConfigUpdate { conf ->
-            conf.copy(openFlags = (conf.openFlags.and(OPEN_READ_MASK.inv())).or(OPEN_READWRITE))
+            conf!!.copy(openFlags = (conf.openFlags.and(OPEN_READ_MASK.inv())).or(OPEN_READWRITE))
         }
         forceClose()
         open()
@@ -1337,7 +1337,7 @@ class SQLiteDatabase private constructor(path: String, openFlags: Int, cursorFac
                     "expected value between 0 and " + MAX_SQL_CACHE_SIZE)
         }
         throwIfNotOpenLocked()
-        sqliteSession.dbConfigUpdate { it.copy(maxSqlCacheSize = cacheSize) }
+        sqliteSession.dbConfigUpdate { it!!.copy(maxSqlCacheSize = cacheSize) }
 
         forceClose()
         open()
@@ -1388,7 +1388,7 @@ class SQLiteDatabase private constructor(path: String, openFlags: Int, cursorFac
         if (sqliteSession.dbForeignKeyConstraintsEnabled() == enable) {
             return
         }
-        sqliteSession.dbConfigUpdate { it.copy(foreignKeyConstraintsEnabled = enable) }
+        sqliteSession.dbConfigUpdate { it!!.copy(foreignKeyConstraintsEnabled = enable) }
 
         forceClose()
         open()
@@ -1493,7 +1493,7 @@ class SQLiteDatabase private constructor(path: String, openFlags: Int, cursorFac
             return false
         }
 
-        sqliteSession.dbConfigUpdate { it.copy(openFlags = it.openFlags or ENABLE_WRITE_AHEAD_LOGGING) }
+        sqliteSession.dbConfigUpdate { it!!.copy(openFlags = it.openFlags or ENABLE_WRITE_AHEAD_LOGGING) }
 
         forceClose()
         open()
@@ -1522,7 +1522,7 @@ class SQLiteDatabase private constructor(path: String, openFlags: Int, cursorFac
         if ((sqliteSession.dbOpenFlags() and ENABLE_WRITE_AHEAD_LOGGING) == 0) {
             return
         }
-        sqliteSession.dbConfigUpdate { it.copy(openFlags = it.openFlags and ENABLE_WRITE_AHEAD_LOGGING.inv()) }
+        sqliteSession.dbConfigUpdate { it!!.copy(openFlags = it.openFlags and ENABLE_WRITE_AHEAD_LOGGING.inv()) }
 
         forceClose()
         open()

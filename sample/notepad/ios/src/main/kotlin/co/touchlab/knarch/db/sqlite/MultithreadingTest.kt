@@ -9,6 +9,7 @@ import konan.test.*
 import konan.worker.*
 import platform.Foundation.*
 import kotlinx.cinterop.*
+import platform.posix.*
 
 class MultithreadingTest {
     lateinit var mDatabase: SQLiteDatabase
@@ -21,16 +22,37 @@ class MultithreadingTest {
     @BeforeEach
     protected fun setUp() {
         getContext().deleteDatabase(DATABASE_FILE_NAME)
+        println("A 1")
         mDatabaseFilePath = getContext().getDatabasePath(DATABASE_FILE_NAME).path
+        println("A 2")
         mDatabaseFile = getContext().getDatabasePath(DATABASE_FILE_NAME)
+        println("A 3")
         mDatabaseDir = mDatabaseFile.getParent()!!
+        println("A 4")
         mDatabaseFile.getParentFile()?.mkdirs() // directory may not exist
-        mDatabase = SQLiteDatabase.openOrCreateDatabase(mDatabaseFilePath, null)
+        println("A 5 $mDatabaseFilePath")
+        try {
+            mDatabase = SQLiteDatabase.openOrCreateDatabase(mDatabaseFilePath, null).freeze()
+        } catch (e: Exception) {
+            e.printStackTrace()
+            throw e
+        }
+        println("A 6")
+
         assertNotNull(mDatabase)
 
-        mDatabase.execSQL(("CREATE TABLE employee (_id INTEGER PRIMARY KEY, " + "name TEXT, month INTEGER, salary INTEGER);"))
+        println("A 7")
+        try {
+            mDatabase.execSQL("CREATE TABLE employee (_id INTEGER PRIMARY KEY, " + "name TEXT, month INTEGER, salary INTEGER);")
+        } catch (e: Exception) {
+            e.printStackTrace()
+            throw e
+        }
+        println("A 8")
         mDatabase.execSQL("CREATE TABLE test (num INTEGER);")
-        mDatabase.execSQL(("CREATE TABLE testmore (_id INTEGER PRIMARY KEY, " + "name TEXT, age INTEGER, address TEXT);"))
+        println("A 9")
+        mDatabase.execSQL("CREATE TABLE testmore (_id INTEGER PRIMARY KEY, " + "name TEXT, age INTEGER, address TEXT);")
+        println("A 10")
     }
 
     @AfterEach
@@ -70,8 +92,8 @@ class MultithreadingTest {
                     try {
                         when ((windex + runs) % 30) {
                             in 0..15 -> goExecSQL(db)
-//                            in 16..28 -> goQuery(db)
-                            else -> goQuery(db)/*goBig(db)*/
+                            in 16..28 -> goQuery(db)
+                            else -> goBig(db)
                         }
                         success = true
                     } catch (e: Exception) {
@@ -111,12 +133,14 @@ class MultithreadingTest {
         val COUNT = 30
         val workers = Array(COUNT, { _ -> startWorker() })
         var shouldFail = false
-        for (attempt in 1..2) {
+
+        for (attempt in 1..3) {
             val futures = Array(workers.size, { workerIndex ->
                 workers[workerIndex].schedule(TransferMode.CHECKED,
-                        { Pair(dbArg, workerIndex).freeze() }) { pair ->
-                    val db = pair.first
-                    val windex = pair.second
+                        { Triple(dbArg, workerIndex, attempt).freeze() }) { triple ->
+                    val db = triple.first
+                    val windex = triple.second
+                    val attempt = triple.third
                     val name = "Mike"
                     val age = 21
                     val address = "LA"
@@ -144,7 +168,7 @@ class MultithreadingTest {
                         if (!success)
                             allSuccess = false
 
-                        println("worker $windex run $runs")
+                        println("attempt $attempt worker $windex run $runs")
                     }
 
                     return@schedule allSuccess
@@ -163,12 +187,17 @@ class MultithreadingTest {
                 }
             }
         }
+        var workerKill = 0
         workers.forEach {
             it.requestTermination().consume { _ -> }
+            println("Killed $workerKill")
+            workerKill++
         }
 
         if (shouldFail)
             fail("Failed multi")
+
+        println("Exiting")
     }
 
     companion object {

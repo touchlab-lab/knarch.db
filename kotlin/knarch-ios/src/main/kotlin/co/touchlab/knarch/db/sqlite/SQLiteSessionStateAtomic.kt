@@ -6,8 +6,8 @@ import konan.worker.*
 import platform.Foundation.*
 import co.touchlab.knarch.Log
 
-class SQLiteSessionStateAtomic(session: SQLiteSession?, dbConfig: SQLiteDatabaseConfiguration) {
-    private val atomicSession: Atomic<SQLiteSession?> = Atomic(session)
+class SQLiteSessionStateAtomic(dbConfig: SQLiteDatabaseConfiguration) {
+    private val atomicSession: Atomic<SQLiteSession> = Atomic(null)
     private val transLock = NSRecursiveLock()
 
     private fun transactionUnlock() {
@@ -19,19 +19,19 @@ class SQLiteSessionStateAtomic(session: SQLiteSession?, dbConfig: SQLiteDatabase
         }
     }
 
-    private val atomicDbConfig: Atomic<SQLiteDatabaseConfiguration> = Atomic(dbConfig)
+    private val atomicDbConfig: Atomic<SQLiteDatabaseConfiguration> = Atomic({dbConfig.freeze()})
 
-    fun dbLabel() = atomicDbConfig.accessForResult { conf -> conf.label }
-    fun dbConfigUpdate(proc: (conf: SQLiteDatabaseConfiguration) -> SQLiteDatabaseConfiguration) {
+    fun dbLabel() = atomicDbConfig.accessForResult { conf -> conf!!.label }
+    fun dbConfigUpdate(proc: (conf: SQLiteDatabaseConfiguration?) -> SQLiteDatabaseConfiguration) {
         atomicDbConfig.accessUpdate(proc)
     }
 
-    fun dbConfigCopy(): SQLiteDatabaseConfiguration = atomicDbConfig.accessForResult { conf -> conf.freeze() }
-    fun dbReadOnlyLocked(): Boolean = atomicDbConfig.accessForResult { (it.openFlags and SQLiteDatabase.OPEN_READ_MASK) == SQLiteDatabase.OPEN_READONLY }
-    fun dbInMemoryDb(): Boolean = atomicDbConfig.accessForResult { it.isInMemoryDb() }
-    fun dbOpenFlags(): Int = atomicDbConfig.accessForResult { it.openFlags }
-    fun dbPath(): String = atomicDbConfig.accessForResult { it.path }
-    fun dbForeignKeyConstraintsEnabled(): Boolean = atomicDbConfig.accessForResult { it.foreignKeyConstraintsEnabled }
+    fun dbConfigCopy(): SQLiteDatabaseConfiguration = atomicDbConfig.accessForResult { conf -> conf!!.freeze() }
+    fun dbReadOnlyLocked(): Boolean = atomicDbConfig.accessForResult { (it!!.openFlags and SQLiteDatabase.OPEN_READ_MASK) == SQLiteDatabase.OPEN_READONLY }
+    fun dbInMemoryDb(): Boolean = atomicDbConfig.accessForResult { it!!.isInMemoryDb() }
+    fun dbOpenFlags(): Int = atomicDbConfig.accessForResult { it!!.openFlags }
+    fun dbPath(): String = atomicDbConfig.accessForResult { it!!.path }
+    fun dbForeignKeyConstraintsEnabled(): Boolean = atomicDbConfig.accessForResult { it!!.foreignKeyConstraintsEnabled }
 
     fun hasTransaction(): Boolean = atomicSession.accessForResult { s ->
         if (s == null) throw IllegalStateException("Not connected to db")
@@ -81,6 +81,7 @@ class SQLiteSessionStateAtomic(session: SQLiteSession?, dbConfig: SQLiteDatabase
     fun prepare(sql: String, connectionFlags: Int,
                 outStatementInfo: SQLiteStatementInfo?) {
         freezeParams(sql)
+        connectionFlags.freeze()
         atomicSession.access { s ->
             if (s == null) throw IllegalStateException("Not connected to db")
             s.prepare(sql, connectionFlags, outStatementInfo)
@@ -147,9 +148,7 @@ class SQLiteSessionStateAtomic(session: SQLiteSession?, dbConfig: SQLiteDatabase
 
     fun openConnection() {
         val configCopy = dbConfigCopy()
-        atomicSession.accessUpdate {
-            SQLiteSession(SQLiteConnection(configCopy, 0, true))
-        }
+        atomicSession.putValue ({ SQLiteSession(SQLiteConnection(configCopy, 0, true)) })
     }
 
     private fun freezeParams(sql: String, bindArgs: Array<Any?>? = null) {

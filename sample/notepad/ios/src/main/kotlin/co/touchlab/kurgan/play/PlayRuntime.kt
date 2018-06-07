@@ -18,20 +18,6 @@ class MyData(var a:String, var b:Int)
 
 class PlayRuntime(){
 
-    var heya:Atomic<MyData>? = null
-
-    fun testAtomicBox(){
-        memScoped {
-//            val dataContainer = DataContainer(AtomicBox<MyThing>({ MyThing(lotso = mutableListOf<Int>(
-//                    1,2,3,4,5,6,7,8,9,0,1,2,3,4,5,6,7,8,9,0,1,2,3,4,5,6,7,8,9,0,1,2,3,4,5,6,7,8,9,0,1,2,3,4,5,6,7,8,9,0
-//            )) }), 123)
-//        dataContainer.freeze()
-//            goNuts(dataContainer)
-//            val tab = TestAtomicBox()
-//            tab.goHello()
-        }
-    }
-
     fun testThreads(){
         val th = ThreadsHello()
         th.callBack()
@@ -40,8 +26,8 @@ class PlayRuntime(){
     fun testTest()
     {
 //        TestRunner.run(arrayOf("--ktest_filter=*testStatementConstraint*"))
-        TestRunner.run(arrayOf("--ktest_filter=*cycleOperations*"))
-//        TestRunner.run(arrayOf("--ktest_filter=*AtomicTest*"))
+//        TestRunner.run(arrayOf("--ktest_filter=*basicMultithreadingTest*"))
+        TestRunner.run(arrayOf("--ktest_filter=*AtomicTest*"))
 //        TestRunner.run()
 
         /*if(heya == null){
@@ -55,57 +41,6 @@ class PlayRuntime(){
         }*/
 
     }
-
-
-    fun testAtomic()
-    {
-        val atom = Atomic(MyData("asdf", 0)).freeze()
-        runFooWorkers(atom)
-        /*atom.access{
-            println("b is ${it.b}")
-        }*/
-
-    }
-
-    fun runFooWorkers(atom:Atomic<MyData>){
-        val COUNT = 10
-        val workers = Array(COUNT, { _ -> startWorker()})
-
-        for (attempt in 1 .. 2) {
-//        var workerCount = 0
-
-            val futures = Array(workers.size, { workerIndex ->
-                workers[workerIndex].schedule(TransferMode.CHECKED,
-                    {atom}
-            ) {latom ->
-                for(i in 0 until 50000) {
-                    latom.access{md->
-                        md.b= md.b+1
-                        if(md.b % 100000 == 0)
-                        {
-                            println("Count md.b ${md.b}")
-                        }
-                    }
-                }
-            }
-            })
-            val futureSet = futures.toSet()
-            var consumed = 0
-            while (consumed < futureSet.size) {
-                val ready = futureSet.waitForMultipleFutures(100000)
-                ready.forEach {
-                    it.consume {consumed++}
-                }
-            }
-            atom.access{
-                println("b is ${it.b}")
-            }
-        }
-        workers.forEach {
-            it.requestTermination().consume { _ -> }
-        }
-    }
-
 
     fun testDb()
     {

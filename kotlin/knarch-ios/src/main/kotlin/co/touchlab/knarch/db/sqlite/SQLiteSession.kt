@@ -1,5 +1,6 @@
 package co.touchlab.knarch.db.sqlite
 
+import co.touchlab.kite.threads.*
 import co.touchlab.knarch.Log
 import co.touchlab.knarch.db.CursorWindow
 import co.touchlab.knarch.db.DatabaseUtils
@@ -255,6 +256,7 @@ class SQLiteSession(val mConnection:SQLiteConnection) {
                 outStatementInfo:SQLiteStatementInfo?) {
 
         acquireConnection(sql, connectionFlags) // might throw
+        println("mConnectionUseCount $mConnectionUseCount")
         try
         {
             mConnection.prepare(sql, outStatementInfo) // might throw
@@ -573,6 +575,7 @@ class SQLiteSession(val mConnection:SQLiteConnection) {
         transaction.mListener = null
         mTransactionPool = transaction
     }
+
     private class Transaction() {
         var mParent:Transaction? = null
         var mMode:Int = 0
@@ -580,6 +583,7 @@ class SQLiteSession(val mConnection:SQLiteConnection) {
         var mMarkedSuccessful:Boolean = false
         var mChildFailed:Boolean = false
     }
+
     companion object {
         /**
          * Transaction mode: Deferred.

@@ -22,6 +22,7 @@ konanArtifacts {
     }*/
 
     library("kurgan"){
+//        extraOpts "-g"
 /*libraries {
             artifact 'objcsrc'
         }*/

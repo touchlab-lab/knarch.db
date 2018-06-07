@@ -31,6 +31,8 @@ void DisposeCStringHelper(char* cstring);
 
 void knarchLog(const char* tag, const char* format, ...);
 
+
+
 #ifdef __cplusplus
 }
 #endif
