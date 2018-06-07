@@ -26,8 +26,8 @@ class PlayRuntime(){
     fun testTest()
     {
 //        TestRunner.run(arrayOf("--ktest_filter=*testStatementConstraint*"))
-//        TestRunner.run(arrayOf("--ktest_filter=*basicMultithreadingTest*"))
-        TestRunner.run(arrayOf("--ktest_filter=*AtomicTest*"))
+        TestRunner.run(arrayOf("--ktest_filter=*basicMultithreadingTest*"))
+//        TestRunner.run(arrayOf("--ktest_filter=*AtomicTest*"))
 //        TestRunner.run()
 
         /*if(heya == null){

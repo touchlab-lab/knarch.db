@@ -8,15 +8,19 @@ import konan.worker.*
 // Object that holds the value we're sharing. The first two params are only there to fill out the space
 // that Weak.cpp assumes will be there. This will likely change if the KN team decides to clean up
 // their implementation.
-internal class AtomicCounter(var referred: COpaquePointer? = null) {
-    var lock: Int = 0
+internal class AtomicCounter(var referred: COpaquePointer? = null,
+                             var lock: Int = 0,
+                             var theData:Any? = null
+                             ) {
 }
 
-/*internal fun <T> Atomic<T>.putValueCounter(dataPointer: COpaquePointer?){
-    atomicGetCounter(this).referred = dataPointer
+internal fun <T> Atomic<T>.putValueCounter(target:T){
+    atomicGetCounter(this).theData = target
 }
 
-internal fun <T> Atomic<T>.getValueCounter():COpaquePointer? = atomicGetCounter(this).referred*/
+internal fun <T> Atomic<T>.getValueCounter():T?{
+    return atomicGetCounter(this).theData as T?
+}
 
 
 /*internal fun <T> Atomic<T>.runProc(proc:(T) -> Unit){
@@ -40,11 +44,9 @@ internal fun <T> Atomic<T>.getValueCounter():COpaquePointer? = atomicGetCounter(
     return proc(ac.theData as T)
 }*/
 
-/*
 @SymbolName("Atomic_atomicGetCounter")
 external internal fun atomicGetCounter(referent: Any):AtomicCounter
 
 // Create a counter object.
 @ExportForCppRuntime
-internal fun makeAtomicCounter():AtomicCounter = AtomicCounter()
-*/
+internal fun makeAtomicCounter(target:Any?):AtomicCounter = AtomicCounter(theData = target)

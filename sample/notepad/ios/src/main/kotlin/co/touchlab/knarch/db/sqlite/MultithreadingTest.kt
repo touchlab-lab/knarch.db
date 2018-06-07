@@ -145,7 +145,7 @@ class MultithreadingTest {
                     val age = 21
                     val address = "LA"
                     var allSuccess = true
-                    for (runs in 0 until 200) {
+                    for (runs in 0 until 5) {
                         var success = false
                         db.beginTransaction()
 
