@@ -14,7 +14,7 @@ import platform.Foundation.*
  */
 class SQLiteSession(val mConnection:SQLiteConnection) {
     private val mConnectionFlags:Int = 0
-    private var mConnectionUseCount:Int = 0
+    var mConnectionUseCount:Int = 0
     private var mTransactionPool:Transaction? = null
     private var mTransactionStack:Transaction? = null
 
@@ -256,7 +256,6 @@ class SQLiteSession(val mConnection:SQLiteConnection) {
                 outStatementInfo:SQLiteStatementInfo?) {
 
         acquireConnection(sql, connectionFlags) // might throw
-        println("mConnectionUseCount $mConnectionUseCount")
         try
         {
             mConnection.prepare(sql, outStatementInfo) // might throw

@@ -7,6 +7,7 @@ val atTempMap = HashMap<Int, Any?>()
 
 internal class Atomic<T>(producer: (() -> T)?){
     val mutex = NSLock()
+    private val dataId:Int = createDataStore()
     val atIndex = atCount++
 
     init {
@@ -15,7 +16,7 @@ internal class Atomic<T>(producer: (() -> T)?){
     }
 
     internal fun putValue(producer: () -> T){
-        putValueCounter(producer.invoke())
+        putDataPointer(dataId, producer.invoke() as Any)
 //        putDataPointer(dataId, konan.worker.detachObjectGraph {producer.invoke() as Any})
     }
 
@@ -28,7 +29,7 @@ internal class Atomic<T>(producer: (() -> T)?){
     }
 
     fun loadTempFromCounter(){
-        atTempMap.put(atIndex, getValueCounter())
+        atTempMap.put(atIndex, getDataPointer(dataId))
     }
 
     fun hasTemp():Boolean = atTempMap.containsKey(atIndex)/* != null*/
@@ -100,4 +101,23 @@ internal class Atomic<T>(producer: (() -> T)?){
         loadTempFromCounter()
         return proc(atTempMap.get(atIndex) as T?)
     }
+
+    internal fun clear(){
+        removeDataPointer(dataId)
+    }
 }
+
+@SymbolName("Atomic_createDataStore")
+external internal fun createDataStore():Int
+
+@SymbolName("Atomic_putDataPointer")
+external internal fun putDataPointer(dataId:Int, pt:Any)
+
+@SymbolName("Atomic_getDataPointer")
+external internal fun getDataPointer(dataId:Int):Any?
+
+@SymbolName("Atomic_removeDataPointer")
+external internal fun removeDataPointer(dataId:Int)
+
+@SymbolName("Atomic_objRefCount")
+external internal fun objRefCount(ref:Any):Int

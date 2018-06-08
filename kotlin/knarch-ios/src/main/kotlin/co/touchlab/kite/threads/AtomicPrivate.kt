@@ -13,6 +13,7 @@ internal class AtomicCounter(var referred: COpaquePointer? = null,
                              var theData:Any? = null
                              ) {
 }
+/*
 
 internal fun <T> Atomic<T>.putValueCounter(target:T){
     atomicGetCounter(this).theData = target
@@ -21,6 +22,7 @@ internal fun <T> Atomic<T>.putValueCounter(target:T){
 internal fun <T> Atomic<T>.getValueCounter():T?{
     return atomicGetCounter(this).theData as T?
 }
+*/
 
 
 /*internal fun <T> Atomic<T>.runProc(proc:(T) -> Unit){

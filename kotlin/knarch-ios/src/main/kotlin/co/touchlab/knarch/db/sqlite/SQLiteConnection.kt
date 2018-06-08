@@ -233,7 +233,6 @@ class SQLiteConnection(private val mConfiguration:SQLiteDatabaseConfiguration,
      * @throws SQLiteException if an error occurs, such as a syntax error.
      */
     fun prepare(sql:String, outStatementInfo:SQLiteStatementInfo?) {
-        println("connection prepare mConnectionPtr $mConnectionPtr")
         val cookie = mRecentOperations.beginOperation("prepare", sql, null)
         try
         {

@@ -27,13 +27,14 @@ namespace {
             return dataId;
         }
 
-        void putDataPointer(KInt dataId, KNativePtr atomicPointer) {
+        void putDataPointer(KInt dataId, KRef atomicPointer) {
             pthread_mutex_lock(&lock_);
-            data_[dataId] = atomicPointer;
+            KNativePtr stablePointer = CreateStablePointer(atomicPointer);
+            data_[dataId] = stablePointer;
             pthread_mutex_unlock(&lock_);
         }
 
-        KNativePtr getDataPointer(KInt dataId) {
+        KRef getDataPointer(KInt dataId) {
             pthread_mutex_lock(&lock_);
 
             auto it = data_.find(dataId);
@@ -43,12 +44,13 @@ namespace {
             if (it == data_.end())
                 return nullptr;
             else
-                return it->second;
+                return (KRef)it->second;
         }
 
         void removeDataPointer(KInt id) {
             pthread_mutex_lock(&lock_);
             auto it = data_.find(id);
+            DisposeStablePointer(it->second);
             if (it == data_.end()) return;
             data_.erase(it);
             pthread_mutex_unlock(&lock_);
@@ -87,7 +89,7 @@ KInt Atomic_createDataStore() {
     return dataState()->createDataStore();
 }
 
-void Atomic_putDataPointer(KInt dataId, KNativePtr atomicPointer) {
+void Atomic_putDataPointer(KInt dataId, KRef atomicPointer) {
     dataState()->putDataPointer(dataId, atomicPointer);
 }
 
@@ -97,6 +99,11 @@ KNativePtr Atomic_getDataPointer(KInt dataId) {
 
 void Atomic_removeDataPointer(KInt id) {
     dataState()->removeDataPointer(id);
+}
+
+KInt Atomic_objRefCount(KRef ref)
+{
+    return ref->container()->refCount();
 }
 
 OBJ_GETTER(makeAtomicCounter, KRef target);
