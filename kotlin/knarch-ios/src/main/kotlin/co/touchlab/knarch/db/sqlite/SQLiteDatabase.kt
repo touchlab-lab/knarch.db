@@ -336,8 +336,8 @@ class SQLiteDatabase private constructor(path: String, openFlags: Int, cursorFac
      */
     fun getThreadSession():SQLiteSessionStateAtomic {
 //        kotlin.assert(sqliteSession != null, {"Must call open before trying to use db"})
-        if(!sqliteSession.hasConnection())
-            openInner()
+        sqliteSession.checkOpenConnection()
+
         return sqliteSession
     }
 
