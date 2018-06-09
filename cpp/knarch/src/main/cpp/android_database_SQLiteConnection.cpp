@@ -822,8 +822,7 @@ KLong Android_Database_SQLiteConnection_nativePrepareStatement(KRef thiz, KLong 
     return nativePrepareStatement(connectionPtr, sqlString);
 }
 
-void Android_Database_SQLiteConnection_nativeFinalizeStatement(KRef thiz,
-                                                               KLong connectionPtr, KLong statementPtr)
+void Android_Database_SQLiteConnection_nativeFinalizeStatement(KLong connectionPtr, KLong statementPtr)
 {
     nativeFinalizeStatement(connectionPtr, statementPtr);
 }

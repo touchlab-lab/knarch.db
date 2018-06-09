@@ -9,7 +9,7 @@ import kotlin.coroutines.experimental.buildIterator
 class AtomicTest {
 
 
-    @Test
+    /*@Test
     fun accessForResult(){
         val atomic = AtTest()
 
@@ -19,7 +19,7 @@ class AtomicTest {
 
         assertTrue (atomic.hasVal())
         assertTrue (atomic.hasSubVal("astring"))
-    }
+    }*/
 
     /*@Test
     fun accessUpdateTest() {

@@ -15,7 +15,6 @@ import platform.Foundation.*
 class SQLiteSession(val mConnection:SQLiteConnection) {
     private val mConnectionFlags:Int = 0
     var mConnectionUseCount:Int = 0
-    private var mTransactionPool:Transaction? = null
     private var mTransactionStack:Transaction? = null
 
 
@@ -33,7 +32,8 @@ class SQLiteSession(val mConnection:SQLiteConnection) {
      * @return True if the session has a nested transaction in progress.
      */
     fun hasNestedTransaction():Boolean {
-        return mTransactionStack != null && mTransactionStack!!.mParent != null
+        val trans = mTransactionStack
+        return trans?.mParent != null
     }
 
     /**
@@ -195,7 +195,7 @@ class SQLiteSession(val mConnection:SQLiteConnection) {
             }
         }
         mTransactionStack = top.mParent
-        recycleTransaction(top)
+
         val transStack = mTransactionStack
         if (transStack != null)
         {
@@ -553,27 +553,12 @@ class SQLiteSession(val mConnection:SQLiteConnection) {
         }
     }
     private fun obtainTransaction(mode:Int, listener:SQLiteTransactionListener?):Transaction {
-        var transaction = mTransactionPool
-        if (transaction != null)
-        {
-            mTransactionPool = transaction.mParent
-            transaction.mParent = null
-            transaction.mMarkedSuccessful = false
-            transaction.mChildFailed = false
-        }
-        else
-        {
-            transaction = Transaction()
-        }
+        var transaction  = Transaction()
         transaction.mMode = mode
         transaction.mListener = listener
         return transaction
     }
-    private fun recycleTransaction(transaction:Transaction) {
-        transaction.mParent = mTransactionPool
-        transaction.mListener = null
-        mTransactionPool = transaction
-    }
+
 
     private class Transaction() {
         var mParent:Transaction? = null

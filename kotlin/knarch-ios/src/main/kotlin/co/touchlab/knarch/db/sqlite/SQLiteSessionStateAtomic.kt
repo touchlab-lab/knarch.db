@@ -280,7 +280,7 @@ class SQLiteSessionStateAtomic(dbConfig: SQLiteDatabaseConfiguration) {
     fun __openConnection()
     {
         val configCopy = dbConfigCopy()
-        putSession(SQLiteSession(SQLiteConnection(configCopy, 0, true)))
+        putSession(SQLiteSession(SQLiteConnection(configCopy)))
     }
 
     private fun freezeParams(sql: String, bindArgs: Array<Any?>? = null) {

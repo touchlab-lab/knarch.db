@@ -150,7 +150,7 @@ class MultithreadingTest {
                         db.beginTransaction()
 
                         try {
-                            val sql = "INSERT INTO testmore (name, age, address) VALUES (?, ?, ?);"
+                            val sql = "INSERT INTO testmore (name, age, address) VALUES (?, ?, ?);".freeze()
                             val insertStatement = db.compileStatement(sql)
                             for (i in 0 until ((30 + 5) - windex)) {
                                 DatabaseUtils.bindObjectToProgram(insertStatement, 1, "$name $i")
