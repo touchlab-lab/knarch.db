@@ -55,15 +55,18 @@ namespace {
             auto all = stmtCache.allEntries();
             std::list<std::pair<KStdString, KNativePtr>>::const_iterator iterator;
             for (iterator = all.begin(); iterator != all.end(); ++iterator) {
-                removeStmt(iterator->second);
+                if(stmtCache.exists(iterator->first))
+                    removeStmt(iterator->second);
             }
             stmtCache.removeAll();
         }
 
         void remove(KString sql) {
             auto key = makeStdString(sql);
-            if (stmtCache.exists(key))
+            if (stmtCache.exists(key)) {
                 removeStmt(stmtCache.get(key));
+                stmtCache.remove(key);
+            }
         }
 
         KRef getStmt(KString sql) {

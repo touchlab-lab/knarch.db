@@ -45,6 +45,14 @@ namespace cache {
             }
         }
 
+        void remove(const key_t &key){
+            auto it = _cache_items_map.find(key);
+            if (it != _cache_items_map.end()) {
+                _cache_items_list.erase(it->second);
+                _cache_items_map.erase(it);
+            }
+        }
+
         std::list<key_value_pair_t> allEntries(){
             return _cache_items_list;
         }
