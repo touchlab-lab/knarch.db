@@ -29,7 +29,7 @@ abstract class SQLiteProgram(
         return mColumnNames
     }
     /** @hide */
-    protected fun getSession():SQLiteSessionStateAtomic {
+    protected fun getSession():SQLiteSession {
         return mDatabase.getThreadSession()
     }
     /** @hide */

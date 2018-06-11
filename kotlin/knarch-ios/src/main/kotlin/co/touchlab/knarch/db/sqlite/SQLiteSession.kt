@@ -6,17 +6,66 @@ import co.touchlab.knarch.db.CursorWindow
 import co.touchlab.knarch.db.DatabaseUtils
 import co.touchlab.knarch.db.sqlite.SQLiteDatabase.Companion.TAG
 import platform.Foundation.*
+import konan.worker.*
 
 /**
  * Creates a session bound to the specified connection pool.
  *
  * @param connectionPool The connection pool.
  */
-class SQLiteSession(val mConnection:SQLiteConnection) {
+class SQLiteSession(private val mConnection: SQLiteConnection, dbConfig: SQLiteDatabaseConfiguration) {
     private val mConnectionFlags:Int = 0
-    var mConnectionUseCount:Int = 0
-    private var mTransactionStack:Transaction? = null
 
+    private val sessionRecursiveLock = NSRecursiveLock()
+    private val transLock = NSRecursiveLock()
+
+    private val atomicDbConfig: Atomic<SQLiteDatabaseConfiguration> = Atomic({dbConfig.freeze()})
+
+    fun dbLabel() = atomicDbConfig.accessForResult { conf -> conf!!.label }
+    fun dbConfigUpdate(proc: (conf: SQLiteDatabaseConfiguration?) -> SQLiteDatabaseConfiguration) {
+        atomicDbConfig.accessUpdate(proc)
+    }
+
+    fun dbConfigCopy(): SQLiteDatabaseConfiguration = atomicDbConfig.accessForResult { conf -> conf!!.freeze() }
+    fun dbReadOnlyLocked(): Boolean = atomicDbConfig.accessForResult { (it!!.openFlags and SQLiteDatabase.OPEN_READ_MASK) == SQLiteDatabase.OPEN_READONLY }
+    fun dbInMemoryDb(): Boolean = atomicDbConfig.accessForResult { it!!.isInMemoryDb() }
+    fun dbOpenFlags(): Int = atomicDbConfig.accessForResult { it!!.openFlags }
+    fun dbPath(): String = atomicDbConfig.accessForResult { it!!.path }
+    fun dbForeignKeyConstraintsEnabled(): Boolean = atomicDbConfig.accessForResult { it!!.foreignKeyConstraintsEnabled }
+
+    internal fun checkOpenConnection(){
+        withLockUnit {
+            if(!mConnection.hasConnection())
+                mConnection.open()
+        }
+    }
+
+    private fun transactionUnlock() {
+        try {
+            transLock.unlock()
+        } catch (e: Exception) {
+            //Presumably we weren't locked
+            Log.w("SQLiteSessionStateAtomic", "Failed unlock", e)
+        }
+    }
+
+    private fun withLockUnit(proc:() -> Unit){
+        sessionRecursiveLock.lock()
+        try {
+            proc.invoke()
+        } finally {
+            sessionRecursiveLock.unlock()
+        }
+    }
+
+    private fun <T> withLock(proc:() -> T):T{
+        sessionRecursiveLock.lock()
+        try {
+            return proc.invoke()
+        } finally {
+            sessionRecursiveLock.unlock()
+        }
+    }
 
     /**
      * Returns true if the session has a transaction in progress.
@@ -24,7 +73,7 @@ class SQLiteSession(val mConnection:SQLiteConnection) {
      * @return True if the session has a transaction in progress.
      */
     fun hasTransaction():Boolean {
-        return mTransactionStack != null
+        return withLock { mConnection.getTransaction() != null }
     }
     /**
      * Returns true if the session has a nested transaction in progress.
@@ -32,9 +81,11 @@ class SQLiteSession(val mConnection:SQLiteConnection) {
      * @return True if the session has a nested transaction in progress.
      */
     fun hasNestedTransaction():Boolean {
-        val trans = mTransactionStack
-        return trans?.mParent != null
+        return withLock { val trans = mConnection.getTransaction()
+            trans?.mParent != null }
     }
+
+    fun hasConnection(): Boolean = mConnection.hasConnection()
 
     /**
      * Begins a transaction.
@@ -71,11 +122,21 @@ class SQLiteSession(val mConnection:SQLiteConnection) {
     fun beginTransaction(transactionMode:Int,
                          transactionListener:SQLiteTransactionListener?,
                          connectionFlags:Int) {
-        throwIfTransactionMarkedSuccessful()
-        beginTransactionUnchecked(transactionMode, transactionListener, connectionFlags)
+        transLock.lock()
+        try {
+            withLockUnit {
+                throwIfTransactionMarkedSuccessful()
+                beginTransactionUnchecked(transactionMode, transactionListener, connectionFlags)
+            }
+        } catch (e: Throwable) {
+            transactionUnlock()
+            throw e
+        }
     }
+
     private fun beginTransactionUnchecked(transactionMode:Int,
                                           transactionListener:SQLiteTransactionListener?, connectionFlags:Int) {
+        val mTransactionStack = mConnection.getTransaction()
         if (mTransactionStack == null)
         {
             acquireConnection(null, connectionFlags) // might throw
@@ -112,7 +173,7 @@ class SQLiteSession(val mConnection:SQLiteConnection) {
             // Bookkeeping can't throw, except an OOM, which is just too bad...
             val transaction = obtainTransaction(transactionMode, transactionListener)
             transaction.mParent = mTransactionStack
-            mTransactionStack = transaction
+            mConnection.putTransaction(transaction)
         }
         finally
         {
@@ -139,9 +200,11 @@ class SQLiteSession(val mConnection:SQLiteConnection) {
      * @see #endTransaction
      */
     fun setTransactionSuccessful() {
-        throwIfNoTransaction()
-        throwIfTransactionMarkedSuccessful()
-        mTransactionStack!!.mMarkedSuccessful = true
+        withLockUnit {
+            throwIfNoTransaction()
+            throwIfTransactionMarkedSuccessful()
+            mConnection.getTransaction()!!.mMarkedSuccessful = true
+        }
     }
     /**
      * Ends the current transaction and commits or rolls back changes.
@@ -164,15 +227,21 @@ class SQLiteSession(val mConnection:SQLiteConnection) {
      * @see #yieldTransaction
      */
     fun endTransaction() {
-        //*Always* call, even if we got here some weird way and there's no lock
-        throwIfNoTransaction()
-        //Won't matter till we get pools back
-//        assert(mConnection != null)
-        endTransactionUnchecked( false)
+        try {
+            withLockUnit {
+                //*Always* call, even if we got here some weird way and there's no lock
+                throwIfNoTransaction()
+                //Won't matter till we get pools back
+    //        assert(mConnection != null)
+                endTransactionUnchecked( false)
+            }
+        } finally {
+            transactionUnlock()
+        }
     }
 
     private fun endTransactionUnchecked(yielding:Boolean) {
-        val top = mTransactionStack
+        val top = mConnection.getTransaction()
         var successful = (top!!.mMarkedSuccessful || yielding) && !top.mChildFailed
         var listenerException:RuntimeException? = null
         val listener = top.mListener
@@ -194,9 +263,9 @@ class SQLiteSession(val mConnection:SQLiteConnection) {
                 successful = false
             }
         }
-        mTransactionStack = top.mParent
+        mConnection.putTransaction(top.mParent)
 
-        val transStack = mTransactionStack
+        val transStack = mConnection.getTransaction()
         if (transStack != null)
         {
             if (!successful)
@@ -255,14 +324,16 @@ class SQLiteSession(val mConnection:SQLiteConnection) {
     fun prepare(sql:String, connectionFlags:Int,
                 outStatementInfo:SQLiteStatementInfo?) {
 
-        acquireConnection(sql, connectionFlags) // might throw
-        try
-        {
-            mConnection.prepare(sql, outStatementInfo) // might throw
-        }
-        finally
-        {
-            releaseConnection() // might throw
+        withLockUnit {
+            acquireConnection(sql, connectionFlags) // might throw
+            try
+            {
+                mConnection.prepare(sql, outStatementInfo) // might throw
+            }
+            finally
+            {
+                releaseConnection() // might throw
+            }
         }
     }
     /**
@@ -279,18 +350,15 @@ class SQLiteSession(val mConnection:SQLiteConnection) {
      * @throws OperationCanceledException if the operation was canceled.
      */
     fun execute(sql:String, bindArgs:Array<Any?>?, connectionFlags:Int) {
-        if (executeSpecial(sql, bindArgs, connectionFlags))
-        {
-            return
-        }
-        acquireConnection(sql, connectionFlags) // might throw
-        try
-        {
-            mConnection.execute(sql, bindArgs) // might throw
-        }
-        finally
-        {
-            releaseConnection() // might throw
+        withLockUnit {
+            if (!executeSpecial(sql, bindArgs, connectionFlags)) {
+                acquireConnection(sql, connectionFlags) // might throw
+                try {
+                    mConnection.execute(sql, bindArgs) // might throw
+                } finally {
+                    releaseConnection() // might throw
+                }
+            }
         }
     }
     /**
@@ -308,7 +376,11 @@ class SQLiteSession(val mConnection:SQLiteConnection) {
      * or invalid number of bind arguments.
      * @throws OperationCanceledException if the operation was canceled.
      */
-    fun executeForLong(sql:String, bindArgs:Array<Any?>?, connectionFlags:Int):Long {
+    fun executeForLong(sql:String, bindArgs:Array<Any?>?, connectionFlags:Int):Long = withLock {
+        __executeForLong(sql, bindArgs, connectionFlags)
+    }
+
+    fun __executeForLong(sql:String, bindArgs:Array<Any?>?, connectionFlags:Int):Long {
 
         if (executeSpecial(sql, bindArgs, connectionFlags))
         {
@@ -339,7 +411,11 @@ class SQLiteSession(val mConnection:SQLiteConnection) {
      * or invalid number of bind arguments.
      * @throws OperationCanceledException if the operation was canceled.
      */
-    fun executeForString(sql:String, bindArgs:Array<Any?>?, connectionFlags:Int):String? {
+    fun executeForString(sql:String, bindArgs:Array<Any?>?, connectionFlags:Int):String? = withLock { __executeForString(
+            sql, bindArgs, connectionFlags
+    ) }
+
+    fun __executeForString(sql:String, bindArgs:Array<Any?>?, connectionFlags:Int):String? {
         if (executeSpecial(sql, bindArgs, connectionFlags))
         {
             return null
@@ -369,7 +445,10 @@ class SQLiteSession(val mConnection:SQLiteConnection) {
      * or invalid number of bind arguments.
      * @throws OperationCanceledException if the operation was canceled.
      */
-    fun executeForChangedRowCount(sql:String, bindArgs:Array<Any?>?, connectionFlags:Int):Int {
+    fun executeForChangedRowCount(sql:String, bindArgs:Array<Any?>?, connectionFlags:Int):Int =
+            withLock { __executeForChangedRowCount(sql, bindArgs, connectionFlags) }
+
+    fun __executeForChangedRowCount(sql:String, bindArgs:Array<Any?>?, connectionFlags:Int):Int {
         if (executeSpecial(sql, bindArgs, connectionFlags))
         {
             return 0
@@ -384,6 +463,7 @@ class SQLiteSession(val mConnection:SQLiteConnection) {
             releaseConnection() // might throw
         }
     }
+
     /**
      * Executes a statement that returns the row id of the last row inserted
      * by the statement. Use for INSERT SQL statements.
@@ -399,7 +479,10 @@ class SQLiteSession(val mConnection:SQLiteConnection) {
      * or invalid number of bind arguments.
      * @throws OperationCanceledException if the operation was canceled.
      */
-    fun executeForLastInsertedRowId(sql:String, bindArgs:Array<Any?>?, connectionFlags:Int):Long {
+    fun executeForLastInsertedRowId(sql:String, bindArgs:Array<Any?>?, connectionFlags:Int):Long =
+            withLock { __executeForLastInsertedRowId(sql, bindArgs, connectionFlags) }
+
+    fun __executeForLastInsertedRowId(sql:String, bindArgs:Array<Any?>?, connectionFlags:Int):Long {
         if (executeSpecial(sql, bindArgs, connectionFlags))
         {
             return 0
@@ -440,6 +523,11 @@ class SQLiteSession(val mConnection:SQLiteConnection) {
      */
     fun executeForCursorWindow(sql:String, bindArgs:Array<Any?>?,
                                window:CursorWindow, startPos:Int, requiredPos:Int, countAllRows:Boolean,
+                               connectionFlags:Int):Int =
+            withLock { __executeForCursorWindow(sql, bindArgs, window, startPos, requiredPos, countAllRows, connectionFlags) }
+
+    fun __executeForCursorWindow(sql:String, bindArgs:Array<Any?>?,
+                               window:CursorWindow, startPos:Int, requiredPos:Int, countAllRows:Boolean,
                                connectionFlags:Int):Int {
         if (executeSpecial(sql, bindArgs, connectionFlags))
         {
@@ -457,6 +545,7 @@ class SQLiteSession(val mConnection:SQLiteConnection) {
             releaseConnection() // might throw
         }
     }
+
     /**
      * Performs special reinterpretation of certain SQL statements such as "BEGIN",
      * "COMMIT" and "ROLLBACK" to ensure that transaction state invariants are
@@ -498,6 +587,12 @@ class SQLiteSession(val mConnection:SQLiteConnection) {
         return false
     }
 
+    fun closeConnection() {
+        withLockUnit {
+            mConnection.close()
+        }
+    }
+
     /**
      * Currently we don't support the connection pool. There's 1 session, and 1 connection. May reintroduce after
      * we get other things sorted.
@@ -509,7 +604,7 @@ class SQLiteSession(val mConnection:SQLiteConnection) {
             mConnection = mConnectionPool.acquireConnection(sql, connectionFlags) // might throw
             mConnectionFlags = connectionFlags
         }*/
-        mConnectionUseCount += 1
+        mConnection.incConnectionCount()
     }
 
     /**
@@ -517,7 +612,7 @@ class SQLiteSession(val mConnection:SQLiteConnection) {
      * we get other things sorted.
      */
     private fun releaseConnection() {
-        --mConnectionUseCount
+        mConnection.decConnectionCount()
         /*assert(mConnection != null)
         assert(mConnectionUseCount > 0)
         if (--mConnectionUseCount == 0)
@@ -532,14 +627,16 @@ class SQLiteSession(val mConnection:SQLiteConnection) {
             }
         }*/
     }
+
     private fun throwIfNoTransaction() {
-        if (mTransactionStack == null)
+        if (mConnection.getTransaction() == null)
         {
             throw IllegalStateException(("Cannot perform this operation because there is no current transaction."))
         }
     }
     private fun throwIfTransactionMarkedSuccessful() {
-        if (mTransactionStack != null && mTransactionStack!!.mMarkedSuccessful)
+        val mTransactionStack= mConnection.getTransaction()
+        if (mTransactionStack != null && mTransactionStack.mMarkedSuccessful)
         {
             throw IllegalStateException(("Cannot perform this operation because "
                     + "the transaction has already been marked successful. The only "
@@ -560,7 +657,7 @@ class SQLiteSession(val mConnection:SQLiteConnection) {
     }
 
 
-    private class Transaction() {
+    internal class Transaction() {
         var mParent:Transaction? = null
         var mMode:Int = 0
         var mListener:SQLiteTransactionListener? = null

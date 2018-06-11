@@ -1,7 +1,7 @@
 package co.touchlab.knarch.db.native
 
 interface NativeCursorWindow{
-    fun implCreate(name:String, cursorWindowSize:Int):Unit
+    fun implCreate(name:String, cursorWindowSize:Int, dataArray:ByteArray):Unit
     fun implDispose()
     fun implClear()
     fun implGetNumRows():Int

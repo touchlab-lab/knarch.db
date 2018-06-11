@@ -20,6 +20,15 @@ private external fun getConnectionPtr(dataId:Int):Long
 @SymbolName("SQLiteSupport_putConnectionPtr")
 private external fun putConnectionPtr(dataId:Int, connectionPtr:Long)
 
+@SymbolName("SQLiteSupport_incConnectionCount")
+private external fun incConnectionCount(dataId:Int)
+
+@SymbolName("SQLiteSupport_decConnectionCount")
+private external fun decConnectionCount(dataId:Int)
+
+@SymbolName("SQLiteSupport_getConnectionCount")
+private external fun getConnectionCount(dataId:Int):Int
+
 @SymbolName("SQLiteSupport_putStmt")
 private external fun putStmt(dataId:Int, sql:String, ptr:NativePreparedStatement)
 
@@ -28,6 +37,15 @@ private external fun getStmt(dataId:Int, sql:String):NativePreparedStatement
 
 @SymbolName("SQLiteSupport_hasStmt")
 private external fun hasStmt(dataId:Int, sql:String):Boolean
+
+@SymbolName("SQLiteSupport_getTransaction")
+private external fun getTransaction(dataId:Int):SQLiteSession.Transaction?
+
+@SymbolName("SQLiteSupport_putTransaction")
+private external fun putTransaction(dataId:Int, trans:SQLiteSession.Transaction?)
+
+@SymbolName("SQLiteSupport_removeTransaction")
+private external fun removeTransaction(dataId:Int)
 
 @SymbolName("SQLiteSupport_evictAll")
 private external fun evictAll(dataId:Int)
@@ -62,6 +80,32 @@ class SQLiteConnection(private val mConfiguration:SQLiteDatabaseConfiguration) {
         }
     }
 
+    fun incConnectionCount(){
+        incConnectionCount(nativeDataId)
+    }
+
+    fun decConnectionCount(){
+        decConnectionCount(nativeDataId)
+    }
+
+    fun getConnectionCount():Int = getConnectionCount(nativeDataId)
+
+    internal fun getTransaction():SQLiteSession.Transaction? = getTransaction(nativeDataId)
+    internal fun putTransaction(trans:SQLiteSession.Transaction?) {
+        if(trans == null)
+        {
+            removeTransaction()
+        }
+        else
+        {
+            putTransaction(nativeDataId, trans)
+        }
+    }
+
+    private fun removeTransaction(){
+        removeTransaction(nativeDataId)
+    }
+
     //Statement cache methods
     private fun cacheEvictAll(){
         evictAll(nativeDataId)
@@ -85,6 +129,8 @@ class SQLiteConnection(private val mConfiguration:SQLiteDatabaseConfiguration) {
         putStmt(nativeDataId, sql, stmt)
     }
 
+    internal fun hasConnection() = getConnectionPtr(nativeDataId) != 0L
+
     // Called by SQLiteConnectionPool only.
     // Closes the database closes and releases all of its associated resources.
     // Do not call methods on the connection after it is closed. It will probably crash.
@@ -92,7 +138,7 @@ class SQLiteConnection(private val mConfiguration:SQLiteDatabaseConfiguration) {
         dispose(false)
     }
 
-    private fun open() {
+    fun open() {
         val connectionPtr = nativeOpen(mConfiguration.path, mConfiguration.openFlags,
                 mConfiguration.label,
                 SQLiteDebug.DEBUG_SQL_STATEMENTS, SQLiteDebug.DEBUG_SQL_TIME,

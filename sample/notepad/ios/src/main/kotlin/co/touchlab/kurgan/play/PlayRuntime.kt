@@ -28,8 +28,8 @@ class PlayRuntime(){
 //        TestRunner.run(arrayOf("--ktest_filter=*testStatementConstraint*"))
 //        TestRunner.run(arrayOf("--ktest_filter=*basicMultithreadingTest*"))
 //        TestRunner.run(arrayOf("--ktest_filter=*testQuery*"))
-//        TestRunner.run(arrayOf("--ktest_filter=-*testStatementConstraint*"))
-        TestRunner.run()
+        TestRunner.run(arrayOf("--ktest_filter=*SQLiteDatabaseTest*"))
+//        TestRunner.run()
 
         /*if(heya == null){
             heya = Atomic(MyData("asdf", 123)).freeze()

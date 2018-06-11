@@ -37,18 +37,18 @@ CursorWindow::CursorWindow(const KString& name,
 
     CursorWindow::~CursorWindow() {
 
-    free(mData);
+//    free(mData);
     //::munmap(mData, mSize);
     //::close(mAshmemFd);
     }
 
     //TODO: Figure out memory for name
-    status_t CursorWindow::create(const KString& name, size_t size, CursorWindow** outCursorWindow) {
+    status_t CursorWindow::create(const KString& name, size_t size, void* data, CursorWindow** outCursorWindow) {
         /*String8 ashmemName("CursorWindow: ");
         ashmemName.append(name);*/
 
         status_t result;
-    void* data = malloc(size);
+
         if(data == NULL)
         {
             //NO_MEMORY maybe?

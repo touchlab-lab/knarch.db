@@ -55,7 +55,7 @@ namespace {
             auto all = stmtCache.allEntries();
             std::list<std::pair<KStdString, KNativePtr>>::const_iterator iterator;
             for (iterator = all.begin(); iterator != all.end(); ++iterator) {
-                if(stmtCache.exists(iterator->first))
+                if (stmtCache.exists(iterator->first))
                     removeStmt(iterator->second);
             }
             stmtCache.removeAll();
@@ -77,7 +77,22 @@ namespace {
                 return nullptr;
         }
 
+        KRef getTransaction(){
+            return (KRef)transaction;
+        }
+
+        void putTransaction(KRef tl){
+            transaction = CreateStablePointer(tl);
+        }
+
+        void removeTransaction(){
+            DisposeStablePointer(transaction);
+            transaction = nullptr;
+        }
+
         KLong connectionPtr;
+        KInt connectionCount;
+
 
     private:
         void removeStmt(KNativePtr stmtPtr) {
@@ -85,6 +100,7 @@ namespace {
             DisposeStablePointer(stmtPtr);
         }
 
+        KNativePtr transaction = nullptr;
         cache::lru_cache<KStdString, KNativePtr> stmtCache;
     };
 
@@ -121,6 +137,24 @@ namespace {
             return it->second->getStmt(sql);
         }
 
+        KRef getTransaction(KInt dataId){
+            Locker locker(&lock_);
+            auto it = data_.find(dataId);
+            return it->second->getTransaction();
+        }
+
+        void putTransaction(KInt dataId, KRef tl) {
+            Locker locker(&lock_);
+            auto it = data_.find(dataId);
+            it->second->putTransaction(tl);
+        }
+
+        void removeTransaction(KInt dataId) {
+            Locker locker(&lock_);
+            auto it = data_.find(dataId);
+            it->second->removeTransaction();
+        }
+
         void putConnectionPtr(KInt dataId, KLong connectionPtr) {
             Locker locker(&lock_);
             auto it = data_.find(dataId);
@@ -151,6 +185,27 @@ namespace {
             auto it = data_.find(dataId);
             if (it == data_.end()) return;
             data_.erase(dataId);
+        }
+
+        void incConnectionCount(KInt dataId) {
+            Locker locker(&lock_);
+            auto it = data_.find(dataId);
+            if (it == data_.end()) return;
+            it->second->connectionCount++;
+        }
+
+        void decConnectionCount(KInt dataId) {
+            Locker locker(&lock_);
+            auto it = data_.find(dataId);
+            if (it == data_.end()) return;
+            it->second->connectionCount--;
+        }
+
+        KInt getConnectionCount(KInt dataId) {
+            Locker locker(&lock_);
+            auto it = data_.find(dataId);
+            if (it == data_.end()) return 0;
+            return it->second->connectionCount;
         }
 
         KInt nextDataId() {
@@ -216,6 +271,18 @@ KLong SQLiteSupport_getConnectionPtr(KInt dataId) {
     return dataState()->getConnectionPtr(dataId);
 }
 
+void SQLiteSupport_incConnectionCount(KInt dataId) {
+    dataState()->incConnectionCount(dataId);
+}
+
+void SQLiteSupport_decConnectionCount(KInt dataId) {
+    dataState()->decConnectionCount(dataId);
+}
+
+KLong SQLiteSupport_getConnectionCount(KInt dataId) {
+    return dataState()->getConnectionCount(dataId);
+}
+
 void SQLiteSupport_putStmt(KInt dataId, KString sql, KRef stmt) {
     dataState()->putStmt(dataId, sql, stmt);
 }
@@ -226,6 +293,18 @@ OBJ_GETTER(SQLiteSupport_getStmt, KInt dataId, KString sql) {
 
 KBoolean SQLiteSupport_hasStmt(KInt dataId, KString sql) {
     return dataState()->getStmt(dataId, sql) != nullptr;
+}
+
+void SQLiteSupport_putTransaction(KInt dataId, KRef tl) {
+    dataState()->putTransaction(dataId, tl);
+}
+
+OBJ_GETTER(SQLiteSupport_getTransaction, KInt dataId) {
+    RETURN_OBJ(dataState()->getTransaction(dataId));
+}
+
+void SQLiteSupport_removeTransaction(KInt dataId) {
+    dataState()->removeTransaction(dataId);
 }
 
 void SQLiteSupport_evictAll(KInt dataId) {

@@ -65,10 +65,10 @@ static void throwUnknownTypeException(KInt type) {
     ThrowSql_IllegalStateException(makeKString(exceptionMessage));
 }
 
-static KLong nativeCreate(KString nameObj, KInt cursorWindowSize) {
+static KLong nativeCreate(KString nameObj, KInt cursorWindowSize, KRef dataArray) {
 
     CursorWindow *window;
-    status_t status = CursorWindow::create(nameObj, cursorWindowSize, &window);
+    status_t status = CursorWindow::create(nameObj, cursorWindowSize, (void*)ArrayAddressOfElementAt(dataArray->array(), 0), &window);
     if (status || !window) {
         ALOGE("Could not allocate CursorWindow '%s' of size %d due to error %d.",
               nameObj, cursorWindowSize, status);
@@ -493,8 +493,8 @@ static KBoolean nativePutNull(KLong windowPtr, KInt row, KInt column) {
 
 extern "C" {
 
-KLong Android_Database_CursorWindow_nativeCreate(KRef thiz, KString nameObj, KInt cursorWindowSize) {
-    return nativeCreate(nameObj, cursorWindowSize);
+KLong Android_Database_CursorWindow_nativeCreate(KRef thiz, KString nameObj, KInt cursorWindowSize, KRef dataArray) {
+    return nativeCreate(nameObj, cursorWindowSize, dataArray);
 }
 
 void Android_Database_CursorWindow_nativeDispose(KRef thiz, KLong windowPtr) {

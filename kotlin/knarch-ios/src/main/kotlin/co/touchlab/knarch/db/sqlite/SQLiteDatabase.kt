@@ -286,7 +286,8 @@ class SQLiteDatabase private constructor(path: String, openFlags: Int, cursorFac
         }
     }
 
-    private val sqliteSession = SQLiteSessionStateAtomic(SQLiteDatabaseConfiguration(path, openFlags))
+    val dbConfig = SQLiteDatabaseConfiguration(path, openFlags)
+    private val sqliteSession = SQLiteSession(SQLiteConnection(dbConfig), dbConfig)
 
     // The optional factory to use when creating new Cursors.  May be null.
     // INVARIANT: Immutable.
@@ -331,7 +332,7 @@ class SQLiteDatabase private constructor(path: String, openFlags: Int, cursorFac
      * @throws IllegalStateException if the thread does not yet have a session and
      * the database is not open.
      */
-    fun getThreadSession():SQLiteSessionStateAtomic {
+    fun getThreadSession():SQLiteSession {
         sqliteSession.checkOpenConnection()
         return sqliteSession
     }
@@ -564,7 +565,7 @@ class SQLiteDatabase private constructor(path: String, openFlags: Int, cursorFac
     }
 
     fun openInner() {
-        sqliteSession.openConnection()
+        sqliteSession.checkOpenConnection()
     }
 
     /**

@@ -3,9 +3,10 @@ package co.touchlab.knarch.db.native
 class CppCursorWindow(name:String):NativeCursorWindow{
 
     var mWindowPtr:Long = 0
+    var dataArray:ByteArray?
 
-    override fun implCreate(name: String, cursorWindowSize: Int) {
-        mWindowPtr = nativeCreate(name, cursorWindowSize)
+    override fun implCreate(name: String, cursorWindowSize: Int, dataArray:ByteArray) {
+        mWindowPtr = nativeCreate(name, cursorWindowSize, dataArray)
         if (mWindowPtr == 0L)
         {
             throw CursorWindowAllocationException(("Cursor window allocation of ${(cursorWindowSize / 1024)} kb failed. "))
@@ -24,6 +25,7 @@ class CppCursorWindow(name:String):NativeCursorWindow{
 
     override fun implClear() {
         nativeClear(mWindowPtr)
+        dataArray = null
     }
 
     override fun implGetNumRows(): Int = nativeGetNumRows(mWindowPtr)
@@ -49,8 +51,8 @@ class CppCursorWindow(name:String):NativeCursorWindow{
     }
 
     init{
-        implCreate(name, sCursorWindowSize)
-
+        dataArray = ByteArray(sCursorWindowSize)
+        implCreate(name, sCursorWindowSize, dataArray!!)
         // recordNewWindow(Binder.getCallingPid(), mWindowPtr);
     }
 
@@ -70,7 +72,7 @@ class CppCursorWindow(name:String):NativeCursorWindow{
         }
 
         @SymbolName("Android_Database_CursorWindow_nativeCreate")
-        private external fun nativeCreate(name:String, cursorWindowSize:Int):Long
+        private external fun nativeCreate(name:String, cursorWindowSize:Int, dataArray:ByteArray):Long
         @SymbolName("Android_Database_CursorWindow_nativeDispose")
         private external fun nativeDispose(windowPtr:Long)
         @SymbolName("Android_Database_CursorWindow_nativeClear")

@@ -88,7 +88,7 @@ namespace android {
 
         ~CursorWindow();
 
-    static status_t create(const KString& name, size_t size, CursorWindow** outCursorWindow);
+    static status_t create(const KString& name, size_t size, void* data, CursorWindow** outCursorWindow);
 
     inline KString name() { return mName; }
         inline size_t size() { return mSize; }
