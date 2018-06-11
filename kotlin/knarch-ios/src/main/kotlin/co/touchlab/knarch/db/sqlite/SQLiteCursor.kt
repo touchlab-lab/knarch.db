@@ -5,7 +5,7 @@ import co.touchlab.knarch.db.AbstractWindowedCursor
 import co.touchlab.knarch.db.CursorWindow
 import co.touchlab.knarch.db.DatabaseUtils
 
-open class SQLiteCursor/**
+/**
  * Execute a query and provide access to its result set through a Cursor
  * interface. For a query such as: {@code SELECT name, birth, phone FROM
  * myTable WHERE ... LIMIT 1,20 ORDER BY...} the column names (name, birth,
@@ -15,7 +15,8 @@ open class SQLiteCursor/**
  * @param editTable the name of the table used for this query
  * @param query the {@link SQLiteQuery} object associated with this cursor object.
  */
-(driver:SQLiteCursorDriver, editTable:String?, query:SQLiteQuery):AbstractWindowedCursor() {
+open class SQLiteCursor
+(private val mDriver:SQLiteCursorDriver, editTable:String?, query:SQLiteQuery):AbstractWindowedCursor() {
     override fun getPosition(): Int = position
 
     override fun isFirst(): Boolean = isFirst
@@ -33,19 +34,29 @@ open class SQLiteCursor/**
     override fun getCount(): Int = count
 
     /** The name of the table to edit */
-    private val mEditTable:String?
+    private val mEditTable:String? = editTable
+
     /** The names of the columns in the rows */
     override val columnNames:Array<String>
+
     /** The query object for the cursor */
     private val mQuery:SQLiteQuery
-    /** The compiled query this cursor came from */
-    private val mDriver:SQLiteCursorDriver
+
     /** The number of rows in the cursor */
     private var mCount = NO_COUNT
+
     /** The number of rows that can fit in the cursor window, 0 if unknown */
     private var mCursorWindowCapacity:Int = 0
+
     /** A mapping of column names to column indices, to speed up lookups */
     private var mColumnNameMap:Map<String, Int>?
+
+    init{
+        mColumnNameMap = null
+        mQuery = query
+        columnNames = query.getColumnNames()
+    }
+
     /**
      * Get the database that this cursor is associated with.
      * @return the SQLiteDatabase that this cursor is associated with.
@@ -79,13 +90,7 @@ open class SQLiteCursor/**
     @Deprecated("use {@link #SQLiteCursor(SQLiteCursorDriver, String, SQLiteQuery)} instead")
     constructor(db:SQLiteDatabase, driver:SQLiteCursorDriver,
                 editTable:String?, query:SQLiteQuery) : this(driver, editTable, query) {}
-    init{
-        mDriver = driver
-        mEditTable = editTable
-        mColumnNameMap = null
-        mQuery = query
-        columnNames = query.getColumnNames()
-    }
+
 
     override fun onMove(oldPosition:Int, newPosition:Int):Boolean {
         // Make sure the row at newPosition is present in the window

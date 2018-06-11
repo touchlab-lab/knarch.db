@@ -495,6 +495,7 @@ open class CursorWindow/**
             releaseReference()
         }
     }
+
     /**
      * Puts a null value into the field at the specified row and column index.
      *
@@ -513,68 +514,15 @@ open class CursorWindow/**
             releaseReference()
         }
     }
+
     fun describeContents():Int {
         return 0
     }
+
     open override fun onAllReferencesReleased() {
         dispose()
     }
-    /*private static final LongSparseArray<Integer> sWindowToPidMap = new LongSparseArray<Integer>();
-   private void recordNewWindow(int pid, long window) {
-   synchronized (sWindowToPidMap) {
-   sWindowToPidMap.put(window, pid);
-   if (Log.isLoggable(STATS_TAG, Log.VERBOSE)) {
-   Log.i(STATS_TAG, "Created a new Cursor. " + printStats());
-   }
-   }
-   }
-   private void recordClosingOfWindow(long window) {
-   synchronized (sWindowToPidMap) {
-   if (sWindowToPidMap.size() == 0) {
-   // this means we are not in the ContentProvider.
-   return;
-   }
-   sWindowToPidMap.delete(window);
-   }
-   }*/
-//    private fun printStats():String {
-//        val buff = StringBuilder()
-//        val myPid = 0//Process.myPid(); TODO: GET ACTUAL PROCESS ID, MAYBE?
-//        val total = 0
-//        val pidCounts = HashMap<Int, Int>()
-//        /*synchronized (sWindowToPidMap) {
-//     int size = sWindowToPidMap.size();
-//     if (size == 0) {
-//     // this means we are not in the ContentProvider.
-//     return "";
-//     }
-//     for (int indx = 0; indx < size; indx++) {
-//     int pid = sWindowToPidMap.valueAt(indx);
-//     int value = pidCounts.get(pid);
-//     pidCounts.put(pid, ++value);
-//     }
-//     }*/
-//        val numPids = pidCounts.size
-//        for (i in 0 until numPids)
-//        {
-//            buff.append(" (# cursors opened by ")
-//            val pid = pidCounts.keyAt(i)
-//            if (pid == myPid)
-//            {
-//                buff.append("this proc=")
-//            }
-//            else
-//            {
-//                buff.append("pid " + pid + "=")
-//            }
-//            val num = pidCounts.get(pid)
-//            buff.append(num + ")")
-//            total += num
-//        }
-//        // limit the returned string size to 1000
-//        val s = if ((buff.length > 980)) buff.substring(0, 980) else buff.toString()
-//        return "# Open Cursors=$total$s"
-//    }
+
     override fun toString():String {
         return name + nativeCursorWindow.toString()
     }
