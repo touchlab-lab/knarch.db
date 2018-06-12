@@ -190,10 +190,10 @@ class SQLiteQueryBuilder {
         val sql = buildQuery(
                 projectionIn, selection, groupBy, having,
                 sortOrder, limit)
-        /*if (Log.isLoggable(TAG, Log.DEBUG))
+        if (Log.isLoggable(TAG, Log.DEBUG_))
         {
             Log.d(TAG, "Performing query: $sql")
-        }*/
+        }
         return db.rawQueryWithFactory(
                 mFactory, sql, selectionArgs,
                 SQLiteDatabase.findEditTable(tables!!)) // will throw if query is invalid

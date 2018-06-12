@@ -103,14 +103,14 @@ class SQLiteQueryBuilderTest {
         var factory = object:SQLiteDatabase.CursorFactory {
             override fun newCursor(db:SQLiteDatabase, masterQuery:SQLiteCursorDriver,
                           editTable:String?, query:SQLiteQuery):Cursor {
-                return GoGoSQLiteCursor(db, masterQuery, editTable, query)
+                return MockCursor(db, masterQuery, editTable, query)
             }
         }
 
         sqliteQueryBuilder.setCursorFactory(factory)
         cursor = sqliteQueryBuilder.query(mDatabase, arrayOf<String>("name", "age"), null, null, null, null, null)
         assertNotNull(cursor)
-        assertTrue(cursor is GoGoSQLiteCursor)
+        assertTrue(cursor is MockCursor)
     }
     private class MockCursor(db:SQLiteDatabase, driver:SQLiteCursorDriver,
                              editTable:String?, query:SQLiteQuery):SQLiteCursor(db, driver, editTable, query)

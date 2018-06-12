@@ -19,8 +19,15 @@ class Log{
         }
 
         /**
+         * Priority constant for the println method; use Log.v.
+         */
+        val VERBOSE = 2
+
+        /**
          * Priority constant for the println method; use Log.d.
          */
+        //TODO: Added the underscore because KN/Swift interop wasn't liking DEBUG
+        //Remove in the future
         val DEBUG_ = 3
 
         /**

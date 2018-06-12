@@ -192,6 +192,3 @@ open class SQLiteCursor
         internal val NO_COUNT = -1
     }
 }
-
-open class GoGoSQLiteCursor(db:SQLiteDatabase, driver:SQLiteCursorDriver,
-                               editTable:String?, query:SQLiteQuery):SQLiteCursor(db, driver, editTable, query)
