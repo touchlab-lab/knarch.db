@@ -19,14 +19,9 @@ class Log{
         }
 
         /**
-         * Priority constant for the println method; use Log.v.
-         */
-        val VERBOSE = 2
-
-        /**
          * Priority constant for the println method; use Log.d.
          */
-        val DEBUG = 3
+        val DEBUG_ = 3
 
         /**
          * Priority constant for the println method; use Log.i.

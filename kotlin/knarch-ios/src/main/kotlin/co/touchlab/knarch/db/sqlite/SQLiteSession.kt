@@ -1,10 +1,8 @@
 package co.touchlab.knarch.db.sqlite
 
-import co.touchlab.kite.threads.*
 import co.touchlab.knarch.Log
 import co.touchlab.knarch.db.CursorWindow
 import co.touchlab.knarch.db.DatabaseUtils
-import co.touchlab.knarch.db.sqlite.SQLiteDatabase.Companion.TAG
 import platform.Foundation.*
 import konan.worker.*
 
