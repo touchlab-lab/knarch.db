@@ -47,6 +47,15 @@ private external fun putTransaction(dataId:Int, trans:SQLiteSession.Transaction?
 @SymbolName("SQLiteSupport_removeTransaction")
 private external fun removeTransaction(dataId:Int)
 
+@SymbolName("SQLiteSupport_getDbConfig")
+private external fun getDbConfig(dataId:Int):SQLiteDatabaseConfiguration?
+
+@SymbolName("SQLiteSupport_putDbConfig")
+private external fun putDbConfig(dataId:Int, dbConfig:SQLiteDatabaseConfiguration)
+
+@SymbolName("SQLiteSupport_removeDbConfig")
+private external fun removeDbConfig(dataId:Int)
+
 @SymbolName("SQLiteSupport_evictAll")
 private external fun evictAll(dataId:Int)
 
@@ -61,23 +70,43 @@ private fun finalizeStmt(connectionPtr:Long, ptr:NativePreparedStatement){
     nativeFinalizeStatement(connectionPtr, ptr.mStatementPtr)
 }
 
-class SQLiteConnection(private val mConfiguration:SQLiteDatabaseConfiguration) {
+class SQLiteConnection(config:SQLiteDatabaseConfiguration) {
     private val mIsReadOnlyConnection:Boolean = false
 
     // The recent operations log.
     private val mRecentOperations = OperationLog()
     // The native SQLiteConnection pointer. (FOR INTERNAL USE ONLY)
-    private val nativeDataId: Int = createDataStore(mConfiguration.maxSqlCacheSize)
+    private val nativeDataId: Int = createDataStore(config.maxSqlCacheSize)
 
     init{
+        putDbConfig(config)
         try
         {
             open()
         }
         catch (ex:SQLiteException) {
-            dispose(false)
+            dispose()
             throw ex
         }
+    }
+
+    fun getDbConfig():SQLiteDatabaseConfiguration{
+        val dbConfig = getDbConfig(nativeDataId)
+        if(dbConfig == null)
+            throw IllegalStateException("Accessing database configuration after database shutdown")
+        else
+            return dbConfig
+    }
+
+    /**
+     * Store dbconfig in C++ structure. This will allow us to have some changed state across threads, but not break
+     * KN rules around data management.
+     *
+     * To support this, the data itself must be frozen, which we do here. Also, the C++ structure itself enforces
+     * a mutex lock to prevent thread timing issues.
+     */
+    fun putDbConfig(config:SQLiteDatabaseConfiguration){
+        putDbConfig(nativeDataId, config.freeze())
     }
 
     fun incConnectionCount(){
@@ -131,14 +160,15 @@ class SQLiteConnection(private val mConfiguration:SQLiteDatabaseConfiguration) {
 
     internal fun hasConnection() = getConnectionPtr(nativeDataId) != 0L
 
-    // Called by SQLiteConnectionPool only.
     // Closes the database closes and releases all of its associated resources.
     // Do not call methods on the connection after it is closed. It will probably crash.
     internal fun close() {
-        dispose(false)
+        dispose()
     }
 
     fun open() {
+        val mConfiguration = getDbConfig()
+
         val connectionPtr = nativeOpen(mConfiguration.path, mConfiguration.openFlags,
                 mConfiguration.label,
                 SQLiteDebug.DEBUG_SQL_STATEMENTS, SQLiteDebug.DEBUG_SQL_TIME,
@@ -153,10 +183,9 @@ class SQLiteConnection(private val mConfiguration:SQLiteDatabaseConfiguration) {
         setAutoCheckpointInterval()
         // setLocaleFromConfiguration();
         // Register custom functions.
-
     }
 
-    private fun dispose(finalized:Boolean) {
+    private fun dispose() {
 
         val connectionPtr = getConnectionPtr(nativeDataId)
 
@@ -167,6 +196,7 @@ class SQLiteConnection(private val mConfiguration:SQLiteDatabaseConfiguration) {
             {
                 cacheEvictAll()
                 nativeClose(connectionPtr)
+                removeDbConfig(nativeDataId)
                 putConnectionPtr(nativeDataId, 0)
             }
             finally
@@ -175,8 +205,9 @@ class SQLiteConnection(private val mConfiguration:SQLiteDatabaseConfiguration) {
             }
         }
     }
+
     private fun setPageSize() {
-        if (!mConfiguration.isInMemoryDb() && !mIsReadOnlyConnection)
+        if (!getDbConfig().isInMemoryDb() && !mIsReadOnlyConnection)
         {
             val newValue = SQLiteGlobal.defaultPageSize
             val value = executeForLong("PRAGMA page_size", null).toInt()
@@ -186,8 +217,9 @@ class SQLiteConnection(private val mConfiguration:SQLiteDatabaseConfiguration) {
             }
         }
     }
+
     private fun setAutoCheckpointInterval() {
-        if (!mConfiguration.isInMemoryDb() && !mIsReadOnlyConnection)
+        if (!getDbConfig().isInMemoryDb() && !mIsReadOnlyConnection)
         {
             val newValue = SQLiteGlobal.walAutoCheckpoint
             val value = executeForLong("PRAGMA wal_autocheckpoint", null).toInt()
@@ -198,10 +230,10 @@ class SQLiteConnection(private val mConfiguration:SQLiteDatabaseConfiguration) {
         }
     }
     private fun setJournalSizeLimit() {
-        if (!mConfiguration.isInMemoryDb() && !mIsReadOnlyConnection)
+        if (!getDbConfig().isInMemoryDb() && !mIsReadOnlyConnection)
         {
             val newValue = SQLiteGlobal.journalSizeLimit
-            var value = executeForLong("PRAGMA journal_size_limit", null).toInt()
+            val value = executeForLong("PRAGMA journal_size_limit", null).toInt()
             if (value != newValue)
             {
                 executeForLong("PRAGMA journal_size_limit=$newValue", null)
@@ -211,7 +243,7 @@ class SQLiteConnection(private val mConfiguration:SQLiteDatabaseConfiguration) {
     private fun setForeignKeyModeFromConfiguration() {
         if (!mIsReadOnlyConnection)
         {
-            val newValue = (if (mConfiguration.foreignKeyConstraintsEnabled) 1 else 0).toLong()
+            val newValue = (if (getDbConfig().foreignKeyConstraintsEnabled) 1 else 0).toLong()
             val value = executeForLong("PRAGMA foreign_keys", null)
             if (value != newValue)
             {
@@ -219,10 +251,11 @@ class SQLiteConnection(private val mConfiguration:SQLiteDatabaseConfiguration) {
             }
         }
     }
+
     private fun setWalModeFromConfiguration() {
-        if (!mConfiguration.isInMemoryDb() && !mIsReadOnlyConnection)
+        if (!getDbConfig().isInMemoryDb() && !mIsReadOnlyConnection)
         {
-            if ((mConfiguration.openFlags and SQLiteDatabase.ENABLE_WRITE_AHEAD_LOGGING) !== 0)
+            if ((getDbConfig().openFlags and SQLiteDatabase.ENABLE_WRITE_AHEAD_LOGGING) != 0)
             {
                 setJournalMode("WAL")
                 setSyncMode(SQLiteGlobal.walSyncMode)
@@ -234,6 +267,7 @@ class SQLiteConnection(private val mConfiguration:SQLiteDatabaseConfiguration) {
             }
         }
     }
+
     private fun setSyncMode(newValue:String) {
         val value = executeForString("PRAGMA synchronous", null)
         if (!canonicalizeSyncMode(value).equals(
@@ -242,6 +276,7 @@ class SQLiteConnection(private val mConfiguration:SQLiteDatabaseConfiguration) {
             execute("PRAGMA synchronous=$newValue", null)
         }
     }
+
     private fun setJournalMode(newValue:String) {
         val value = executeForString("PRAGMA journal_mode", null)
         if (!value.equals(newValue, ignoreCase = true))
@@ -274,7 +309,7 @@ class SQLiteConnection(private val mConfiguration:SQLiteDatabaseConfiguration) {
             // In the worst case, an application that enables WAL might not actually
             // get it, although it can still use connection pooling.
             Log.w(TAG, ("Could not change the database journal mode of '"
-                    + mConfiguration.label + "' from '" + value + "' to '" + newValue
+                    + getDbConfig().label + "' from '" + value + "' to '" + newValue
                     + "' because the database is locked. This usually means that "
                     + "there are other open connections to the database which prevents "
                     + "the database from enabling or disabling write-ahead logging mode. "
@@ -303,12 +338,6 @@ class SQLiteConnection(private val mConfiguration:SQLiteDatabaseConfiguration) {
             setWalModeFromConfiguration()
         }
     }*/
-
-    // Called by SQLiteConnectionPool only.
-    // Returns true if the prepared statement cache contains the specified SQL.
-    internal fun isPreparedStatementInCache(sql:String):Boolean {
-        return cacheHasStatement(sql)
-    }
 
     /**
      * Prepares a statement for execution but does not bind its parameters or execute it.
@@ -375,6 +404,7 @@ class SQLiteConnection(private val mConfiguration:SQLiteDatabaseConfiguration) {
             mRecentOperations.endOperation(cookie)
         }
     }
+
     /**
      * Executes a statement that does not return a result.
      *
@@ -410,6 +440,7 @@ class SQLiteConnection(private val mConfiguration:SQLiteDatabaseConfiguration) {
             mRecentOperations.endOperation(cookie)
         }
     }
+
     /**
      * Executes a statement that returns a single <code>long</code> result.
      *
@@ -447,6 +478,7 @@ class SQLiteConnection(private val mConfiguration:SQLiteDatabaseConfiguration) {
             mRecentOperations.endOperation(cookie)
         }
     }
+
     /**
      * Executes a statement that returns a single {@link String} result.
      *
@@ -484,6 +516,7 @@ class SQLiteConnection(private val mConfiguration:SQLiteDatabaseConfiguration) {
             mRecentOperations.endOperation(cookie)
         }
     }
+
     /**
      * Executes a statement that returns a count of the number of rows
      * that were changed. Use for UPDATE or DELETE SQL statements.
@@ -530,6 +563,7 @@ class SQLiteConnection(private val mConfiguration:SQLiteDatabaseConfiguration) {
             }
         }
     }
+
     /**
      * Executes a statement that returns the row id of the last row inserted
      * by the statement. Use for INSERT SQL statements.
@@ -569,6 +603,7 @@ class SQLiteConnection(private val mConfiguration:SQLiteDatabaseConfiguration) {
             mRecentOperations.endOperation(cookie)
         }
     }
+
     /**
      * Executes a statement and populates the specified {@link CursorWindow}
      * with a range of results. Returns the number of rows that were counted
@@ -593,6 +628,7 @@ class SQLiteConnection(private val mConfiguration:SQLiteDatabaseConfiguration) {
      */
     fun executeForCursorWindow(sql:String, bindArgs:Array<Any?>?,
                                window:CursorWindow, startPos:Int, requiredPos:Int, countAllRows:Boolean):Int {
+        //CursorWindow exposes some of its internals in this method. Not a huge fan, but it works.
         window.acquireReference()
         try
         {
@@ -643,14 +679,8 @@ class SQLiteConnection(private val mConfiguration:SQLiteDatabaseConfiguration) {
             window.releaseReference()
         }
     }
+
     private fun acquirePreparedStatement(sql:String):NativePreparedStatement {
-        /*if(hasStmt(nativeDataId, sql)) {
-            val ps = konan.worker.attachObjectGraph<NativePreparedStatement>(getStmt(nativeDataId, sql))
-            println("RRRRRR $ps")
-            konan.worker.detachObjectGraph { ps }
-        }*/
-//        var statement = mPreparedStatementCache.get(sql)
-//        var skipCache = hasStmt(nativeDataId, sql)
         if (cacheHasStatement(sql))
         {
             return cacheGetStatement(sql)
@@ -716,17 +746,20 @@ class SQLiteConnection(private val mConfiguration:SQLiteDatabaseConfiguration) {
         }
     }
 
-    // CancellationSignal.OnCancelListener callback.
-    // This method may be called on a different thread than the executing statement.
-    // However, it will only be called between calls to attachCancellationSignal and
-    // detachCancellationSignal, while a statement is executing. We can safely assume
-    // that the SQLite connection is still alive.
+    /**
+     * From original comment...
+     *
+     * "CancellationSignal.OnCancelListener callback.
+     * This method may be called on a different thread than the executing statement..."
+     *
+     * If only called from cancellation signal, this clearly won't be used in KN. Evaluate.
+     */
     fun onCancel() {
         nativeCancel(getConnectionPtr(nativeDataId))
     }
 
     private fun bindArguments(statement:NativePreparedStatement, bindArgs:Array<Any?>?) {
-        val count = if (bindArgs != null) bindArgs.size else 0
+        val count = bindArgs?.size ?: 0
         if (count != statement.mNumParameters)
         {
             throw SQLiteException(
@@ -895,7 +928,7 @@ class SQLiteConnection(private val mConfiguration:SQLiteDatabaseConfiguration) {
     private fun getMainDbStatsUnsafe(lookaside:Int, pageCount:Long, pageSize:Long):SQLiteDebug.DbStats {
         // The prepared statement cache is thread-safe so we can access its statistics
         // even if we do not own the database connection.
-        var label = mConfiguration.path
+        val label = getDbConfig().path
 
         //TODO Replace with real numbers if desired...
         return SQLiteDebug.DbStats(label, pageCount, pageSize, lookaside,
@@ -918,47 +951,6 @@ class SQLiteConnection(private val mConfiguration:SQLiteDatabaseConfiguration) {
                 inCache).freeze()
     }
 
-    /*private inner class
-    PreparedStatementCache(size:Int):LruCache<String, PreparedStatement>(size) {
-        override fun entryRemoved(evicted:Boolean, key:String,
-                                  oldValue:PreparedStatement?, newValue:PreparedStatement?) {
-            if(oldValue != null) {
-                oldValue.mInCache = false
-                if (!oldValue.mInUse) {
-
-                    finalizePreparedStatement(oldValue)
-                }
-            }
-        }
-
-        fun dump(printer:Printer) {
-            printer.println(" Prepared statement cache:")
-            val cache = snapshot()
-            if (!cache.isEmpty())
-            {
-                var i = 0
-                for (entry in cache.entries)
-                {
-                    val statement = entry.value!!
-                    if (statement.mInCache)
-                    { // might be false due to a race with entryRemoved
-                        val sql = entry.key
-                        printer.println((" " + i + ": statementPtr=0x"
-                                + statement.mStatementPtr.toString(16)
-                                + ", numParameters=" + statement.mNumParameters
-                                + ", type=" + statement.mType
-                                + ", readOnly=" + statement.mReadOnly
-                                + ", sql=\"" + trimSqlForDisplay(sql) + "\""))
-                    }
-                    i += 1
-                }
-            }
-            else
-            {
-                printer.println(" <none>")
-            }
-        }
-    }*/
     private class OperationLog {
         //        private val mOperations = arrayOfNulls<Operation>(MAX_RECENT_OPERATIONS)
         private var mIndex:Int = 0

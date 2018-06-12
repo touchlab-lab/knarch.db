@@ -90,6 +90,19 @@ namespace {
             transaction = nullptr;
         }
 
+        KRef getDbConfig(){
+            return (KRef)dbConfig;
+        }
+
+        void putDbConfig(KRef tl){
+            dbConfig = CreateStablePointer(tl);
+        }
+
+        void removeDbConfig(){
+            DisposeStablePointer(dbConfig);
+            dbConfig = nullptr;
+        }
+
         KLong connectionPtr;
         KInt connectionCount;
 
@@ -101,6 +114,7 @@ namespace {
         }
 
         KNativePtr transaction = nullptr;
+        KNativePtr dbConfig = nullptr;
         cache::lru_cache<KStdString, KNativePtr> stmtCache;
     };
 
@@ -153,6 +167,24 @@ namespace {
             Locker locker(&lock_);
             auto it = data_.find(dataId);
             it->second->removeTransaction();
+        }
+
+        KRef getDbConfig(KInt dataId){
+            Locker locker(&lock_);
+            auto it = data_.find(dataId);
+            return it->second->getDbConfig();
+        }
+
+        void putDbConfig(KInt dataId, KRef tl) {
+            Locker locker(&lock_);
+            auto it = data_.find(dataId);
+            it->second->putDbConfig(tl);
+        }
+
+        void removeDbConfig(KInt dataId) {
+            Locker locker(&lock_);
+            auto it = data_.find(dataId);
+            it->second->removeDbConfig();
         }
 
         void putConnectionPtr(KInt dataId, KLong connectionPtr) {
@@ -305,6 +337,18 @@ OBJ_GETTER(SQLiteSupport_getTransaction, KInt dataId) {
 
 void SQLiteSupport_removeTransaction(KInt dataId) {
     dataState()->removeTransaction(dataId);
+}
+
+void SQLiteSupport_putDbConfig(KInt dataId, KRef tl) {
+    dataState()->putDbConfig(dataId, tl);
+}
+
+OBJ_GETTER(SQLiteSupport_getDbConfig, KInt dataId) {
+    RETURN_OBJ(dataState()->getDbConfig(dataId));
+}
+
+void SQLiteSupport_removeDbConfig(KInt dataId) {
+    dataState()->removeDbConfig(dataId);
 }
 
 void SQLiteSupport_evictAll(KInt dataId) {

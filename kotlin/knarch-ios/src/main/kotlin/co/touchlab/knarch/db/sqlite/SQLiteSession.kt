@@ -18,25 +18,9 @@ import konan.worker.*
  * here or below should change, with few exceptions kept in specialized and specially designated structures,
  * outside of the normal KN memory management lifecycle.
  */
-class SQLiteSession(private val mConnection: SQLiteConnection, dbConfig: SQLiteDatabaseConfiguration) {
-    private val mConnectionFlags:Int = 0
-
+class SQLiteSession(private val mConnection: SQLiteConnection) {
     private val sessionRecursiveLock = NSRecursiveLock()
     private val transLock = NSRecursiveLock()
-
-    private val atomicDbConfig: Atomic<SQLiteDatabaseConfiguration> = Atomic({dbConfig.freeze()})
-
-    fun dbLabel() = atomicDbConfig.accessForResult { conf -> conf!!.label }
-    fun dbConfigUpdate(proc: (conf: SQLiteDatabaseConfiguration?) -> SQLiteDatabaseConfiguration) {
-        atomicDbConfig.accessUpdate(proc)
-    }
-
-    fun dbConfigCopy(): SQLiteDatabaseConfiguration = atomicDbConfig.accessForResult { conf -> conf!!.freeze() }
-    fun dbReadOnlyLocked(): Boolean = atomicDbConfig.accessForResult { (it!!.openFlags and SQLiteDatabase.OPEN_READ_MASK) == SQLiteDatabase.OPEN_READONLY }
-    fun dbInMemoryDb(): Boolean = atomicDbConfig.accessForResult { it!!.isInMemoryDb() }
-    fun dbOpenFlags(): Int = atomicDbConfig.accessForResult { it!!.openFlags }
-    fun dbPath(): String = atomicDbConfig.accessForResult { it!!.path }
-    fun dbForeignKeyConstraintsEnabled(): Boolean = atomicDbConfig.accessForResult { it!!.foreignKeyConstraintsEnabled }
 
     internal fun checkOpenConnection(){
         withLock {
@@ -82,6 +66,12 @@ class SQLiteSession(private val mConnection: SQLiteConnection, dbConfig: SQLiteD
     }
 
     fun hasConnection(): Boolean = mConnection.hasConnection()
+
+    fun getDbConfig():SQLiteDatabaseConfiguration = mConnection.getDbConfig()
+
+    fun putDbConfig(config:SQLiteDatabaseConfiguration) {
+        mConnection.putDbConfig(config)
+    }
 
     /**
      * Begins a transaction.
