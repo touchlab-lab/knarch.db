@@ -1,5 +1,9 @@
 package co.touchlab.knarch.db.sqlite
 
+/**
+ * Like the Android version. Because of threading rules, the listener will only
+ * be called on the thread that started the transaction.
+ */
 interface SQLiteTransactionListener{
     /**
      * Called immediately after the transaction begins.

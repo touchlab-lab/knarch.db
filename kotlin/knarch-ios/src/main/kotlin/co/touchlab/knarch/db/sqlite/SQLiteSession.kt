@@ -9,9 +9,14 @@ import platform.Foundation.*
 import konan.worker.*
 
 /**
- * Creates a session bound to the specified connection pool.
+ * In Android, the session is part of the stack that facilitates multithreaded sqlite access. Currently, due
+ * to KN's restrictive threading rules, we're serializing db access. As this code matures, we *may*
+ * refactor this to approximate Android's support, but currently the session is the gatekeeper to make
+ * sure all access to the underlying connection is single threaded.
  *
- * @param connectionPool The connection pool.
+ * This class can be shared across threads. In doing so, you should assume it is frozen. No state
+ * here or below should change, with few exceptions kept in specialized and specially designated structures,
+ * outside of the normal KN memory management lifecycle.
  */
 class SQLiteSession(private val mConnection: SQLiteConnection, dbConfig: SQLiteDatabaseConfiguration) {
     private val mConnectionFlags:Int = 0
@@ -34,7 +39,7 @@ class SQLiteSession(private val mConnection: SQLiteConnection, dbConfig: SQLiteD
     fun dbForeignKeyConstraintsEnabled(): Boolean = atomicDbConfig.accessForResult { it!!.foreignKeyConstraintsEnabled }
 
     internal fun checkOpenConnection(){
-        withLockUnit {
+        withLock {
             if(!mConnection.hasConnection())
                 mConnection.open()
         }
@@ -46,15 +51,6 @@ class SQLiteSession(private val mConnection: SQLiteConnection, dbConfig: SQLiteD
         } catch (e: Exception) {
             //Presumably we weren't locked
             Log.w("SQLiteSessionStateAtomic", "Failed unlock", e)
-        }
-    }
-
-    private fun withLockUnit(proc:() -> Unit){
-        sessionRecursiveLock.lock()
-        try {
-            proc.invoke()
-        } finally {
-            sessionRecursiveLock.unlock()
         }
     }
 
@@ -124,7 +120,7 @@ class SQLiteSession(private val mConnection: SQLiteConnection, dbConfig: SQLiteD
                          connectionFlags:Int) {
         transLock.lock()
         try {
-            withLockUnit {
+            withLock {
                 throwIfTransactionMarkedSuccessful()
                 beginTransactionUnchecked(transactionMode, transactionListener, connectionFlags)
             }
@@ -200,7 +196,7 @@ class SQLiteSession(private val mConnection: SQLiteConnection, dbConfig: SQLiteD
      * @see #endTransaction
      */
     fun setTransactionSuccessful() {
-        withLockUnit {
+        withLock {
             throwIfNoTransaction()
             throwIfTransactionMarkedSuccessful()
             mConnection.getTransaction()!!.mMarkedSuccessful = true
@@ -228,7 +224,7 @@ class SQLiteSession(private val mConnection: SQLiteConnection, dbConfig: SQLiteD
      */
     fun endTransaction() {
         try {
-            withLockUnit {
+            withLock {
                 //*Always* call, even if we got here some weird way and there's no lock
                 throwIfNoTransaction()
                 //Won't matter till we get pools back
@@ -324,7 +320,7 @@ class SQLiteSession(private val mConnection: SQLiteConnection, dbConfig: SQLiteD
     fun prepare(sql:String, connectionFlags:Int,
                 outStatementInfo:SQLiteStatementInfo?) {
 
-        withLockUnit {
+        withLock {
             acquireConnection(sql, connectionFlags) // might throw
             try
             {
@@ -350,7 +346,7 @@ class SQLiteSession(private val mConnection: SQLiteConnection, dbConfig: SQLiteD
      * @throws OperationCanceledException if the operation was canceled.
      */
     fun execute(sql:String, bindArgs:Array<Any?>?, connectionFlags:Int) {
-        withLockUnit {
+        withLock {
             if (!executeSpecial(sql, bindArgs, connectionFlags)) {
                 acquireConnection(sql, connectionFlags) // might throw
                 try {
@@ -588,7 +584,7 @@ class SQLiteSession(private val mConnection: SQLiteConnection, dbConfig: SQLiteD
     }
 
     fun closeConnection() {
-        withLockUnit {
+        withLock {
             mConnection.close()
         }
     }

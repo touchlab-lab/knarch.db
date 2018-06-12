@@ -360,12 +360,6 @@ class CursorWindowTest {
         assertTrue(cursorWindow.hasReleasedAllReferences())
     }
 
-    @Test
-    fun testDescribeContents() {
-        var cursorWindow = CursorWindow(null)
-        assertEquals(0, cursorWindow.describeContents())
-    }
-
     private inner class MockCursorWindow(localWindow:Boolean):CursorWindow(null) {
         private var mHasReleasedAllReferences = false
         protected override fun onAllReferencesReleased() {

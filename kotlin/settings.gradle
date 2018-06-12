@@ -4,6 +4,7 @@ include ':knarch-common'
 //include ':jvm'
 
 include ':knarch-ios'
+//include ':knarch-ios-test'
 //include ':kurgan-android'
 
 //include ':sample/common'

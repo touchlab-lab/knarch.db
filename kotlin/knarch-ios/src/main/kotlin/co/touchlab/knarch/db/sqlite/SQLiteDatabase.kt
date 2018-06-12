@@ -282,7 +282,7 @@ class SQLiteDatabase private constructor(path: String, openFlags: Int, cursorFac
         fun create(factory:CursorFactory?):SQLiteDatabase {
             // This is a magic string with special meaning for SQLite.
             return openDatabase(SQLiteDatabaseConfiguration.MEMORY_DB_PATH,
-                    factory, CREATE_IF_NECESSARY);
+                    factory, CREATE_IF_NECESSARY)
         }
     }
 
@@ -528,10 +528,10 @@ class SQLiteDatabase private constructor(path: String, openFlags: Int, cursorFac
      * @hide
      */
     fun reopenReadWrite() {
-        throwIfNotOpenLocked();
+        throwIfNotOpenLocked()
 
         if (!isReadOnlyLocked()) {
-            return; // nothing to do
+            return // nothing to do
         }
 
         sqliteSession.dbConfigUpdate { conf ->

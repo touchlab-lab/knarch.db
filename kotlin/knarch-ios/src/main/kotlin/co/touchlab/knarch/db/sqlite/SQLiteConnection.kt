@@ -607,10 +607,8 @@ class SQLiteConnection(private val mConfiguration:SQLiteDatabaseConfiguration) {
                 try {
                     bindArguments(statement, bindArgs)
 
-                    val ncw = window.nativeCursorWindow as CppCursorWindow
-
                     val result = nativeExecuteForCursorWindow(
-                            getConnectionPtr(nativeDataId), statement.mStatementPtr, ncw.mWindowPtr,
+                            getConnectionPtr(nativeDataId), statement.mStatementPtr, window.getWindowCursorPtr(),
                             startPos, requiredPos, countAllRows)
                     actualPos = (result shr 32).toInt()
                     countedRows = result.toInt()

@@ -12,9 +12,6 @@ class SQLiteStatementInfo{
      * The names of all columns in the result set of the statement.
      */
     var columnNames: Array<String> = arrayOf()
-    set(value) {
-        field = value.copyOf().freeze()
-    }
 
     /**
      * True if the statement is read-only.

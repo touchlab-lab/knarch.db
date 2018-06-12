@@ -4,41 +4,34 @@ import co.touchlab.knarch.Log
 import co.touchlab.knarch.SystemContext
 import co.touchlab.knarch.db.DatabaseErrorHandler
 
-abstract class SQLiteOpenHelper/**
- * Create a helper object to create, open, and/or manage a database.
- * The database is not actually created or opened until one of
- * {@link #getWritableDatabase} or {@link #getReadableDatabase} is called.
+/**
+ * A helper class to manage database creation and version management.
  *
- * <p>Accepts input param: a concrete instance of {@link DatabaseErrorHandler} to be
- * used to handle corruption when sqlite reports database corruption.</p>
+ * For Kotlin/Native, this class is *not* thread safe, and as such will probably get a slight redesign in the future.
+ * Calls to get*Database may use coroutines to avoid blocking the main thread, but this class itself will likely live
+ * in main thread code.
  *
- * @param context to use to open or create the database
- * @param name of the database file, or null for an in-memory database
- * @param factory to use for creating cursor objects, or null for the default
- * @param version number of the database (starting at 1); if the database is older,
- * {@link #onUpgrade} will be used to upgrade the database; if the database is
- * newer, {@link #onDowngrade} will be used to downgrade the database
- * @param errorHandler the {@link DatabaseErrorHandler} to be used when sqlite reports database
- * corruption, or null to use the default error handler.
+ * SQLiteDatabase and below are thread safe and can be passed around.
+ *
+ * @see <a href="https://developer.android.com/reference/android/database/sqlite/SQLiteOpenHelper">SQLiteOpenHelper</a>
  */
-constructor(val mContext:SystemContext, val databaseName:String?,
-            private val mFactory:SQLiteDatabase.CursorFactory?=null,
-            private val mNewVersion:Int,
-            val mErrorHandler:DatabaseErrorHandler? = null) {
+abstract class SQLiteOpenHelper(private val mContext: SystemContext,
+                                private val databaseName: String?,
+                                private val mFactory: SQLiteDatabase.CursorFactory? = null,
+                                private val mNewVersion: Int,
+                                private val mErrorHandler: DatabaseErrorHandler? = null) {
 
-    init{
+    init {
         if (mNewVersion < 1) throw IllegalArgumentException("Version must be >= 1, was $mNewVersion")
-
     }
 
     /**
      * Return the name of the SQLite database being opened, as given to
      * the constructor.
      */
-
-    private var mDatabase:SQLiteDatabase?=null
-    private var mIsInitializing:Boolean = false
-    private var mEnableWriteAheadLogging:Boolean = false
+    private var mDatabase: SQLiteDatabase? = null
+    private var mIsInitializing: Boolean = false
+    private var mEnableWriteAheadLogging: Boolean = false
 
     /**
      * Create and/or open a database that will be used for reading and writing.
@@ -59,15 +52,9 @@ constructor(val mContext:SystemContext, val databaseName:String?,
      * @throws SQLiteException if the database cannot be opened for writing
      * @return a read/write database object valid until {@link #close} is called
      */
-    val writableDatabase:SQLiteDatabase
-        get() {
-//            synchronized (this) {
-                return getDatabaseLocked(true)
-//            }
-        }
-
-    fun getWritableDatabase():SQLiteDatabase = writableDatabase
-    fun getReadableDatabase():SQLiteDatabase = readableDatabase
+    fun getWritableDatabase(): SQLiteDatabase {
+        return getDatabaseLocked(true)
+    }
 
     /**
      * Create and/or open a database. This will be the same object returned by
@@ -87,12 +74,9 @@ constructor(val mContext:SystemContext, val databaseName:String?,
      * @return a database object valid until {@link #getWritableDatabase}
      * or {@link #close} is called.
      */
-    val readableDatabase:SQLiteDatabase
-        get() {
-//            synchronized (this) {
-                return getDatabaseLocked(false)
-//            }
-        }
+    fun getReadableDatabase(): SQLiteDatabase {
+        return getDatabaseLocked(false)
+    }
 
     /**
      * Enables or disables the use of write-ahead logging for the database.
@@ -105,82 +89,59 @@ constructor(val mContext:SystemContext, val databaseName:String?,
      *
      * @see SQLiteDatabase#enableWriteAheadLogging()
      */
-    fun setWriteAheadLoggingEnabled(enabled:Boolean) {
-//        synchronized (this) {
-            if (mEnableWriteAheadLogging != enabled)
-            {
-                val db = mDatabase
-                if (db != null && db.isOpen() && !db.isReadOnly())
-                {
-                    if (enabled)
-                    {
-                        db.enableWriteAheadLogging()
-                    }
-                    else
-                    {
-                        db.disableWriteAheadLogging()
-                    }
+    fun setWriteAheadLoggingEnabled(enabled: Boolean) {
+        if (mEnableWriteAheadLogging != enabled) {
+            val db = mDatabase
+            if (db != null && db.isOpen() && !db.isReadOnly()) {
+                if (enabled) {
+                    db.enableWriteAheadLogging()
+                } else {
+                    db.disableWriteAheadLogging()
                 }
-                mEnableWriteAheadLogging = enabled
             }
-//        }
+            mEnableWriteAheadLogging = enabled
+        }
     }
-    private fun getDatabaseLocked(writable:Boolean):SQLiteDatabase {
 
-        if (mDatabase != null)
-        {
-            if (!mDatabase!!.isOpen())
-            {
+    /**
+     * This is fairly complex. We should review the possibility of not supporting readonly at all, but for
+     * now we'll leave as is.
+     */
+    private fun getDatabaseLocked(writable: Boolean): SQLiteDatabase {
+
+        if (mDatabase != null) {
+            if (!mDatabase!!.isOpen()) {
                 // Darn! The user closed the database by calling mDatabase.close().
                 mDatabase = null
-            }
-            else if (!writable || !mDatabase!!.isReadOnly())
-            {
+            } else if (!writable || !mDatabase!!.isReadOnly()) {
                 // The database is already open for business.
                 return mDatabase!!
             }
         }
-        if (mIsInitializing)
-        {
+        if (mIsInitializing) {
             throw IllegalStateException("getDatabase called recursively")
         }
         var db = mDatabase
-        try
-        {
+        try {
             mIsInitializing = true
-            if (db != null)
-            {
-                if (writable && db.isReadOnly())
-                {
+            if (db != null) {
+                if (writable && db.isReadOnly()) {
                     db.reopenReadWrite()
                 }
-            }
-            else if (databaseName == null)
-            {
+            } else if (databaseName == null) {
                 db = SQLiteDatabase.create(null)
-            }
-            else
-            {
-                try
-                {
-                    if (DEBUG_STRICT_READONLY && !writable)
-                    {
-                        val path = mContext.getDatabasePath(databaseName).path
-                        db = SQLiteDatabase.openDatabase(path, mFactory,
-                                SQLiteDatabase.OPEN_READONLY, mErrorHandler)
-                    }
-                    else
-                    {
-                        db = mContext.openOrCreateDatabase(databaseName, if (mEnableWriteAheadLogging)
-                            SystemContext.MODE_ENABLE_WRITE_AHEAD_LOGGING
-                        else
-                            0,
-                                mFactory, mErrorHandler)
-                    }
-                }
-                catch (ex:SQLiteException) {
-                    if (writable)
-                    {
+            } else {
+                try {
+                    db = mContext.openOrCreateDatabase(
+                            databaseName,
+                            if (mEnableWriteAheadLogging) {
+                                SystemContext.MODE_ENABLE_WRITE_AHEAD_LOGGING
+                            } else {
+                                0
+                            },
+                            mFactory, mErrorHandler)
+                } catch (ex: SQLiteException) {
+                    if (writable) {
                         throw ex
                     }
                     Log.e(TAG, ("Couldn't open " + databaseName
@@ -192,67 +153,53 @@ constructor(val mContext:SystemContext, val databaseName:String?,
             }
             onConfigure(db!!)
             val version = db.getVersion()
-            if (version != mNewVersion)
-            {
-                if (db.isReadOnly())
-                {
+            if (version != mNewVersion) {
+                if (db.isReadOnly()) {
                     throw SQLiteException(("Can't upgrade read-only database from version " +
                             db.getVersion() + " to " + mNewVersion + ": " + databaseName))
                 }
                 db.beginTransaction()
-                try
-                {
-                    if (version == 0)
-                    {
+                try {
+                    if (version == 0) {
                         onCreate(db)
-                    }
-                    else
-                    {
-                        if (version > mNewVersion)
-                        {
+                    } else {
+                        if (version > mNewVersion) {
                             onDowngrade(db, version, mNewVersion)
-                        }
-                        else
-                        {
+                        } else {
                             onUpgrade(db, version, mNewVersion)
                         }
                     }
                     db.setVersion(mNewVersion)
                     db.setTransactionSuccessful()
-                }
-                finally
-                {
+                } finally {
                     db.endTransaction()
                 }
             }
             onOpen(db)
-            if (db.isReadOnly())
-            {
-                Log.w(TAG, "Opened " + databaseName + " in read-only mode")
+            if (db.isReadOnly()) {
+                Log.w(TAG, "Opened $databaseName in read-only mode")
             }
             mDatabase = db
             return db
-        }
-        finally
-        {
+        } finally {
             mIsInitializing = false
-            if (db != null && db != mDatabase)
-            {
+            if (db != null && db != mDatabase) {
                 db.close()
             }
         }
     }
+
     /**
      * Close any open database object.
      */
     fun close() {
         if (mIsInitializing) throw IllegalStateException("Closed during initialization")
-        if (mDatabase != null && mDatabase!!.isOpen())
-        {
+        if (mDatabase != null && mDatabase!!.isOpen()) {
             mDatabase!!.close()
             mDatabase = null
         }
     }
+
     /**
      * Called when the database connection is being configured, to enable features
      * such as write-ahead logging or foreign key support.
@@ -270,14 +217,16 @@ constructor(val mContext:SystemContext, val databaseName:String?,
      *
      * @param db The database.
      */
-    open fun onConfigure(db:SQLiteDatabase) {}
+    open fun onConfigure(db: SQLiteDatabase) {}
+
     /**
      * Called when the database is created for the first time. This is where the
      * creation of tables and the initial population of the tables should happen.
      *
      * @param db The database.
      */
-    abstract fun onCreate(db:SQLiteDatabase)
+    abstract fun onCreate(db: SQLiteDatabase)
+
     /**
      * Called when the database needs to be upgraded. The implementation
      * should use this method to drop tables, add tables, or do anything else it
@@ -298,7 +247,8 @@ constructor(val mContext:SystemContext, val databaseName:String?,
      * @param oldVersion The old database version.
      * @param newVersion The new database version.
      */
-    abstract fun onUpgrade(db:SQLiteDatabase, oldVersion:Int, newVersion:Int)
+    abstract fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int)
+
     /**
      * Called when the database needs to be downgraded. This is strictly similar to
      * {@link #onUpgrade} method, but is called whenever current version is newer than requested one.
@@ -315,10 +265,11 @@ constructor(val mContext:SystemContext, val databaseName:String?,
      * @param oldVersion The old database version.
      * @param newVersion The new database version.
      */
-    open fun onDowngrade(db:SQLiteDatabase, oldVersion:Int, newVersion:Int) {
+    open fun onDowngrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
         throw SQLiteException(("Can't downgrade database from version " +
                 oldVersion + " to " + newVersion))
     }
+
     /**
      * Called when the database has been opened. The implementation
      * should check {@link SQLiteDatabase#isReadOnly} before updating the
@@ -332,27 +283,9 @@ constructor(val mContext:SystemContext, val databaseName:String?,
      *
      * @param db The database.
      */
-    open fun onOpen(db:SQLiteDatabase) {}
+    open fun onOpen(db: SQLiteDatabase) {}
+
     companion object {
         private val TAG = "SQLiteOpenHelper"
-        // When true, getReadableDatabase returns a read-only database if it is just being opened.
-        // The database handle is reopened in read/write mode when getWritableDatabase is called.
-        // We leave this behavior disabled in production because it is inefficient and breaks
-        // many applications. For debugging purposes it can be useful to turn on strict
-        // read-only semantics to catch applications that call getReadableDatabase when they really
-        // wanted getWritableDatabase.
-        private val DEBUG_STRICT_READONLY = false
     }
-}/**
- * Create a helper object to create, open, and/or manage a database.
- * This method always returns very quickly. The database is not actually
- * created or opened until one of {@link #getWritableDatabase} or
- * {@link #getReadableDatabase} is called.
- *
- * @param context to use to open or create the database
- * @param name of the database file, or null for an in-memory database
- * @param factory to use for creating cursor objects, or null for the default
- * @param version number of the database (starting at 1); if the database is older,
- * {@link #onUpgrade} will be used to upgrade the database; if the database is
- * newer, {@link #onDowngrade} will be used to downgrade the database
- */
+}

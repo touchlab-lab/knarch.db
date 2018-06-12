@@ -10,7 +10,7 @@ abstract class SQLiteProgram(
 
     private val EMPTY_STRING_ARRAY = arrayOf<String>()
     private val mDatabase:SQLiteDatabase = db
-    private val mSql:String
+    private val mSql:String = sql.trim({ it <= ' ' })
     private val mReadOnly:Boolean
     private val mColumnNames:Array<String>
     private val mNumParameters:Int
@@ -136,7 +136,6 @@ abstract class SQLiteProgram(
     }
 
     init {
-        mSql = sql.trim({ it <= ' ' })
         val n = DatabaseUtils.getSqlStatementType(mSql)
         when (n) {
             DatabaseUtils.STATEMENT_BEGIN, DatabaseUtils.STATEMENT_COMMIT, DatabaseUtils.STATEMENT_ABORT -> {

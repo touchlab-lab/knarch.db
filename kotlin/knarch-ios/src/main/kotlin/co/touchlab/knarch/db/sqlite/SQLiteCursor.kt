@@ -179,6 +179,7 @@ open class SQLiteCursor
         super.window = window
         mCount = NO_COUNT
     }
+
     /**
      * Changes the selection arguments. The new values take effect after a call to requery().
      */
