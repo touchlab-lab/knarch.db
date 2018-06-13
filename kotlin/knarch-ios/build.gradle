@@ -14,12 +14,11 @@ apply plugin: 'konan'
 konan.targets = ['iphone', 'iphone_sim', 'macos_x64']
 
 konanArtifacts {
-    library("kurgan"){
-//        extraOpts "-g"
+    library("knarch"){
         enableMultiplatform true
     }
 
-
+    //TODO: Rename test framework. Just feels like a lot of Xcode work that I don't want.
     framework('KotlinArithmeticParser', targets: ['iphone', 'iphone_sim']) {
         srcDir 'src/main/kotlin'
         srcDir 'src/test/kotlin'
@@ -31,10 +30,6 @@ konanArtifacts {
         target('iphone') {
             nativeLibraries '../../cpp/knarch/build/ios_arm64/tlruntime.bc'
         }
-//
-//        target('macos_x64') {
-//            nativeLibraries '../../cpp/knarch/build/macos_x64/tlruntime.bc'
-//        }
 
         extraOpts "-tr", "-g"
         linkerOpts "-lsqlite3"

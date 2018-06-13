@@ -1,9 +1,9 @@
-package co.touchlab.kurgan.architecture.database.sqlite
+package co.touchlab.multiplatform.architecture.db.sqlite
 
 expect class SQLiteStatement: SQLiteProgram {
     fun execute()
     fun executeUpdateDelete(): Int
     fun executeInsert(): Long
     fun simpleQueryForLong(): Long
-    fun simpleQueryForString(): String
+    fun simpleQueryForString(): String?
 }

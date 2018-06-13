@@ -841,8 +841,8 @@ class SQLiteDatabase private constructor(path: String, openFlags: Int, cursorFac
      * {@link Cursor}s are not synchronized, see the documentation for more details.
      */
     fun rawQueryWithFactory(
-            cursorFactory:CursorFactory?, sql:String, selectionArgs:Array<String>?,
-            editTable:String?):Cursor {
+            cursorFactory:CursorFactory?, sql:String,
+            selectionArgs:Array<String>?, editTable:String?):Cursor {
         acquireReference()
         try {
             val driver:SQLiteCursorDriver = SQLiteDirectCursorDriver(this, sql, editTable)

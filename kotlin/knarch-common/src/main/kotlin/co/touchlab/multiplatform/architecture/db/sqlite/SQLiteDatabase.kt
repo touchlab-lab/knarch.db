@@ -1,12 +1,12 @@
-package co.touchlab.kurgan.architecture.database.sqlite
+package co.touchlab.multiplatform.architecture.db.sqlite
 
-import co.touchlab.kurgan.architecture.database.ContentValues
-import co.touchlab.kurgan.architecture.database.Cursor
+import co.touchlab.multiplatform.architecture.db.ContentValues
+import co.touchlab.multiplatform.architecture.db.Cursor
 
 expect interface CursorFactory{
     fun newCursor(db: SQLiteDatabase,
                   masterQuery: SQLiteCursorDriver,
-                  editTable: String,
+                  editTable: String?,
                   query: SQLiteQuery): Cursor
 }
 
@@ -122,33 +122,29 @@ expect class SQLiteDatabase{
     fun endTransaction():Unit
     fun setTransactionSuccessful():Unit
     fun inTransaction(): Boolean
-    fun yieldIfContendedSafely(): Boolean
-    fun yieldIfContendedSafely(sleepAfterYieldDelay: Long): Boolean
     fun getVersion():Int
-    fun setVersion(value:Int)
+    fun setVersion(version:Int)
     fun getMaximumSize():Long
-    fun setMaximumSize(value:Long):Long
+    fun setMaximumSize(numBytes:Long):Long
     fun getPageSize():Long
-    fun setPageSize(value:Long)
+    fun setPageSize(numBytes:Long)
 
     fun compileStatement(sql:String): SQLiteStatement
 
-    fun query(distinct:Boolean=false, table:String, columns:Array<String>? = null, selection:String? = null,
-              selectionArgs:Array<String>? = null, groupBy:String? = null, having:String? = null,
-              orderBy:String? = null, limit:String? = null):Cursor
+    fun query(distinct:Boolean, table:String, columns:Array<String>?, selection:String?,
+              selectionArgs:Array<String>?, groupBy:String?, having:String?,
+              orderBy:String?, limit:String?):Cursor
 
-    fun insertWithOnConflict(table: String, nullColumnHack:String?, contentValues: ContentValues, conflictAlgorithm: Int): Long
+    fun insertWithOnConflict(table: String, nullColumnHack:String?, initialValues: ContentValues?, conflictAlgorithm: Int): Long
     fun updateWithOnConflict(table: String, values:ContentValues, whereClause:String?, whereArgs:Array<String>?, conflictAlgorithm:Int): Int
 
-    fun delete(table:String, whereClause:String? = null, whereArgs:Array<String>? = null):Int
+    fun delete(table:String, whereClause:String?, whereArgs:Array<String>?):Int
 
-    fun execSQL(sql:String):Unit
-    fun execSQL(sql:String, bindArgs:Array<Any?>):Unit
+    fun execSQL(sql:String, bindArgs:Array<Any?>?):Unit
 
-
-
-    fun rawQuery(sql:String, selectionArgs:Array<String>? = null):Cursor
-    fun rawQueryWithFactory(cursorFactory: CursorFactory, sql:String, selectionArgs:Array<String?>?, editTable: String?): Cursor
+    fun rawQuery(sql:String, selectionArgs:Array<String>?):Cursor
+    fun rawQueryWithFactory(cursorFactory: CursorFactory?, sql:String,
+                            selectionArgs:Array<String>?, editTable: String?): Cursor
 
     //CursorFactory cursorFactory, String sql, String[] selectionArgs,
     //            String editTable
@@ -167,7 +163,5 @@ expect class SQLiteDatabase{
     fun enableWriteAheadLogging():Boolean
     fun disableWriteAheadLogging():Unit
     fun isWriteAheadLoggingEnabled():Boolean
-    fun isDatabaseIntegrityOk():Boolean
     fun close():Unit
-
 }

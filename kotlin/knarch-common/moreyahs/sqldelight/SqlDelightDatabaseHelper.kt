@@ -1,8 +1,8 @@
-package co.touchlab.kurgan.architecture.database.sqldelight
+package co.touchlab.multiplatform.architecture.db.sqldelight
 
-import co.touchlab.kurgan.architecture.ThreadLocal
-import co.touchlab.kurgan.architecture.database.Cursor
-import co.touchlab.kurgan.architecture.database.sqlite.*
+import co.touchlab.multiplatform.architecture.ThreadLocal
+import co.touchlab.multiplatform.architecture.db.Cursor
+import co.touchlab.multiplatform.architecture.db.sqlite.*
 import com.squareup.sqldelight.Transacter
 import com.squareup.sqldelight.db.SqlDatabase
 import com.squareup.sqldelight.db.SqlDatabaseConnection

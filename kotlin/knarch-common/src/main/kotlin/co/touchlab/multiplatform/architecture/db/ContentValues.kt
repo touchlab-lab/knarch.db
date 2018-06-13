@@ -1,4 +1,4 @@
-package co.touchlab.kurgan.architecture.database
+package co.touchlab.multiplatform.architecture.db
 
 expect class ContentValues(){
     constructor(size: Int)

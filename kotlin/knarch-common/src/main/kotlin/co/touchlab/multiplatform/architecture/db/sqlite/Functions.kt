@@ -1,6 +1,4 @@
-package co.touchlab.kurgan.architecture.database.sqlite
-
-import co.touchlab.kurgan.architecture.database.ContentValues
+package co.touchlab.multiplatform.architecture.db.sqlite
 
 expect fun deleteDatabase(path:String):Boolean
 

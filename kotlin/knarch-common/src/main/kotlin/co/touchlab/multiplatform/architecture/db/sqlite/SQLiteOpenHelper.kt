@@ -1,4 +1,4 @@
-package co.touchlab.kurgan.architecture.database.sqlite
+package co.touchlab.multiplatform.architecture.db.sqlite
 
 expect abstract class SQLiteOpenHelper{
 
@@ -10,9 +10,7 @@ expect abstract class SQLiteOpenHelper{
 //    open fun onOpen(db: SQLiteDatabase):Unit
 //    open fun onConfigure(db: SQLiteDatabase):Unit
 
-    open fun close()
-
-    fun getDatabaseName():String?
+    fun close()
 
     fun setWriteAheadLoggingEnabled(enabled: Boolean)
 }

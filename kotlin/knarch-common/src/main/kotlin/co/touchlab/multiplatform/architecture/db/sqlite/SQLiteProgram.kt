@@ -1,4 +1,4 @@
-package co.touchlab.kurgan.architecture.database.sqlite
+package co.touchlab.multiplatform.architecture.db.sqlite
 
 expect abstract class SQLiteProgram:SQLiteClosable{
     fun bindNull(index:Int)
@@ -7,7 +7,7 @@ expect abstract class SQLiteProgram:SQLiteClosable{
     fun bindString(index:Int, value:String)
     fun bindBlob(index:Int, value:ByteArray)
     fun clearBindings()
-    fun bindAllArgsAsStrings(bindArgs:Array<String>)
+    fun bindAllArgsAsStrings(bindArgs:Array<String>?)
 }
 
 expect abstract class SQLiteClosable{

@@ -1,7 +1,6 @@
-package co.touchlab.kurgan.architecture.database.sqlite
+package co.touchlab.multiplatform.architecture.db.sqlite
 
-import co.touchlab.kurgan.Log
-import co.touchlab.kurgan.architecture.database.DatabaseErrorHandler
+import co.touchlab.multiplatform.architecture.db.DatabaseErrorHandler
 
 expect fun createOpenHelper(
         name:String?,
@@ -134,9 +133,6 @@ abstract class PlatformSQLiteOpenHelperCallback(val version:Int) {
     open fun onCorruption(db:SQLiteDatabase) {
         // the following implementation is taken from {@link DefaultDatabaseErrorHandler}.
 
-        Log.e(TAG, "Corruption reported by sqlite on database: " + db.getPath())
-
-        // is the corruption detected even before database could be 'opened'?
         if (!db.isOpen()) {
             // database files are not even openable. delete this database file.
             // NOTE if the database has attached databases, then any of them could be corrupt.
