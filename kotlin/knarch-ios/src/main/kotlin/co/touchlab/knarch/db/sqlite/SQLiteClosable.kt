@@ -48,4 +48,17 @@ abstract class SQLiteClosable{
     open fun close() {
         releaseReference()
     }
+
+    internal fun <R> withRef(proc:() -> R):R{
+        acquireReference()
+        try
+        {
+            return proc()
+        }
+        finally
+        {
+            releaseReference()
+        }
+    }
+
 }

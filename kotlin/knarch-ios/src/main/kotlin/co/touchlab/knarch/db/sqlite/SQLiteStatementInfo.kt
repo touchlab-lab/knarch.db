@@ -1,7 +1,5 @@
 package co.touchlab.knarch.db.sqlite
 
-import konan.worker.*
-
 class SQLiteStatementInfo{
     /**
      * The number of parameters that the statement has.

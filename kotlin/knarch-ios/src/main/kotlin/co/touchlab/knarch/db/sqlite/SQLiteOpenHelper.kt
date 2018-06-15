@@ -3,6 +3,7 @@ package co.touchlab.knarch.db.sqlite
 import co.touchlab.knarch.Log
 import co.touchlab.knarch.SystemContext
 import co.touchlab.knarch.db.DatabaseErrorHandler
+import platform.Foundation.*
 
 /**
  * A helper class to manage database creation and version management.
@@ -21,17 +22,20 @@ abstract class SQLiteOpenHelper(private val mContext: SystemContext,
                                 private val mNewVersion: Int,
                                 private val mErrorHandler: DatabaseErrorHandler? = null) {
 
-    init {
-        if (mNewVersion < 1) throw IllegalArgumentException("Version must be >= 1, was $mNewVersion")
+    private val createLock = NSRecursiveLock()
+
+    private fun getData():HelperData = getHelperInfo(nativeInfoId)
+
+    private fun putData(data:HelperData?){
+        putHelperInfo(nativeInfoId, data)
     }
 
-    /**
-     * Return the name of the SQLite database being opened, as given to
-     * the constructor.
-     */
-    private var mDatabase: SQLiteDatabase? = null
-    private var mIsInitializing: Boolean = false
-    private var mEnableWriteAheadLogging: Boolean = false
+    private val nativeInfoId = nextHelperInfoId()
+
+    init {
+        if (mNewVersion < 1) throw IllegalArgumentException("Version must be >= 1, was $mNewVersion")
+        putData(HelperData())
+    }
 
     /**
      * Create and/or open a database that will be used for reading and writing.
@@ -53,7 +57,12 @@ abstract class SQLiteOpenHelper(private val mContext: SystemContext,
      * @return a read/write database object valid until {@link #close} is called
      */
     fun getWritableDatabase(): SQLiteDatabase {
-        return getDatabaseLocked(true)
+        createLock.lock()
+        try {
+            return getDatabaseLocked(true)
+        } finally {
+            createLock.unlock()
+        }
     }
 
     /**
@@ -75,7 +84,12 @@ abstract class SQLiteOpenHelper(private val mContext: SystemContext,
      * or {@link #close} is called.
      */
     fun getReadableDatabase(): SQLiteDatabase {
-        return getDatabaseLocked(false)
+        createLock.lock()
+        try {
+            return getDatabaseLocked(false)
+        } finally {
+            createLock.unlock()
+        }
     }
 
     /**
@@ -90,8 +104,18 @@ abstract class SQLiteOpenHelper(private val mContext: SystemContext,
      * @see SQLiteDatabase#enableWriteAheadLogging()
      */
     fun setWriteAheadLoggingEnabled(enabled: Boolean) {
-        if (mEnableWriteAheadLogging != enabled) {
-            val db = mDatabase
+        createLock.lock()
+        try {
+            setWriteAheadLoggingEnabledLocked(enabled)
+        } finally {
+            createLock.unlock()
+        }
+    }
+
+    private fun setWriteAheadLoggingEnabledLocked(enabled: Boolean) {
+        val data = getData()
+        if (data.mEnableWriteAheadLogging != enabled) {
+            val db = data.mDatabase
             if (db != null && db.isOpen() && !db.isReadOnly()) {
                 if (enabled) {
                     db.enableWriteAheadLogging()
@@ -99,7 +123,8 @@ abstract class SQLiteOpenHelper(private val mContext: SystemContext,
                     db.disableWriteAheadLogging()
                 }
             }
-            mEnableWriteAheadLogging = enabled
+            val dataCopy = data.copy(mEnableWriteAheadLogging = enabled)
+            putData(dataCopy)
         }
     }
 
@@ -108,22 +133,24 @@ abstract class SQLiteOpenHelper(private val mContext: SystemContext,
      * now we'll leave as is.
      */
     private fun getDatabaseLocked(writable: Boolean): SQLiteDatabase {
-
-        if (mDatabase != null) {
-            if (!mDatabase!!.isOpen()) {
+        var data = getData()
+        if (data.mDatabase != null) {
+            if (!data.mDatabase!!.isOpen()) {
                 // Darn! The user closed the database by calling mDatabase.close().
-                mDatabase = null
-            } else if (!writable || !mDatabase!!.isReadOnly()) {
+                data = data.copy(mDatabase = null)
+                putData(data)
+            } else if (!writable || !data.mDatabase!!.isReadOnly()) {
                 // The database is already open for business.
-                return mDatabase!!
+                return data.mDatabase!!
             }
         }
-        if (mIsInitializing) {
+        if (data.mIsInitializing) {
             throw IllegalStateException("getDatabase called recursively")
         }
-        var db = mDatabase
+        var db = data.mDatabase
         try {
-            mIsInitializing = true
+            data = data.copy(mIsInitializing = true)
+
             if (db != null) {
                 if (writable && db.isReadOnly()) {
                     db.reopenReadWrite()
@@ -134,7 +161,7 @@ abstract class SQLiteOpenHelper(private val mContext: SystemContext,
                 try {
                     db = mContext.openOrCreateDatabase(
                             databaseName,
-                            if (mEnableWriteAheadLogging) {
+                            if (data.mEnableWriteAheadLogging) {
                                 SystemContext.MODE_ENABLE_WRITE_AHEAD_LOGGING
                             } else {
                                 0
@@ -179,13 +206,16 @@ abstract class SQLiteOpenHelper(private val mContext: SystemContext,
             if (db.isReadOnly()) {
                 Log.w(TAG, "Opened $databaseName in read-only mode")
             }
-            mDatabase = db
+            data = data.copy(mDatabase = db)
             return db
         } finally {
-            mIsInitializing = false
-            if (db != null && db != mDatabase) {
+            data = data.copy(mIsInitializing = false)
+
+            if (db != null && db != data.mDatabase) {
                 db.close()
             }
+
+            putData(data)
         }
     }
 
@@ -193,10 +223,16 @@ abstract class SQLiteOpenHelper(private val mContext: SystemContext,
      * Close any open database object.
      */
     fun close() {
-        if (mIsInitializing) throw IllegalStateException("Closed during initialization")
-        if (mDatabase != null && mDatabase!!.isOpen()) {
-            mDatabase!!.close()
-            mDatabase = null
+        createLock.lock()
+        try {
+            val data = getData()
+            if (data.mIsInitializing) throw IllegalStateException("Closed during initialization")
+            if (data.mDatabase != null && data.mDatabase.isOpen()) {
+                data.mDatabase.close()
+                putData(data.copy(mDatabase = null))
+            }
+        } finally {
+            createLock.unlock()
         }
     }
 
@@ -289,3 +325,17 @@ abstract class SQLiteOpenHelper(private val mContext: SystemContext,
         private val TAG = "SQLiteOpenHelper"
     }
 }
+
+data class HelperData(val mDatabase: SQLiteDatabase? = null,
+                      val mIsInitializing: Boolean = false,
+                      val mEnableWriteAheadLogging: Boolean = false)
+
+
+@SymbolName("SQLiteSupport_nextHelperInfoId")
+private external fun nextHelperInfoId():Int
+
+@SymbolName("SQLiteSupport_getHelperInfo")
+private external fun getHelperInfo(dataId:Int):HelperData
+
+@SymbolName("SQLiteSupport_putHelperInfo")
+private external fun putHelperInfo(dataId:Int, data:HelperData?)

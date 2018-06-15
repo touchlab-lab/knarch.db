@@ -215,34 +215,6 @@ class SQLiteDatabase private constructor(path: String, openFlags: Int, cursorFac
             }
             return deleted
         }
-        /*public static boolean deleteDatabase(File file) {
-            if (file == null) {
-                throw new IllegalArgumentException("file must not be null");
-            }
-
-            boolean deleted = false;
-            deleted |= file.delete();
-            deleted |= new File(file.getPath() + "-journal").delete();
-            deleted |= new File(file.getPath() + "-shm").delete();
-            deleted |= new File(file.getPath() + "-wal").delete();
-
-            File dir = file.getParentFile();
-            if (dir != null) {
-                final String prefix = file.getName() + "-mj";
-                File[] files = dir.listFiles(new FileFilter() {
-                    @Override
-                    public boolean accept(File candidate) {
-                        return candidate.getName().startsWith(prefix);
-                    }
-                });
-                if (files != null) {
-                    for (File masterJournal : files) {
-                        deleted |= masterJournal.delete();
-                    }
-                }
-            }
-            return deleted;
-        }*/
 
         /**
          * Finds the name of the first table, which is editable.
@@ -297,7 +269,6 @@ class SQLiteDatabase private constructor(path: String, openFlags: Int, cursorFac
     private val mErrorHandler:DatabaseErrorHandler = errorHandler ?: DefaultDatabaseErrorHandler()
 
     private fun dispose(finalized:Boolean) {
-        //TODO: close session?
         forceClose()
     }
 
@@ -370,7 +341,7 @@ class SQLiteDatabase private constructor(path: String, openFlags: Int, cursorFac
      * </pre>
      */
     fun beginTransaction() {
-        beginTransaction(null /* transactionStatusCallback */, true);
+        beginTransaction(null /* transactionStatusCallback */, true)
     }
 
     /**
@@ -394,7 +365,7 @@ class SQLiteDatabase private constructor(path: String, openFlags: Int, cursorFac
      * </pre>
      */
     fun beginTransactionNonExclusive() {
-        beginTransaction(null /* transactionStatusCallback */, false);
+        beginTransaction(null /* transactionStatusCallback */, false)
     }
 
     /**
@@ -423,7 +394,7 @@ class SQLiteDatabase private constructor(path: String, openFlags: Int, cursorFac
      * {@link #yieldIfContendedSafely}.
      */
     fun beginTransactionWithListener(transactionListener:SQLiteTransactionListener) {
-        beginTransaction(transactionListener, true);
+        beginTransaction(transactionListener, true)
     }
 
     /**
@@ -456,18 +427,12 @@ class SQLiteDatabase private constructor(path: String, openFlags: Int, cursorFac
 
     private fun beginTransaction(transactionListener:SQLiteTransactionListener?,
                                  exclusive:Boolean) {
-        acquireReference()
-        try {
-            getThreadSession().beginTransaction(
-                    if(exclusive){SQLiteSession.TRANSACTION_MODE_EXCLUSIVE}
-                    else{
-                        SQLiteSession.TRANSACTION_MODE_IMMEDIATE}
-                    ,
-                    transactionListener,
-                    getThreadDefaultConnectionFlags(false /*readOnly*/))
-        } finally {
-            releaseReference()
-        }
+        getThreadSession().beginTransaction(
+                if(exclusive){SQLiteSession.TRANSACTION_MODE_EXCLUSIVE}
+                else{
+                    SQLiteSession.TRANSACTION_MODE_IMMEDIATE}
+                ,
+                transactionListener)
     }
 
     /**
@@ -475,12 +440,7 @@ class SQLiteDatabase private constructor(path: String, openFlags: Int, cursorFac
      * are committed and rolled back.
      */
     fun endTransaction() {
-        acquireReference()
-        try {
-            getThreadSession().endTransaction()
-        } finally {
-            releaseReference()
-        }
+        getThreadSession().endTransaction()
     }
 
     /**
@@ -493,12 +453,7 @@ class SQLiteDatabase private constructor(path: String, openFlags: Int, cursorFac
      * transaction is already marked as successful.
      */
     fun setTransactionSuccessful() {
-        acquireReference()
-        try {
-            getThreadSession().setTransactionSuccessful()
-        } finally {
-            releaseReference()
-        }
+        getThreadSession().setTransactionSuccessful()
     }
 
     /**
@@ -507,12 +462,7 @@ class SQLiteDatabase private constructor(path: String, openFlags: Int, cursorFac
      * @return True if the current thread is in a transaction.
      */
     fun inTransaction():Boolean {
-        acquireReference()
-        try {
-            return getThreadSession().hasTransaction()
-        } finally {
-            releaseReference()
-        }
+        return getThreadSession().hasTransaction()
     }
 
     /**
@@ -563,7 +513,7 @@ class SQLiteDatabase private constructor(path: String, openFlags: Int, cursorFac
         forceClose()
     }
 
-    fun openInner() {
+    private fun openInner() {
         sqliteSession.checkOpenConnection()
     }
 
@@ -646,12 +596,7 @@ class SQLiteDatabase private constructor(path: String, openFlags: Int, cursorFac
      * {@link SQLiteStatement}s are not synchronized, see the documentation for more details.
      */
     fun compileStatement(sql:String):SQLiteStatement {
-        acquireReference()
-        try {
-            return SQLiteStatement(this, sql, null)
-        } finally {
-            releaseReference()
-        }
+        return SQLiteStatement(this, sql, null)
     }
 
     /**
@@ -728,16 +673,11 @@ class SQLiteDatabase private constructor(path: String, openFlags: Int, cursorFac
                          distinct:Boolean, table:String, columns:Array<String>?, selection:String?,
                          selectionArgs:Array<String>?, groupBy:String?, having:String?,
                          orderBy:String?, limit:String?):Cursor {
-        acquireReference()
-        try {
-            val sql = SQLiteQueryBuilder.buildQueryString(
-                    distinct, table, columns, selection, groupBy, having, orderBy, limit)
+        val sql = SQLiteQueryBuilder.buildQueryString(
+                distinct, table, columns, selection, groupBy, having, orderBy, limit)
 
-            return rawQueryWithFactory(cursorFactory, sql, selectionArgs,
-                    findEditTable(table))
-        } finally {
-            releaseReference()
-        }
+        return rawQueryWithFactory(cursorFactory, sql, selectionArgs,
+                findEditTable(table))
     }
 
     /**
@@ -843,13 +783,8 @@ class SQLiteDatabase private constructor(path: String, openFlags: Int, cursorFac
     fun rawQueryWithFactory(
             cursorFactory:CursorFactory?, sql:String,
             selectionArgs:Array<String>?, editTable:String?):Cursor {
-        acquireReference()
-        try {
-            val driver:SQLiteCursorDriver = SQLiteDirectCursorDriver(this, sql, editTable)
-            return driver.query(cursorFactory ?: mCursorFactory, selectionArgs)
-        } finally {
-            releaseReference()
-        }
+        val driver:SQLiteCursorDriver = SQLiteDirectCursorDriver(this, sql, editTable)
+        return driver.query(cursorFactory ?: mCursorFactory, selectionArgs)
     }
 
 
@@ -968,56 +903,48 @@ class SQLiteDatabase private constructor(path: String, openFlags: Int, cursorFac
      */
     fun insertWithOnConflict(table:String, nullColumnHack:String?,
                              initialValues:ContentValues?, conflictAlgorithm:Int):Long {
-        acquireReference()
-        try
+        val sql = StringBuilder()
+        sql.append("INSERT")
+        sql.append(CONFLICT_VALUES[conflictAlgorithm])
+        sql.append(" INTO ")
+        sql.append(table)
+        sql.append('(')
+        val size = initialValues?.size() ?: 0
+
+        val bindArgs = arrayOfNulls<Any>(size)
+
+        if (size > 0)
         {
-            val sql = StringBuilder()
-            sql.append("INSERT")
-            sql.append(CONFLICT_VALUES[conflictAlgorithm])
-            sql.append(" INTO ")
-            sql.append(table)
-            sql.append('(')
-            val size = initialValues?.size() ?: 0
 
-            val bindArgs = arrayOfNulls<Any>(size)
-
-            if (size > 0)
+            var i = 0
+            for (colName in initialValues!!.keySet())
             {
-
-                var i = 0
-                for (colName in initialValues!!.keySet())
-                {
-                    sql.append(if ((i > 0)) "," else "")
-                    sql.append(colName)
-                    bindArgs[i++] = initialValues!!.get(colName)
-                }
-                sql.append(')')
-                sql.append(" VALUES (")
-                i = 0
-                while (i < size)
-                {
-                    sql.append(if ((i > 0)) ",?" else "?")
-                    i++
-                }
-            }
-            else
-            {
-                sql.append("$nullColumnHack) VALUES (NULL")
+                sql.append(if ((i > 0)) "," else "")
+                sql.append(colName)
+                bindArgs[i++] = initialValues!!.get(colName)
             }
             sql.append(')')
-            val statement = SQLiteStatement(this, sql.toString(), bindArgs)
-            try
+            sql.append(" VALUES (")
+            i = 0
+            while (i < size)
             {
-                return statement.executeInsert()
+                sql.append(if ((i > 0)) ",?" else "?")
+                i++
             }
-            finally
-            {
-                statement.close()
-            }
+        }
+        else
+        {
+            sql.append("$nullColumnHack) VALUES (NULL")
+        }
+        sql.append(')')
+        val statement = SQLiteStatement(this, sql.toString(), bindArgs)
+        try
+        {
+            return statement.executeInsert()
         }
         finally
         {
-            releaseReference()
+            statement.close()
         }
     }
 
@@ -1035,27 +962,19 @@ class SQLiteDatabase private constructor(path: String, openFlags: Int, cursorFac
      * whereClause.
      */
     fun delete(table:String, whereClause:String?, whereArgs:Array<String>?):Int {
-        acquireReference()
+        var i = 0
+        val anyArgs = if(whereArgs == null){null}else{Array<Any?>(whereArgs.size, {
+            whereArgs[i++]})}
+
+        val statement = SQLiteStatement(this, ("DELETE FROM " + table +
+                (if (!whereClause.isNullOrEmpty()) " WHERE $whereClause" else "")), anyArgs)
         try
         {
-            var i = 0
-            val anyArgs = if(whereArgs == null){null}else{Array<Any?>(whereArgs.size, {
-                whereArgs[i++]})}
-
-            val statement = SQLiteStatement(this, ("DELETE FROM " + table +
-                    (if (!whereClause.isNullOrEmpty()) " WHERE $whereClause" else "")), anyArgs)
-            try
-            {
-                return statement.executeUpdateDelete()
-            }
-            finally
-            {
-                statement.close()
-            }
+            return statement.executeUpdateDelete()
         }
         finally
         {
-            releaseReference()
+            statement.close()
         }
     }
 
@@ -1092,55 +1011,48 @@ class SQLiteDatabase private constructor(path: String, openFlags: Int, cursorFac
      */
     fun updateWithOnConflict(table:String, values:ContentValues,
                              whereClause:String?, whereArgs:Array<String>?, conflictAlgorithm:Int):Int {
-        acquireReference()
+        val sql = StringBuilder(120)
+        sql.append("UPDATE ")
+        sql.append(CONFLICT_VALUES[conflictAlgorithm])
+        sql.append(table)
+        sql.append(" SET ")
+        // move all bind args to one array
+        val setValuesSize = values.size()
+        val bindArgsSize = if ((whereArgs == null)) setValuesSize else (setValuesSize + whereArgs.size)
+        val bindArgs = arrayOfNulls<Any>(bindArgsSize)
+        var i = 0
+        for (colName in values.keySet())
+        {
+            sql.append(if ((i > 0)) "," else "")
+            sql.append(colName)
+            bindArgs[i++] = values.get(colName)
+            sql.append("=?")
+        }
+        if (whereArgs != null)
+        {
+            i = setValuesSize
+            while (i < bindArgsSize)
+            {
+                bindArgs[i] = whereArgs[i - setValuesSize]
+                i++
+            }
+        }
+        if (!(whereClause != null && whereClause.isEmpty()))
+        {
+            sql.append(" WHERE ")
+            sql.append(whereClause)
+        }
+        val statement = SQLiteStatement(this, sql.toString(), bindArgs)
         try
         {
-            val sql = StringBuilder(120)
-            sql.append("UPDATE ")
-            sql.append(CONFLICT_VALUES[conflictAlgorithm])
-            sql.append(table)
-            sql.append(" SET ")
-            // move all bind args to one array
-            val setValuesSize = values.size()
-            val bindArgsSize = if ((whereArgs == null)) setValuesSize else (setValuesSize + whereArgs.size)
-            val bindArgs = arrayOfNulls<Any>(bindArgsSize)
-            var i = 0
-            for (colName in values.keySet())
-            {
-                sql.append(if ((i > 0)) "," else "")
-                sql.append(colName)
-                bindArgs[i++] = values.get(colName)
-                sql.append("=?")
-            }
-            if (whereArgs != null)
-            {
-                i = setValuesSize
-                while (i < bindArgsSize)
-                {
-                    bindArgs[i] = whereArgs[i - setValuesSize]
-                    i++
-                }
-            }
-            if (!(whereClause != null && whereClause.isEmpty()))
-            {
-                sql.append(" WHERE ")
-                sql.append(whereClause)
-            }
-            val statement = SQLiteStatement(this, sql.toString(), bindArgs)
-            try
-            {
-                return statement.executeUpdateDelete()
-            }
-            finally
-            {
-                statement.close()
-            }
+            return statement.executeUpdateDelete()
         }
         finally
         {
-            releaseReference()
+            statement.close()
         }
     }
+
     /**
      * Execute a single SQL statement that is NOT a SELECT/INSERT/UPDATE/DELETE.
      * <p>
@@ -1188,28 +1100,16 @@ class SQLiteDatabase private constructor(path: String, openFlags: Int, cursorFac
         executeSql(sql, bindArgs)
     }
 
-    private fun executeSql(sql:String, bindArgs:Array<Any?>?):Int {
-        acquireReference()
-        try
-        {
-            //TODO: Should revisit this part of the framework
-            if (DatabaseUtils.getSqlStatementType(sql) == DatabaseUtils.STATEMENT_ATTACH)
-            {
-                throw UnsupportedOperationException("Database attach not supported")
-            }
-            val statement = SQLiteStatement(this, sql, bindArgs)
-            try
-            {
-                return statement.executeUpdateDelete()
-            }
-            finally
-            {
-                statement.close()
-            }
+    private fun executeSql(sql: String, bindArgs: Array<Any?>?): Int {
+        //TODO: Should revisit this part of the framework
+        if (DatabaseUtils.getSqlStatementType(sql) == DatabaseUtils.STATEMENT_ATTACH) {
+            throw UnsupportedOperationException("Database attach not supported")
         }
-        finally
-        {
-            releaseReference()
+        val statement = SQLiteStatement(this, sql, bindArgs)
+        try {
+            return statement.executeUpdateDelete()
+        } finally {
+            statement.close()
         }
     }
 
@@ -1330,6 +1230,7 @@ class SQLiteDatabase private constructor(path: String, openFlags: Int, cursorFac
         forceClose()
         open()
     }
+
     /**
      * This method enables parallel execution of queries from multiple threads on the
      * same database. It does this by opening multiple connections to the database
@@ -1484,18 +1385,4 @@ class SQLiteDatabase private constructor(path: String, openFlags: Int, cursorFac
                       masterQuery:SQLiteCursorDriver, editTable:String?,
                       query:SQLiteQuery):Cursor
     }
-    /**
-     * A callback interface for a custom sqlite3 function.
-     * This can be used to create a function that can be called from
-     * sqlite3 database triggers.
-     * @hide
-     */
-    interface CustomFunction {
-        fun callback(args:Array<String>)
-    }
-
-    //Need to think on this stuff
-
-    fun releaseReference() {}
-    fun acquireReference() {}
 }

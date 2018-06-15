@@ -447,7 +447,7 @@ class SQLiteDatabaseTest {
     }
 
     private class MockSQLiteCursor(db:SQLiteDatabase, driver:SQLiteCursorDriver,
-                                         editTable:String?, query:SQLiteQuery):SQLiteCursor(db, driver, editTable, query)
+                                         editTable:String?, query:SQLiteQuery):SQLiteCursor(driver, query)
 
     @Test
     fun testFindEditTable() {
@@ -564,13 +564,13 @@ class SQLiteDatabaseTest {
         {
             database = SQLiteDatabase.openDatabase(mDatabaseFilePath!!, null,
                     SQLiteDatabase.OPEN_READONLY)
-            assertTrue(database!!.isReadOnly())
+            assertTrue(database.isReadOnly())
         }
         finally
         {
             if (database != null)
             {
-                database!!.close()
+                database.close()
             }
         }
     }
@@ -1046,13 +1046,6 @@ class SQLiteDatabaseTest {
         assertTrue(mDatabase!!.needUpgrade(1))
         mDatabase!!.setVersion(1)
         assertFalse(mDatabase!!.needUpgrade(1))
-    }
-
-    @Test
-    fun testOnAllReferencesReleased() {
-        assertTrue(mDatabase!!.isOpen())
-        mDatabase!!.releaseReference()
-        assertFalse(mDatabase!!.isOpen())
     }
 
     @Test
@@ -2394,6 +2387,3 @@ class SQLiteDatabaseTest {
         )
     }
 }
-
-class HockSQLiteCursor(db:SQLiteDatabase, driver:SQLiteCursorDriver,
-                       editTable:String, query:SQLiteQuery):SQLiteCursor(db, driver, editTable, query)

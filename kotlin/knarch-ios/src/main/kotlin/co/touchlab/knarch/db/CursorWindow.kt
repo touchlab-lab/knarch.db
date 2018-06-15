@@ -2,10 +2,9 @@ package co.touchlab.knarch.db
 
 import co.touchlab.knarch.db.sqlite.SQLiteClosable
 
-open class CursorWindow(initName:String? = null):SQLiteClosable() {
+open class CursorWindow:SQLiteClosable() {
 
-    private val nativeCursorWindow:CppCursorWindow
-    var name:String = if (initName != null && initName.isNotEmpty()) initName else "<unnamed>"
+    private val nativeCursorWindow:CppCursorWindow = CppCursorWindow()
 
     /**
      * The start position is the zero-based index of the first row that this window contains
@@ -20,10 +19,6 @@ open class CursorWindow(initName:String? = null):SQLiteClosable() {
         get() {
             return withRef { nativeCursorWindow.implGetNumRows() }
         }
-
-    init{
-        nativeCursorWindow = CppCursorWindow(this.name)
-    }
 
     private fun dispose() {
         nativeCursorWindow.implDispose()
@@ -314,19 +309,7 @@ open class CursorWindow(initName:String? = null):SQLiteClosable() {
     fun getWindowCursorPtr():Long = nativeCursorWindow.mWindowPtr
 
     override fun toString():String {
-        return name + nativeCursorWindow.toString()
-    }
-
-    private fun <R> withRef(proc:() -> R):R{
-        acquireReference()
-        try
-        {
-            return proc.invoke()
-        }
-        finally
-        {
-            releaseReference()
-        }
+        return nativeCursorWindow.toString()
     }
 
     //Deprecated methods available for tests
@@ -406,7 +389,7 @@ open class CursorWindow(initName:String? = null):SQLiteClosable() {
  * This class originally was intended to be a part of multiple implementations, but
  * that's not happening. TODO: Fold into the class above (but we have bigger fish to fry today)
  */
-private class CppCursorWindow(name:String) {
+private class CppCursorWindow {
 
     var mWindowPtr:Long = 0
 
@@ -429,8 +412,8 @@ private class CppCursorWindow(name:String) {
      */
     var dataArray:ByteArray?
 
-    fun implCreate(name: String, cursorWindowSize: Int, dataArray:ByteArray) {
-        mWindowPtr = nativeCreate(name, cursorWindowSize, dataArray)
+    fun implCreate(cursorWindowSize: Int, dataArray:ByteArray) {
+        mWindowPtr = nativeCreate(cursorWindowSize, dataArray)
         if (mWindowPtr == 0L)
         {
             throw CursorWindowAllocationException(("Cursor window allocation of ${(cursorWindowSize / 1024)} kb failed. "))
@@ -468,7 +451,6 @@ private class CppCursorWindow(name:String) {
     fun implPutLong(value: Long, row: Int, column: Int): Boolean = nativePutLong(mWindowPtr, value, row, column)
     fun implPutDouble(value: Double, row: Int, column: Int): Boolean = nativePutDouble(mWindowPtr, value, row, column)
     fun implPutNull(row: Int, column: Int): Boolean = nativePutNull(mWindowPtr, row, column)
-    fun implGetName(): String = nativeGetName(mWindowPtr)
 
     override fun toString(): String {
         return " {" + mWindowPtr.toString(16) + "}"
@@ -476,7 +458,7 @@ private class CppCursorWindow(name:String) {
 
     init{
         dataArray = ByteArray(sCursorWindowSize)
-        implCreate(name, sCursorWindowSize, dataArray!!)
+        implCreate(sCursorWindowSize, dataArray!!)
         // recordNewWindow(Binder.getCallingPid(), mWindowPtr);
     }
 
@@ -496,7 +478,7 @@ private class CppCursorWindow(name:String) {
         }
 
         @SymbolName("Android_Database_CursorWindow_nativeCreate")
-        private external fun nativeCreate(name:String, cursorWindowSize:Int, dataArray:ByteArray):Long
+        private external fun nativeCreate(cursorWindowSize:Int, dataArray:ByteArray):Long
         @SymbolName("Android_Database_CursorWindow_nativeDispose")
         private external fun nativeDispose(windowPtr:Long)
         @SymbolName("Android_Database_CursorWindow_nativeClear")
@@ -531,8 +513,6 @@ private class CppCursorWindow(name:String) {
         private external fun nativePutDouble(windowPtr:Long, value:Double, row:Int, column:Int):Boolean
         @SymbolName("Android_Database_CursorWindow_nativePutNull")
         private external fun nativePutNull(windowPtr:Long, row:Int, column:Int):Boolean
-        @SymbolName("Android_Database_CursorWindow_nativeGetName")
-        private external fun nativeGetName(windowPtr:Long):String
     }
 }
 

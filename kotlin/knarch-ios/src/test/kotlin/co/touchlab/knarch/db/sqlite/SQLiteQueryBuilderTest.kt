@@ -113,7 +113,7 @@ class SQLiteQueryBuilderTest {
         assertTrue(cursor is MockCursor)
     }
     private class MockCursor(db:SQLiteDatabase, driver:SQLiteCursorDriver,
-                             editTable:String?, query:SQLiteQuery):SQLiteCursor(db, driver, editTable, query)
+                             editTable:String?, query:SQLiteQuery):SQLiteCursor(driver, query)
 
     @Test
     fun testBuildQueryString() {
@@ -170,14 +170,14 @@ class SQLiteQueryBuilderTest {
         val COLUMN_NAME_INDEX = 0
         val COLUMN_SALARY_INDEX = 1
         cursor!!.moveToFirst()
-        assertEquals("Jim", cursor!!.getString(COLUMN_NAME_INDEX))
-        assertEquals(4500, cursor!!.getInt(COLUMN_SALARY_INDEX))
+        assertEquals("Jim", cursor.getString(COLUMN_NAME_INDEX))
+        assertEquals(4500, cursor.getInt(COLUMN_SALARY_INDEX))
         cursor!!.moveToNext()
-        assertEquals("Mike", cursor!!.getString(COLUMN_NAME_INDEX))
-        assertEquals(4000, cursor!!.getInt(COLUMN_SALARY_INDEX))
+        assertEquals("Mike", cursor.getString(COLUMN_NAME_INDEX))
+        assertEquals(4000, cursor.getInt(COLUMN_SALARY_INDEX))
         cursor!!.moveToNext()
-        assertEquals("jack", cursor!!.getString(COLUMN_NAME_INDEX))
-        assertEquals(3500, cursor!!.getInt(COLUMN_SALARY_INDEX))
+        assertEquals("jack", cursor.getString(COLUMN_NAME_INDEX))
+        assertEquals(3500, cursor.getInt(COLUMN_SALARY_INDEX))
         sqliteQueryBuilder = SQLiteQueryBuilder()
         sqliteQueryBuilder.setTables(EMPLOYEE_TABLE_NAME)
         cursor = sqliteQueryBuilder.query(mDatabase,
@@ -187,11 +187,11 @@ class SQLiteQueryBuilderTest {
         assertNotNull(cursor!!)
         assertEquals(2, cursor!!.getCount())
         cursor!!.moveToFirst()
-        assertEquals("Jim", cursor!!.getString(COLUMN_NAME_INDEX))
-        assertEquals(4500, cursor!!.getInt(COLUMN_SALARY_INDEX))
-        cursor!!.moveToNext()
-        assertEquals("Mike", cursor!!.getString(COLUMN_NAME_INDEX))
-        assertEquals(4000, cursor!!.getInt(COLUMN_SALARY_INDEX))
+        assertEquals("Jim", cursor.getString(COLUMN_NAME_INDEX))
+        assertEquals(4500, cursor.getInt(COLUMN_SALARY_INDEX))
+        cursor.moveToNext()
+        assertEquals("Mike", cursor.getString(COLUMN_NAME_INDEX))
+        assertEquals(4000, cursor.getInt(COLUMN_SALARY_INDEX))
     }
 
     @Test

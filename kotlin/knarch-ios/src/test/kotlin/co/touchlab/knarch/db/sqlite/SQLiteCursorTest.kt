@@ -236,7 +236,7 @@ class SQLiteCursorTest {
             return mHasInvalidated
         }
     }*/
-    private inner class MockCursorWindow(localWindow:Boolean):CursorWindow(null) {
+    private inner class MockCursorWindow(localWindow:Boolean):CursorWindow() {
         var isClosed = false
         override fun close() {
             super.close()

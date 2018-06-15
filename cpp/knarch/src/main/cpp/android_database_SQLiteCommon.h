@@ -39,10 +39,6 @@ RUNTIME_NORETURN void ThrowSql_SQLiteException(KString exceptionClass, KString s
 };
 namespace android {
 
-    KString makeKString(const char *str);
-
-    KString makeKString(char *str);
-
 /* throw a SQLiteException with a message appropriate for the error in handle */
     void throw_sqlite3_exception(sqlite3 *handle);
 

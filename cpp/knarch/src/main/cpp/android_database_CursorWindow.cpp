@@ -56,22 +56,25 @@ static void throwExceptionWithRowCol(KInt row, KInt column) {
     snprintf(exceptionMessage, sizeof(exceptionMessage),
              "Couldn't read row %d, col %d from CursorWindow.  Make sure the Cursor is initialized correctly before accessing data from it.",
              row, column);
-    ThrowSql_IllegalStateException(makeKString(exceptionMessage));
+    ObjHolder messageHold;
+    CreateStringFromCString(exceptionMessage, messageHold.slot());
+    ThrowSql_IllegalStateException((KString)messageHold.obj());
 }
 
 static void throwUnknownTypeException(KInt type) {
     char exceptionMessage[50];
     snprintf(exceptionMessage, sizeof(exceptionMessage), "UNKNOWN type %d", type);
-    ThrowSql_IllegalStateException(makeKString(exceptionMessage));
+    ObjHolder messageHold;
+    CreateStringFromCString(exceptionMessage, messageHold.slot());
+    ThrowSql_IllegalStateException((KString)messageHold.obj());
 }
 
-static KLong nativeCreate(KString nameObj, KInt cursorWindowSize, KRef dataArray) {
+static KLong nativeCreate(KInt cursorWindowSize, KRef dataArray) {
 
     CursorWindow *window;
-    status_t status = CursorWindow::create(nameObj, cursorWindowSize, (void*)ArrayAddressOfElementAt(dataArray->array(), 0), &window);
+    status_t status = CursorWindow::create(cursorWindowSize, (void*)ArrayAddressOfElementAt(dataArray->array(), 0), &window);
     if (status || !window) {
-        ALOGE("Could not allocate CursorWindow '%s' of size %d due to error %d.",
-              nameObj, cursorWindowSize, status);
+        ALOGE("Could not allocate CursorWindow of size %d due to error %d.", cursorWindowSize, status);
         return 0;
     }
 
@@ -103,11 +106,6 @@ static void nativeDispose(KLong windowPtr) {
         LOG_WINDOW("Closing window %p", window);
         delete window;
     }
-}
-
-static KString nativeGetName(KLong windowPtr) {
-    CursorWindow *window = reinterpret_cast<CursorWindow *>(windowPtr);
-    return window->name();
 }
 
 /*
@@ -493,16 +491,12 @@ static KBoolean nativePutNull(KLong windowPtr, KInt row, KInt column) {
 
 extern "C" {
 
-KLong Android_Database_CursorWindow_nativeCreate(KRef thiz, KString nameObj, KInt cursorWindowSize, KRef dataArray) {
-    return nativeCreate(nameObj, cursorWindowSize, dataArray);
+KLong Android_Database_CursorWindow_nativeCreate(KRef thiz, KInt cursorWindowSize, KRef dataArray) {
+    return nativeCreate(cursorWindowSize, dataArray);
 }
 
 void Android_Database_CursorWindow_nativeDispose(KRef thiz, KLong windowPtr) {
     nativeDispose(windowPtr);
-}
-
-KString Android_Database_CursorWindow_nativeGetName(KRef thiz, KLong windowPtr) {
-    return nativeGetName(windowPtr);
 }
 
 void Android_Database_CursorWindow_nativeClear(KRef thiz, KLong windowPtr) {

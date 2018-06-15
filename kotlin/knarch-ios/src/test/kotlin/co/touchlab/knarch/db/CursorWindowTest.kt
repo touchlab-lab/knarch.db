@@ -14,7 +14,7 @@ class CursorWindowTest {
      */
     private val oneByOneWindow:CursorWindow
         get() {
-            val window = CursorWindow(null)
+            val window = CursorWindow()
             assertTrue(window.setNumColumns(1))
             assertTrue(window.allocRow())
             return window
@@ -32,7 +32,7 @@ class CursorWindowTest {
             cursor.addRow(row)
         }
         // fill window
-        var window = CursorWindow(null)
+        var window = CursorWindow()
         cursor.fillWindow(0, window)
         // read from cursor window
         for (i in 0 until list.size())
@@ -92,14 +92,14 @@ class CursorWindowTest {
         var TEST_NUMBER = 5
         var cursorWindow:CursorWindow
         // Test constructor with 'true' input, and startPosition should return 0
-        cursorWindow = CursorWindow(null)
+        cursorWindow = CursorWindow()
         assertEquals(0, cursorWindow.startPosition)
         // Test constructor with 'false' input
-        cursorWindow = CursorWindow(null)
+        cursorWindow = CursorWindow()
         assertEquals(0, cursorWindow.startPosition)
         // Test newFromParcel
         var parcel = Parcel.obtain()
-        cursorWindow = CursorWindow(null)
+        cursorWindow = CursorWindow()
         cursorWindow.startPosition = (TEST_NUMBER)
         cursorWindow.setNumColumns(1)
         cursorWindow.allocRow()
@@ -113,7 +113,7 @@ class CursorWindowTest {
 
     @Test
     fun testDataStructureOperations() {
-        var cursorWindow = CursorWindow(null)
+        var cursorWindow = CursorWindow()
         // Test with normal values
         assertTrue(cursorWindow.setNumColumns(0))
         // If the column has been set to zero, can't put String.
@@ -130,7 +130,7 @@ class CursorWindowTest {
         assertEquals(1, cursorWindow.numRows)
         cursorWindow.freeLastRow()
         assertEquals(0, cursorWindow.numRows)
-        cursorWindow = CursorWindow(null)
+        cursorWindow = CursorWindow()
         assertTrue(cursorWindow.setNumColumns(6))
         assertTrue(cursorWindow.allocRow())
         // Column number set to negative number, so now can put values.
@@ -186,7 +186,7 @@ class CursorWindowTest {
         {
             originalBlob[i] = i.toByte()
         }
-        var cursorWindow = CursorWindow(null)
+        var cursorWindow = CursorWindow()
         cursorWindow.setNumColumns(5)
         cursorWindow.allocRow()
         // Test putString, getString, getLong, getInt, isBlob
@@ -284,7 +284,7 @@ class CursorWindowTest {
             expectedString += baseString
         }
         var charArrayBuffer = CharArrayBuffer(null)
-        var cursorWindow = CursorWindow(null)
+        var cursorWindow = CursorWindow()
         cursorWindow.setNumColumns(2)
         cursorWindow.allocRow()
         assertEquals(null, charArrayBuffer.data)
@@ -312,7 +312,7 @@ class CursorWindowTest {
     fun testAccessStartPosition() {
         var TEST_POSITION_1 = 0
         var TEST_POSITION_2 = 3
-        var cursorWindow = CursorWindow(null)
+        var cursorWindow = CursorWindow()
         fillCursorTestContents(cursorWindow, 5)
         // Test startPosition = 
         assertEquals(TEST_POSITION_1, cursorWindow.startPosition)
@@ -360,7 +360,7 @@ class CursorWindowTest {
         assertTrue(cursorWindow.hasReleasedAllReferences())
     }
 
-    private inner class MockCursorWindow(localWindow:Boolean):CursorWindow(null) {
+    private inner class MockCursorWindow(localWindow:Boolean):CursorWindow() {
         private var mHasReleasedAllReferences = false
         protected override fun onAllReferencesReleased() {
             super.onAllReferencesReleased()

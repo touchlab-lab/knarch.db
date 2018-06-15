@@ -57,8 +57,7 @@ namespace android {
  * Strings are stored in UTF-8.
  */
     class CursorWindow {
-    CursorWindow(const KString& name,
-                     void* data, size_t size, bool readOnly);
+    CursorWindow(void* data, size_t size, bool readOnly);
 
     public:
         /* Field types. */
@@ -88,9 +87,8 @@ namespace android {
 
         ~CursorWindow();
 
-    static status_t create(const KString& name, size_t size, void* data, CursorWindow** outCursorWindow);
+    static status_t create(size_t size, void* data, CursorWindow** outCursorWindow);
 
-    inline KString name() { return mName; }
         inline size_t size() { return mSize; }
         inline size_t freeSpace() { return mSize - mHeader->freeOffset; }
         inline uint32_t getNumRows() { return mHeader->numRows; }
@@ -108,8 +106,8 @@ namespace android {
 
         status_t putBlob(uint32_t row, uint32_t column, const void* value, size_t size);
         status_t putString(uint32_t row, uint32_t column, const char* value, size_t sizeIncludingNull);
-    status_t putLong(uint32_t row, uint32_t column, KLong value);
-    status_t putDouble(uint32_t row, uint32_t column, KDouble value);
+        status_t putLong(uint32_t row, uint32_t column, KLong value);
+        status_t putDouble(uint32_t row, uint32_t column, KDouble value);
         status_t putNull(uint32_t row, uint32_t column);
 
         /**
@@ -165,7 +163,6 @@ namespace android {
             uint32_t nextChunkOffset;
         };
 
-    KString mName;
         void* mData;
         size_t mSize;
         bool mReadOnly;

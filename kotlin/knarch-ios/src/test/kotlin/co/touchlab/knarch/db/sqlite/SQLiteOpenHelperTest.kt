@@ -80,9 +80,9 @@ class SQLiteOpenHelperTest{
         // Lookaside is always disabled on low-RAM devices
         val expectDisabled = mContext.getSystemService(ActivityManager::class.java).isLowRamDevice()
         verifyLookasideStats(mOpenHelper.getDatabaseName(), expectDisabled)
-    }*/
+    }
 
-    /*@Test
+    @Test
     fun testLookasideDisabled() {
         mOpenHelper.setLookasideConfig(0, 0)
         assertNotNull(mOpenHelper.getWritableDatabase())
@@ -181,7 +181,7 @@ class SQLiteOpenHelperTest{
         }
     }
     private inner class MockCursor(db:SQLiteDatabase, driver:SQLiteCursorDriver, editTable:String?,
-                                   query:SQLiteQuery):SQLiteCursor(db, driver, editTable, query)
+                                   query:SQLiteQuery):SQLiteCursor(driver, query)
     companion object {
         private val TAG = "SQLiteOpenHelperTest"
         private val TEST_DATABASE_NAME = "database_test.db"

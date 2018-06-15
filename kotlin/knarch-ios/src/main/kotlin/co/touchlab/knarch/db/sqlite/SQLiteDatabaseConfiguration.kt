@@ -68,7 +68,7 @@ data class SQLiteDatabaseConfiguration(
      * This is derived from the path but is stripped to remove PII.
      */
     val label:String
-    get() = stripPathForLogs(path);
+    get() = stripPathForLogs(path)
 
 
     /**

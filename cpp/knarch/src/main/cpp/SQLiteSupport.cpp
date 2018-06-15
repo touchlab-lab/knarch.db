@@ -77,34 +77,33 @@ namespace {
                 return nullptr;
         }
 
-        KRef getTransaction(){
-            return (KRef)transaction;
+        KRef getTransaction() {
+            return (KRef) transaction;
         }
 
-        void putTransaction(KRef tl){
+        void putTransaction(KRef tl) {
             transaction = CreateStablePointer(tl);
         }
 
-        void removeTransaction(){
+        void removeTransaction() {
             DisposeStablePointer(transaction);
             transaction = nullptr;
         }
 
-        KRef getDbConfig(){
-            return (KRef)dbConfig;
+        KRef getDbConfig() {
+            return (KRef) dbConfig;
         }
 
-        void putDbConfig(KRef tl){
+        void putDbConfig(KRef tl) {
             dbConfig = CreateStablePointer(tl);
         }
 
-        void removeDbConfig(){
+        void removeDbConfig() {
             DisposeStablePointer(dbConfig);
             dbConfig = nullptr;
         }
 
         KLong connectionPtr;
-        KInt connectionCount;
 
 
     private:
@@ -117,6 +116,7 @@ namespace {
         KNativePtr dbConfig = nullptr;
         cache::lru_cache<KStdString, KNativePtr> stmtCache;
     };
+
 
     class SQLiteState {
     public:
@@ -151,7 +151,7 @@ namespace {
             return it->second->getStmt(sql);
         }
 
-        KRef getTransaction(KInt dataId){
+        KRef getTransaction(KInt dataId) {
             Locker locker(&lock_);
             auto it = data_.find(dataId);
             return it->second->getTransaction();
@@ -169,7 +169,7 @@ namespace {
             it->second->removeTransaction();
         }
 
-        KRef getDbConfig(KInt dataId){
+        KRef getDbConfig(KInt dataId) {
             Locker locker(&lock_);
             auto it = data_.find(dataId);
             return it->second->getDbConfig();
@@ -219,35 +219,48 @@ namespace {
             data_.erase(dataId);
         }
 
-        void incConnectionCount(KInt dataId) {
+        void putHelperInfo(KInt dataId, KRef helperInfo) {
             Locker locker(&lock_);
-            auto it = data_.find(dataId);
-            if (it == data_.end()) return;
-            it->second->connectionCount++;
+            removeHelperInfo(dataId);
+            if(helperInfo != nullptr) {
+                helperData_[dataId] = CreateStablePointer(helperInfo);
+            }
         }
 
-        void decConnectionCount(KInt dataId) {
+        KRef getHelperInfo(KInt dataId) {
             Locker locker(&lock_);
-            auto it = data_.find(dataId);
-            if (it == data_.end()) return;
-            it->second->connectionCount--;
+            auto it = helperData_.find(dataId);
+            if (it != helperData_.end()) {
+                return (KRef)it->second;
+            } else {
+                return nullptr;
+            }
         }
 
-        KInt getConnectionCount(KInt dataId) {
+        KInt nextHelperInfoId() {
             Locker locker(&lock_);
-            auto it = data_.find(dataId);
-            if (it == data_.end()) return 0;
-            return it->second->connectionCount;
+            return currentHelperInfoId_++;
         }
+
+    private:
 
         KInt nextDataId() {
             return currentDataId_++;
         }
 
-    private:
+        void removeHelperInfo(KInt dataId) {
+            auto it = helperData_.find(dataId);
+            if (it != helperData_.end()) {
+                DisposeStablePointer(it->second);
+                helperData_.erase(it);
+            }
+        }
+
         pthread_mutex_t lock_;
         KStdUnorderedMap<KInt, DatabaseInfo *> data_;
+        KStdUnorderedMap<KInt, KNativePtr> helperData_;
         KInt currentDataId_;
+        KInt currentHelperInfoId_;
     };
 
     SQLiteState *dataState() {
@@ -291,6 +304,18 @@ void DisposeCString(char* cstring) {
 
 extern "C" {
 
+KRef SQLiteSupport_getHelperInfo(KInt dataId) {
+    return dataState()->getHelperInfo(dataId);
+}
+
+void SQLiteSupport_putHelperInfo(KInt dataId, KRef helperInfo) {
+    dataState()->putHelperInfo(dataId, helperInfo);
+}
+
+KInt SQLiteSupport_nextHelperInfoId() {
+    return dataState()->nextHelperInfoId();
+}
+
 KInt SQLiteSupport_createDataStore(KInt maxCacheSize) {
     return dataState()->createDataStore(maxCacheSize);
 }
@@ -301,18 +326,6 @@ void SQLiteSupport_putConnectionPtr(KInt dataId, KLong connectionPtr) {
 
 KLong SQLiteSupport_getConnectionPtr(KInt dataId) {
     return dataState()->getConnectionPtr(dataId);
-}
-
-void SQLiteSupport_incConnectionCount(KInt dataId) {
-    dataState()->incConnectionCount(dataId);
-}
-
-void SQLiteSupport_decConnectionCount(KInt dataId) {
-    dataState()->decConnectionCount(dataId);
-}
-
-KLong SQLiteSupport_getConnectionCount(KInt dataId) {
-    return dataState()->getConnectionCount(dataId);
 }
 
 void SQLiteSupport_putStmt(KInt dataId, KString sql, KRef stmt) {

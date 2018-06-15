@@ -80,32 +80,6 @@ val CONFLICT_REPLACE = 5
  */
 val CONFLICT_NONE = 0
 
-/*
-fun SQLiteDatabase.query(query: String, bindArgs: Array<Any?>?): Cursor = query(SimpleSQLiteQuery(query, bindArgs))
-fun SQLiteDatabase.query(supportQuery: SupportSQLiteQuery): Cursor {
-    return rawQueryWithFactory(
-            object : CursorFactory {
-                override fun newCursor(db: SQLiteDatabase, masterQuery: SQLiteCursorDriver, editTable: String, query: SQLiteQuery): Cursor {
-                    supportQuery.bindTo(SizzleSQLiteProgram(query))
-                    return SQLiteCursor(masterQuery, editTable, query)
-                }
-            },
-            supportQuery.getSql(),
-            arrayOfNulls(0),
-            null)
-}
-
-fun SQLiteDatabase.insert(table: String, conflictAlgorithm: Int, values: ContentValues): Long =
-        insertWithOnConflict(table, null, values, conflictAlgorithm)
-
-fun SQLiteDatabase.delete(table: String, whereClause: String?, whereArgs: Array<Any?>?): Int =
-        execDeleteStatement(this, table, whereClause, whereArgs)
-
-fun SQLiteDatabase.update(table: String, conflictAlgorithm: Int,
-                          values: ContentValues, whereClause: String?, whereArgs: Array<Any?>?): Int =
-        execUpdateStatement(this, table, conflictAlgorithm, values, whereClause, whereArgs)
-*/
-
 fun SQLiteDatabase.insert(table: String, conflictAlgorithm: Int = CONFLICT_ABORT, values: ContentValues): Long =
         insertWithOnConflict(table, null, values, conflictAlgorithm)
 
@@ -145,9 +119,6 @@ expect class SQLiteDatabase{
     fun rawQuery(sql:String, selectionArgs:Array<String>?):Cursor
     fun rawQueryWithFactory(cursorFactory: CursorFactory?, sql:String,
                             selectionArgs:Array<String>?, editTable: String?): Cursor
-
-    //CursorFactory cursorFactory, String sql, String[] selectionArgs,
-    //            String editTable
 
     fun isReadOnly():Boolean
     fun isOpen():Boolean

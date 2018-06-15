@@ -144,10 +144,8 @@ abstract class SQLiteProgram(
                 mNumParameters = 0
             }
             else -> {
-                val assumeReadOnly = (n == DatabaseUtils.STATEMENT_SELECT)
                 val info = SQLiteStatementInfo()
-                db.getThreadSession().prepare(mSql,
-                        db.getThreadDefaultConnectionFlags(assumeReadOnly), info)
+                db.getThreadSession().prepare(mSql, info)
                 mReadOnly = info.readOnly
                 mColumnNames = info.columnNames
                 mNumParameters = info.numParameters

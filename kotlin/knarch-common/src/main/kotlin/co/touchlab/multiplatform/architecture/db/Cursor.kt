@@ -298,8 +298,6 @@ expect interface Cursor{
 
     /**
      * Closes the Cursor, releasing all of its resources and making it completely invalid.
-     * Unlike [.deactivate] a call to [.requery] will not make the Cursor valid
-     * again.
      */
     fun close()
 

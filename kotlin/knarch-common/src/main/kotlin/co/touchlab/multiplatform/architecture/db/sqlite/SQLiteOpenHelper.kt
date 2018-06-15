@@ -1,16 +1,15 @@
 package co.touchlab.multiplatform.architecture.db.sqlite
 
 expect abstract class SQLiteOpenHelper{
-
     fun getWritableDatabase():SQLiteDatabase
     fun getReadableDatabase():SQLiteDatabase
-//    abstract fun onCreate(db: SQLiteDatabase):Unit
-//    abstract fun onUpgrade(db: SQLiteDatabase, oldVersion:Int, newVersion:Int):Unit
-//    open fun onDowngrade(db: SQLiteDatabase, oldVersion:Int, newVersion:Int):Unit
-//    open fun onOpen(db: SQLiteDatabase):Unit
-//    open fun onConfigure(db: SQLiteDatabase):Unit
+    fun setWriteAheadLoggingEnabled(enabled: Boolean)
 
     fun close()
 
-    fun setWriteAheadLoggingEnabled(enabled: Boolean)
+    open fun onConfigure(db: SQLiteDatabase)
+    abstract fun onCreate(db: SQLiteDatabase)
+    abstract fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int)
+    open fun onDowngrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int)
+    open fun onOpen(db: SQLiteDatabase)
 }

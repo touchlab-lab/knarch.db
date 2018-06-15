@@ -22,37 +22,22 @@ class MultithreadingTest {
     @BeforeEach
     protected fun setUp() {
         getContext().deleteDatabase(DATABASE_FILE_NAME)
-        println("A 1")
         mDatabaseFilePath = getContext().getDatabasePath(DATABASE_FILE_NAME).path
-        println("A 2")
         mDatabaseFile = getContext().getDatabasePath(DATABASE_FILE_NAME)
-        println("A 3")
         mDatabaseDir = mDatabaseFile.getParent()!!
-        println("A 4")
         mDatabaseFile.getParentFile()?.mkdirs() // directory may not exist
-        println("A 5 $mDatabaseFilePath")
         try {
             mDatabase = SQLiteDatabase.openOrCreateDatabase(mDatabaseFilePath, null).freeze()
         } catch (e: Exception) {
             e.printStackTrace()
             throw e
         }
-        println("A 6")
 
         assertNotNull(mDatabase)
 
-        println("A 7")
-        try {
-            mDatabase.execSQL("CREATE TABLE employee (_id INTEGER PRIMARY KEY, " + "name TEXT, month INTEGER, salary INTEGER);")
-        } catch (e: Exception) {
-            e.printStackTrace()
-            throw e
-        }
-        println("A 8")
+        mDatabase.execSQL("CREATE TABLE employee (_id INTEGER PRIMARY KEY, " + "name TEXT, month INTEGER, salary INTEGER);")
         mDatabase.execSQL("CREATE TABLE test (num INTEGER);")
-        println("A 9")
         mDatabase.execSQL("CREATE TABLE testmore (_id INTEGER PRIMARY KEY, " + "name TEXT, age INTEGER, address TEXT);")
-        println("A 10")
     }
 
     @AfterEach
@@ -61,12 +46,8 @@ class MultithreadingTest {
     }
 
     private fun closeAndDeleteDatabase() {
-        /*try {*/
         mDatabase.close()
         SQLiteDatabase.deleteDatabase(mDatabaseFile)
-        /*} catch (e: Exception) {
-            //Ehh
-        }*/
     }
 
     @Test
@@ -76,7 +57,6 @@ class MultithreadingTest {
 
     @Test
     fun cycleOperations() {
-
         val COUNT = 10
         val workers = Array(COUNT, { _ -> startWorker() })
         var shouldFail = false
@@ -86,7 +66,7 @@ class MultithreadingTest {
                 val db = pair.first
                 val windex = pair.second
                 var allSuccess = true
-                for (runs in 0 until 2000) {
+                for (runs in 0 until 20) {
                     var success = false
 
                     try {
@@ -247,7 +227,7 @@ fun goBig(db: SQLiteDatabase) {
 
         try {
 
-            for (i in 0 until 10000) {
+            for (i in 0 until 1000) {
                 val insStr = "OK big string insert val $i oh Binky is sad because food"
                 stmt.bindLong(1, i.toLong())
                 stmt.bindString(2, insStr)
