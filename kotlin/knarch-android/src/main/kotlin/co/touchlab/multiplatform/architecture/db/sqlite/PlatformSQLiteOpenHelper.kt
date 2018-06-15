@@ -1,8 +1,8 @@
-package co.touchlab.kurgan.architecture.database.sqlite
+package co.touchlab.multiplatform.architecture.db.sqlite
 
 import android.content.Context
 import android.database.sqlite.SQLiteOpenHelper
-import co.touchlab.kurgan.architecture.database.DatabaseErrorHandler
+import co.touchlab.multiplatform.architecture.db.DatabaseErrorHandler
 
 class PlatformSQLiteOpenHelper(
         val callback:PlatformSQLiteOpenHelperCallback,

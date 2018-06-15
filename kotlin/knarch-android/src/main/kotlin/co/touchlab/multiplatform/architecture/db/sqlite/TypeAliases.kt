@@ -1,4 +1,4 @@
-package co.touchlab.kurgan.architecture.database.sqlite
+package co.touchlab.multiplatform.architecture.db.sqlite
 
 import android.database.sqlite.SQLiteClosable
 import android.database.sqlite.SQLiteCursorDriver

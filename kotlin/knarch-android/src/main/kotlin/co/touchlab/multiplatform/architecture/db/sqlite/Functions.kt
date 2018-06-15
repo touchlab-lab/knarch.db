@@ -1,8 +1,8 @@
-package co.touchlab.kurgan.architecture.database.sqlite
+package co.touchlab.multiplatform.architecture.db.sqlite
 
 import android.app.Application
 import android.database.sqlite.SQLiteDatabase
-import co.touchlab.kurgan.architecture.database.DatabaseErrorHandler
+import co.touchlab.multiplatform.architecture.db.DatabaseErrorHandler
 import java.io.File
 
 
