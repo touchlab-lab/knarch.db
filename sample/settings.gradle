@@ -1,8 +1,0 @@
-include ':notepad'
-//include ':notepad:android'
-include ':notepad:ios'
-
-def kotlinNativeDir = System.getenv('KOTLIN_NATIVE_DIR')
-
-includeBuild "${kotlinNativeDir}/shared"
-includeBuild "${kotlinNativeDir}/tools/kotlin-native-gradle-plugin"

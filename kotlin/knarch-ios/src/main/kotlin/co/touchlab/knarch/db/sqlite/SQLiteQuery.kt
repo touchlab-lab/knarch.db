@@ -18,18 +18,14 @@ class SQLiteQuery internal constructor(db:SQLiteDatabase, query:String):SQLitePr
      * unless countAllRows is true.
      *
      * @throws SQLiteException if an error occurs.
-     * @throws OperationCanceledException if the operation was canceled.
      */
     internal fun fillWindow(window:CursorWindow, startPos:Int, requiredPos:Int, countAllRows:Boolean):Int {
-        acquireReference()
-        try
-        {
+        return withRef {
             window.acquireReference()
             try
             {
-                val numRows = getSession().executeForCursorWindow(getSql(), getBindArgs(),
-                        window, startPos, requiredPos, countAllRows, getConnectionFlags())
-                return numRows
+                getSession().executeForCursorWindow(getSql(), getBindArgs(),
+                        window, startPos, requiredPos, countAllRows)
             }
             catch (ex:SQLiteDatabaseCorruptException) {
                 onCorruption()
@@ -43,10 +39,6 @@ class SQLiteQuery internal constructor(db:SQLiteDatabase, query:String):SQLitePr
             {
                 window.releaseReference()
             }
-        }
-        finally
-        {
-            releaseReference()
         }
     }
     override fun toString():String {

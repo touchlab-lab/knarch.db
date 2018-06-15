@@ -29,7 +29,6 @@ repositories {
 
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-common:$kotlin_version"
-//    implementation project(":kurgan-db")
 }
 
 apply from: "$dopplSharedScriptHome/kotlinpublish.gradle"

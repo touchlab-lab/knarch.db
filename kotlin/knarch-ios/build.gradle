@@ -11,20 +11,42 @@ buildscript {
 
 apply plugin: 'konan'
 
-konan.targets = ['iphone', 'iphone_sim']
-
-//def j2objcRuntime = System.getenv('J2OBJC_RUNTIME')
+konan.targets = ['iphone', 'iphone_sim', 'macos_x64']
 
 konanArtifacts {
-    /*interop ("objcsrc"){
-        includeDirs ".", "${j2objcRuntime}/include", "dbarch"
-        linkerOpts "-L${j2objcRuntime}/lib", "-Ldbarch/Build/Products/Debug-universal"
-    }*/
+    library("knarch"){
+        enableMultiplatform true
+    }
 
-    library("kurgan"){
-        /*libraries {
-            artifact 'objcsrc'
-        }*/
+    //TODO: Rename test framework. Just feels like a lot of Xcode work that I don't want.
+    framework('KotlinArithmeticParser', targets: ['iphone', 'iphone_sim']) {
+        srcDir 'src/main/kotlin'
+        srcDir 'src/test/kotlin'
+
+        target('iphone_sim') {
+            nativeLibraries '../../cpp/knarch/build/ios_x64/tlruntime.bc'
+        }
+
+        target('iphone') {
+            nativeLibraries '../../cpp/knarch/build/ios_arm64/tlruntime.bc'
+        }
+
+        extraOpts "-tr", "-g"
+        linkerOpts "-lsqlite3"
+        enableMultiplatform true
+    }
+
+    program("knarchtest", targets: ['macos_x64']) {
+        srcDir 'src/main/kotlin'
+        srcDir 'src/test/kotlin'
+        srcDir 'src/testexe/kotlin'
+
+        target('macos_x64') {
+            nativeLibraries '../../cpp/knarch/build/macos_x64/tlruntime.bc'
+        }
+
+        extraOpts "-tr", "-g"
+        linkerOpts "-lsqlite3"
         enableMultiplatform true
     }
 }

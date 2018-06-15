@@ -3,10 +3,10 @@ package co.touchlab.knarch.db.sqlite
 import co.touchlab.knarch.Log
 import co.touchlab.knarch.db.*
 import co.touchlab.knarch.io.*
-import co.touchlab.knarch.other.Printer
 import platform.Foundation.*
+import konan.worker.*
 
-class SQLiteDatabase private constructor(path: String, openFlags: Int, cursorFactory: CursorFactory?, errorHandler: DatabaseErrorHandler?) : SQLiteClosable() {
+class SQLiteDatabase private constructor(path: String, openFlags: Int, cursorFactory: CursorFactory?, errorHandler: DatabaseErrorHandler?)  {
 
     companion object {
         val CONNECTION_FLAG_PRIMARY_CONNECTION_AFFINITY = 1 shl 1
@@ -168,9 +168,10 @@ class SQLiteDatabase private constructor(path: String, openFlags: Int, cursorFac
         fun openDatabase(path:String , factory:CursorFactory?, flags:Int,
                          errorHandler:DatabaseErrorHandler? = null):SQLiteDatabase {
             val db = SQLiteDatabase(path, flags, factory, errorHandler);
-            db.open();
-            return db;
+            db.open()
+            return db
         }
+
 
         /**
          * Equivalent to openDatabase(path, factory, CREATE_IF_NECESSARY, errorHandler).
@@ -188,10 +189,6 @@ class SQLiteDatabase private constructor(path: String, openFlags: Int, cursorFac
          * @return True if the database was successfully deleted.
          */
         fun deleteDatabase(file:File):Boolean {
-            if (file == null)
-            {
-                throw IllegalArgumentException("file must not be null")
-            }
             var deleted = false
             deleted = deleted or file.delete()
             deleted = deleted or File(file.getPath() + "-journal").delete()
@@ -218,34 +215,6 @@ class SQLiteDatabase private constructor(path: String, openFlags: Int, cursorFac
             }
             return deleted
         }
-        /*public static boolean deleteDatabase(File file) {
-            if (file == null) {
-                throw new IllegalArgumentException("file must not be null");
-            }
-
-            boolean deleted = false;
-            deleted |= file.delete();
-            deleted |= new File(file.getPath() + "-journal").delete();
-            deleted |= new File(file.getPath() + "-shm").delete();
-            deleted |= new File(file.getPath() + "-wal").delete();
-
-            File dir = file.getParentFile();
-            if (dir != null) {
-                final String prefix = file.getName() + "-mj";
-                File[] files = dir.listFiles(new FileFilter() {
-                    @Override
-                    public boolean accept(File candidate) {
-                        return candidate.getName().startsWith(prefix);
-                    }
-                });
-                if (files != null) {
-                    for (File masterJournal : files) {
-                        deleted |= masterJournal.delete();
-                    }
-                }
-            }
-            return deleted;
-        }*/
 
         /**
          * Finds the name of the first table, which is editable.
@@ -285,11 +254,11 @@ class SQLiteDatabase private constructor(path: String, openFlags: Int, cursorFac
         fun create(factory:CursorFactory?):SQLiteDatabase {
             // This is a magic string with special meaning for SQLite.
             return openDatabase(SQLiteDatabaseConfiguration.MEMORY_DB_PATH,
-                    factory, CREATE_IF_NECESSARY);
+                    factory, CREATE_IF_NECESSARY)
         }
     }
 
-    var sqliteSession :SQLiteSession?=null
+    private val sqliteSession = SQLiteSession(SQLiteConnection(SQLiteDatabaseConfiguration(path, openFlags)))
 
     // The optional factory to use when creating new Cursors.  May be null.
     // INVARIANT: Immutable.
@@ -297,24 +266,9 @@ class SQLiteDatabase private constructor(path: String, openFlags: Int, cursorFac
 
     // Error handler to be used when SQLite returns corruption errors.
     // INVARIANT: Immutable.
-    private val mErrorHandler:DatabaseErrorHandler
-
-    // The database configuration.
-    // INVARIANT: Guarded by mLock.
-    private val mConfigurationLocked: SQLiteDatabaseConfiguration
-
-
-    override fun onAllReferencesReleased() {
-//        dispose(false);
-    }
-
-    //TODO: This needs to get sorted if we don't implement full class stack. This isn't working right, even if tests pass.
-    override fun close(){
-        dispose(false)
-    }
+    private val mErrorHandler:DatabaseErrorHandler = errorHandler ?: DefaultDatabaseErrorHandler()
 
     private fun dispose(finalized:Boolean) {
-        //TODO: close session?
         forceClose()
     }
 
@@ -322,7 +276,7 @@ class SQLiteDatabase private constructor(path: String, openFlags: Int, cursorFac
      * Gets a label to use when describing the database in log messages.
      * @return The label.
      */
-    fun getLabel() = mConfigurationLocked.label
+    fun getLabel() = sqliteSession.getDbConfig().label
 
     /**
      * Sends a corruption message to the database error handler.
@@ -349,10 +303,8 @@ class SQLiteDatabase private constructor(path: String, openFlags: Int, cursorFac
      * the database is not open.
      */
     fun getThreadSession():SQLiteSession {
-//        kotlin.assert(sqliteSession != null, {"Must call open before trying to use db"})
-        if(sqliteSession == null)
-            openInner()
-        return sqliteSession!!
+        sqliteSession.checkOpenConnection()
+        return sqliteSession
     }
 
     /**
@@ -389,7 +341,7 @@ class SQLiteDatabase private constructor(path: String, openFlags: Int, cursorFac
      * </pre>
      */
     fun beginTransaction() {
-        beginTransaction(null /* transactionStatusCallback */, true);
+        beginTransaction(null /* transactionStatusCallback */, true)
     }
 
     /**
@@ -413,7 +365,7 @@ class SQLiteDatabase private constructor(path: String, openFlags: Int, cursorFac
      * </pre>
      */
     fun beginTransactionNonExclusive() {
-        beginTransaction(null /* transactionStatusCallback */, false);
+        beginTransaction(null /* transactionStatusCallback */, false)
     }
 
     /**
@@ -442,7 +394,7 @@ class SQLiteDatabase private constructor(path: String, openFlags: Int, cursorFac
      * {@link #yieldIfContendedSafely}.
      */
     fun beginTransactionWithListener(transactionListener:SQLiteTransactionListener) {
-        beginTransaction(transactionListener, true);
+        beginTransaction(transactionListener, true)
     }
 
     /**
@@ -470,23 +422,17 @@ class SQLiteDatabase private constructor(path: String, openFlags: Int, cursorFac
      *            explicitly or by a call to {@link #yieldIfContendedSafely}.
      */
     fun beginTransactionWithListenerNonExclusive(transactionListener:SQLiteTransactionListener) {
-        beginTransaction(transactionListener, false);
+        beginTransaction(transactionListener, false)
     }
 
     private fun beginTransaction(transactionListener:SQLiteTransactionListener?,
                                  exclusive:Boolean) {
-        acquireReference();
-        try {
-            getThreadSession().beginTransaction(
-                    if(exclusive){SQLiteSession.TRANSACTION_MODE_EXCLUSIVE}
-                    else{
-                        SQLiteSession.TRANSACTION_MODE_IMMEDIATE}
-                    ,
-                    transactionListener,
-                    getThreadDefaultConnectionFlags(false /*readOnly*/))
-        } finally {
-            releaseReference()
-        }
+        getThreadSession().beginTransaction(
+                if(exclusive){SQLiteSession.TRANSACTION_MODE_EXCLUSIVE}
+                else{
+                    SQLiteSession.TRANSACTION_MODE_IMMEDIATE}
+                ,
+                transactionListener)
     }
 
     /**
@@ -494,12 +440,7 @@ class SQLiteDatabase private constructor(path: String, openFlags: Int, cursorFac
      * are committed and rolled back.
      */
     fun endTransaction() {
-        acquireReference();
-        try {
-            getThreadSession().endTransaction();
-        } finally {
-            releaseReference();
-        }
+        getThreadSession().endTransaction()
     }
 
     /**
@@ -512,12 +453,7 @@ class SQLiteDatabase private constructor(path: String, openFlags: Int, cursorFac
      * transaction is already marked as successful.
      */
     fun setTransactionSuccessful() {
-        acquireReference();
-        try {
-            getThreadSession().setTransactionSuccessful();
-        } finally {
-            releaseReference();
-        }
+        getThreadSession().setTransactionSuccessful()
     }
 
     /**
@@ -526,33 +462,7 @@ class SQLiteDatabase private constructor(path: String, openFlags: Int, cursorFac
      * @return True if the current thread is in a transaction.
      */
     fun inTransaction():Boolean {
-        acquireReference();
-        try {
-            return getThreadSession().hasTransaction();
-        } finally {
-            releaseReference();
-        }
-    }
-
-    /**
-     * Returns true if the current thread is holding an active connection to the database.
-     * <p>
-     * The name of this method comes from a time when having an active connection
-     * to the database meant that the thread was holding an actual lock on the
-     * database.  Nowadays, there is no longer a true "database lock" although threads
-     * may block if they cannot acquire a database connection to perform a
-     * particular operation.
-     * </p>
-     *
-     * @return True if the current thread is holding an active connection to the database.
-     */
-    fun isDbLockedByCurrentThread():Boolean {
-        acquireReference();
-        try {
-            return getThreadSession().hasConnection();
-        } finally {
-            releaseReference();
-        }
+        return getThreadSession().hasTransaction()
     }
 
     /**
@@ -567,51 +477,45 @@ class SQLiteDatabase private constructor(path: String, openFlags: Int, cursorFac
      * @hide
      */
     fun reopenReadWrite() {
-        throwIfNotOpenLocked();
+        throwIfNotOpenLocked()
 
         if (!isReadOnlyLocked()) {
-            return; // nothing to do
+            return // nothing to do
         }
 
-//        TODO("Need to figure out pools")
-        // Reopen the database in read-write mode.
-        val oldOpenFlags = mConfigurationLocked.openFlags;
-        mConfigurationLocked.openFlags = (mConfigurationLocked.openFlags.and(OPEN_READ_MASK.inv())).or(OPEN_READWRITE)
+        val config = sqliteSession.getDbConfig()
+        sqliteSession.putDbConfig(config.copy(openFlags = (config.openFlags.and(OPEN_READ_MASK.inv())).or(OPEN_READWRITE)))
+
         forceClose()
         open()
     }
 
     fun forceClose(){
-        sqliteSession?.mConnection?.close()
-        sqliteSession = null
+        sqliteSession.closeConnection()
     }
 
     fun open() {
         try {
             try {
-                openInner();
+                openInner()
             } catch (ex:SQLiteDatabaseCorruptException) {
-                onCorruption();
-                openInner();
+                onCorruption()
+                openInner()
             }
         } catch (ex:SQLiteException) {
-            Log.e(TAG, "Failed to open database '" + getLabel() + "'.", ex);
-            close();
-            throw ex;
+            Log.e(TAG, "Failed to open database '" + getLabel() + "'.", ex)
+            close()
+            throw ex
         }
     }
 
-    fun openInner() {
-        val sqliteConnection = SQLiteConnection.open(mConfigurationLocked, 0, true)
-        sqliteSession = SQLiteSession(sqliteConnection)
-        //TODO: Where's assert?
-//            assert(mConnectionPoolLocked == null)
-        //TODO: OPEN Session
-//        mConnectionPoolLocked = SQLiteConnectionPool.open(mConfigurationLocked);
-
+    fun close(){
+        forceClose()
     }
 
-
+    private fun openInner() {
+        sqliteSession.checkOpenConnection()
+    }
 
     /**
      * Gets the database version.
@@ -626,7 +530,7 @@ class SQLiteDatabase private constructor(path: String, openFlags: Int, cursorFac
      * @param version the new database version
      */
     fun setVersion(version:Int) {
-        execSQL("PRAGMA user_version = $version");
+        execSQL("PRAGMA user_version = $version")
     }
 
     /**
@@ -636,7 +540,7 @@ class SQLiteDatabase private constructor(path: String, openFlags: Int, cursorFac
      */
     fun getMaximumSize():Long {
         val pageCount = DatabaseUtils.longForQuery(this, "PRAGMA max_page_count;", null);
-        return pageCount * getPageSize();
+        return pageCount * getPageSize()
     }
 
     /**
@@ -663,7 +567,7 @@ class SQLiteDatabase private constructor(path: String, openFlags: Int, cursorFac
      * @return the database page size, in bytes
      */
     fun getPageSize():Long {
-        return DatabaseUtils.longForQuery(this, "PRAGMA page_size;", null);
+        return DatabaseUtils.longForQuery(this, "PRAGMA page_size;", null)
     }
 
     /**
@@ -674,7 +578,7 @@ class SQLiteDatabase private constructor(path: String, openFlags: Int, cursorFac
      * @param numBytes the database page size, in bytes
      */
     fun setPageSize(numBytes:Long) {
-        execSQL("PRAGMA page_size = $numBytes");
+        execSQL("PRAGMA page_size = $numBytes")
     }
 
     /**
@@ -692,12 +596,7 @@ class SQLiteDatabase private constructor(path: String, openFlags: Int, cursorFac
      * {@link SQLiteStatement}s are not synchronized, see the documentation for more details.
      */
     fun compileStatement(sql:String):SQLiteStatement {
-        acquireReference()
-        try {
-            return SQLiteStatement(this, sql, null);
-        } finally {
-            releaseReference()
-        }
+        return SQLiteStatement(this, sql, null)
     }
 
     /**
@@ -735,7 +634,7 @@ class SQLiteDatabase private constructor(path: String, openFlags: Int, cursorFac
               selectionArgs:Array<String>?, groupBy:String?, having:String?,
               orderBy:String?, limit:String?):Cursor {
         return queryWithFactory(null, distinct, table, columns, selection, selectionArgs,
-                groupBy, having, orderBy, limit);
+                groupBy, having, orderBy, limit)
     }
 
     /**
@@ -774,16 +673,11 @@ class SQLiteDatabase private constructor(path: String, openFlags: Int, cursorFac
                          distinct:Boolean, table:String, columns:Array<String>?, selection:String?,
                          selectionArgs:Array<String>?, groupBy:String?, having:String?,
                          orderBy:String?, limit:String?):Cursor {
-        acquireReference();
-        try {
-            val sql = SQLiteQueryBuilder.buildQueryString(
-                    distinct, table, columns, selection, groupBy, having, orderBy, limit);
+        val sql = SQLiteQueryBuilder.buildQueryString(
+                distinct, table, columns, selection, groupBy, having, orderBy, limit)
 
-            return rawQueryWithFactory(cursorFactory, sql, selectionArgs,
-                    findEditTable(table));
-        } finally {
-            releaseReference();
-        }
+        return rawQueryWithFactory(cursorFactory, sql, selectionArgs,
+                findEditTable(table))
     }
 
     /**
@@ -819,7 +713,7 @@ class SQLiteDatabase private constructor(path: String, openFlags: Int, cursorFac
               orderBy:String?):Cursor {
 
         return query(false, table, columns, selection, selectionArgs, groupBy,
-                having, orderBy, null /* limit */);
+                having, orderBy, null /* limit */)
     }
 
     /**
@@ -857,7 +751,7 @@ class SQLiteDatabase private constructor(path: String, openFlags: Int, cursorFac
               orderBy:String?,limit:String?) :Cursor {
 
         return query(false, table, columns, selection, selectionArgs, groupBy,
-                having, orderBy, limit);
+                having, orderBy, limit)
     }
 
     /**
@@ -871,7 +765,7 @@ class SQLiteDatabase private constructor(path: String, openFlags: Int, cursorFac
      * {@link Cursor}s are not synchronized, see the documentation for more details.
      */
     fun rawQuery(sql:String, selectionArgs:Array<String>?):Cursor {
-        return rawQueryWithFactory(null, sql, selectionArgs, null);
+        return rawQueryWithFactory(null, sql, selectionArgs, null)
     }
 
     /**
@@ -887,15 +781,10 @@ class SQLiteDatabase private constructor(path: String, openFlags: Int, cursorFac
      * {@link Cursor}s are not synchronized, see the documentation for more details.
      */
     fun rawQueryWithFactory(
-            cursorFactory:CursorFactory?, sql:String, selectionArgs:Array<String>?,
-            editTable:String?):Cursor {
-        acquireReference();
-        try {
-            val driver:SQLiteCursorDriver = SQLiteDirectCursorDriver(this, sql, editTable);
-            return driver.query(cursorFactory ?: mCursorFactory, selectionArgs);
-        } finally {
-            releaseReference();
-        }
+            cursorFactory:CursorFactory?, sql:String,
+            selectionArgs:Array<String>?, editTable:String?):Cursor {
+        val driver:SQLiteCursorDriver = SQLiteDirectCursorDriver(this, sql, editTable)
+        return driver.query(cursorFactory ?: mCursorFactory, selectionArgs)
     }
 
 
@@ -916,11 +805,11 @@ class SQLiteDatabase private constructor(path: String, openFlags: Int, cursorFac
      * @return the row ID of the newly inserted row, or -1 if an error occurred
      */
     fun insert(table:String, nullColumnHack:String?, values:ContentValues?):Long {
-        try {
-            return insertWithOnConflict(table, nullColumnHack, values, CONFLICT_NONE);
+        return try {
+            insertWithOnConflict(table, nullColumnHack, values, CONFLICT_NONE)
         } catch (e:SQLException) {
-            Log.e(TAG, "Error inserting $values", e);
-            return -1;
+            Log.e(TAG, "Error inserting $values", e)
+            -1
         }
     }
 
@@ -942,7 +831,7 @@ class SQLiteDatabase private constructor(path: String, openFlags: Int, cursorFac
      * @return the row ID of the newly inserted row, or -1 if an error occurred
      */
     fun insertOrThrow(table:String, nullColumnHack:String?, values:ContentValues?):Long {
-        return insertWithOnConflict(table, nullColumnHack, values, CONFLICT_NONE);
+        return insertWithOnConflict(table, nullColumnHack, values, CONFLICT_NONE)
     }
 
     /**
@@ -966,7 +855,7 @@ class SQLiteDatabase private constructor(path: String, openFlags: Int, cursorFac
                     CONFLICT_REPLACE);
         } catch (e:SQLException) {
             Log.e(TAG, "Error inserting $initialValues", e);
-            return -1;
+            return -1
         }
     }
 
@@ -989,7 +878,7 @@ class SQLiteDatabase private constructor(path: String, openFlags: Int, cursorFac
     fun replaceOrThrow(table:String, nullColumnHack:String?,
                        initialValues:ContentValues): Long {
         return insertWithOnConflict(table, nullColumnHack, initialValues,
-                CONFLICT_REPLACE);
+                CONFLICT_REPLACE)
     }
 
     /**
@@ -1014,56 +903,48 @@ class SQLiteDatabase private constructor(path: String, openFlags: Int, cursorFac
      */
     fun insertWithOnConflict(table:String, nullColumnHack:String?,
                              initialValues:ContentValues?, conflictAlgorithm:Int):Long {
-        acquireReference()
-        try
+        val sql = StringBuilder()
+        sql.append("INSERT")
+        sql.append(CONFLICT_VALUES[conflictAlgorithm])
+        sql.append(" INTO ")
+        sql.append(table)
+        sql.append('(')
+        val size = initialValues?.size() ?: 0
+
+        val bindArgs = arrayOfNulls<Any>(size)
+
+        if (size > 0)
         {
-            val sql = StringBuilder()
-            sql.append("INSERT")
-            sql.append(CONFLICT_VALUES[conflictAlgorithm])
-            sql.append(" INTO ")
-            sql.append(table)
-            sql.append('(')
-            val size = initialValues?.size() ?: 0
 
-            val bindArgs = arrayOfNulls<Any>(size)
-
-            if (size > 0)
+            var i = 0
+            for (colName in initialValues!!.keySet())
             {
-
-                var i = 0
-                for (colName in initialValues!!.keySet())
-                {
-                    sql.append(if ((i > 0)) "," else "")
-                    sql.append(colName)
-                    bindArgs[i++] = initialValues!!.get(colName)
-                }
-                sql.append(')')
-                sql.append(" VALUES (")
-                i = 0
-                while (i < size)
-                {
-                    sql.append(if ((i > 0)) ",?" else "?")
-                    i++
-                }
-            }
-            else
-            {
-                sql.append("$nullColumnHack) VALUES (NULL")
+                sql.append(if ((i > 0)) "," else "")
+                sql.append(colName)
+                bindArgs[i++] = initialValues!!.get(colName)
             }
             sql.append(')')
-            val statement = SQLiteStatement(this, sql.toString(), bindArgs)
-            try
+            sql.append(" VALUES (")
+            i = 0
+            while (i < size)
             {
-                return statement.executeInsert()
+                sql.append(if ((i > 0)) ",?" else "?")
+                i++
             }
-            finally
-            {
-                statement.close()
-            }
+        }
+        else
+        {
+            sql.append("$nullColumnHack) VALUES (NULL")
+        }
+        sql.append(')')
+        val statement = SQLiteStatement(this, sql.toString(), bindArgs)
+        try
+        {
+            return statement.executeInsert()
         }
         finally
         {
-            releaseReference()
+            statement.close()
         }
     }
 
@@ -1081,29 +962,22 @@ class SQLiteDatabase private constructor(path: String, openFlags: Int, cursorFac
      * whereClause.
      */
     fun delete(table:String, whereClause:String?, whereArgs:Array<String>?):Int {
-        acquireReference()
+        var i = 0
+        val anyArgs = if(whereArgs == null){null}else{Array<Any?>(whereArgs.size, {
+            whereArgs[i++]})}
+
+        val statement = SQLiteStatement(this, ("DELETE FROM " + table +
+                (if (!whereClause.isNullOrEmpty()) " WHERE $whereClause" else "")), anyArgs)
         try
         {
-            var i = 0
-            var anyArgs = if(whereArgs == null){null}else{Array<Any?>(whereArgs.size, {
-                whereArgs[i++]})}
-
-            val statement = SQLiteStatement(this, ("DELETE FROM " + table +
-                    (if (!whereClause.isNullOrEmpty()) " WHERE $whereClause" else "")), anyArgs)
-            try
-            {
-                return statement.executeUpdateDelete()
-            }
-            finally
-            {
-                statement.close()
-            }
+            return statement.executeUpdateDelete()
         }
         finally
         {
-            releaseReference()
+            statement.close()
         }
     }
+
     /**
      * Convenience method for updating rows in the database.
      *
@@ -1120,6 +994,7 @@ class SQLiteDatabase private constructor(path: String, openFlags: Int, cursorFac
     fun update(table:String, values:ContentValues, whereClause:String?, whereArgs:Array<String>?):Int {
         return updateWithOnConflict(table, values, whereClause, whereArgs, CONFLICT_NONE)
     }
+
     /**
      * Convenience method for updating rows in the database.
      *
@@ -1136,77 +1011,48 @@ class SQLiteDatabase private constructor(path: String, openFlags: Int, cursorFac
      */
     fun updateWithOnConflict(table:String, values:ContentValues,
                              whereClause:String?, whereArgs:Array<String>?, conflictAlgorithm:Int):Int {
-        acquireReference()
+        val sql = StringBuilder(120)
+        sql.append("UPDATE ")
+        sql.append(CONFLICT_VALUES[conflictAlgorithm])
+        sql.append(table)
+        sql.append(" SET ")
+        // move all bind args to one array
+        val setValuesSize = values.size()
+        val bindArgsSize = if ((whereArgs == null)) setValuesSize else (setValuesSize + whereArgs.size)
+        val bindArgs = arrayOfNulls<Any>(bindArgsSize)
+        var i = 0
+        for (colName in values.keySet())
+        {
+            sql.append(if ((i > 0)) "," else "")
+            sql.append(colName)
+            bindArgs[i++] = values.get(colName)
+            sql.append("=?")
+        }
+        if (whereArgs != null)
+        {
+            i = setValuesSize
+            while (i < bindArgsSize)
+            {
+                bindArgs[i] = whereArgs[i - setValuesSize]
+                i++
+            }
+        }
+        if (!(whereClause != null && whereClause.isEmpty()))
+        {
+            sql.append(" WHERE ")
+            sql.append(whereClause)
+        }
+        val statement = SQLiteStatement(this, sql.toString(), bindArgs)
         try
         {
-            val sql = StringBuilder(120)
-            sql.append("UPDATE ")
-            sql.append(CONFLICT_VALUES[conflictAlgorithm])
-            sql.append(table)
-            sql.append(" SET ")
-            // move all bind args to one array
-            val setValuesSize = values.size()
-            val bindArgsSize = if ((whereArgs == null)) setValuesSize else (setValuesSize + whereArgs.size)
-            val bindArgs = arrayOfNulls<Any>(bindArgsSize)
-            var i = 0
-            for (colName in values.keySet())
-            {
-                sql.append(if ((i > 0)) "," else "")
-                sql.append(colName)
-                bindArgs[i++] = values.get(colName)
-                sql.append("=?")
-            }
-            if (whereArgs != null)
-            {
-                i = setValuesSize
-                while (i < bindArgsSize)
-                {
-                    bindArgs[i] = whereArgs[i - setValuesSize]
-                    i++
-                }
-            }
-            if (!(whereClause != null && whereClause.isEmpty()))
-            {
-                sql.append(" WHERE ")
-                sql.append(whereClause)
-            }
-            val statement = SQLiteStatement(this, sql.toString(), bindArgs)
-            try
-            {
-                return statement.executeUpdateDelete()
-            }
-            finally
-            {
-                statement.close()
-            }
+            return statement.executeUpdateDelete()
         }
         finally
         {
-            releaseReference()
+            statement.close()
         }
     }
-    /**
-     * Execute a single SQL statement that is NOT a SELECT
-     * or any other SQL statement that returns data.
-     * <p>
-     * It has no means to return any data (such as the number of affected rows).
-     * Instead, you're encouraged to use {@link #insert(String, String, ContentValues)},
-     * {@link #update(String, ContentValues, String, String[])}, et al, when possible.
-     * </p>
-     * <p>
-     * When using {@link #enableWriteAheadLogging()}, journal_mode is
-     * automatically managed by this class. So, do not set journal_mode
-     * using "PRAGMA journal_mode'<value>" statement if your app is using
-     * {@link #enableWriteAheadLogging()}
-     * </p>
-     *
-     * @param sql the SQL statement to be executed. Multiple statements separated by semicolons are
-     * not supported.
-     * @throws SQLException if the SQL string is invalid
-     */
-    fun execSQL(sql:String) {
-        executeSql(sql, null)
-    }
+
     /**
      * Execute a single SQL statement that is NOT a SELECT/INSERT/UPDATE/DELETE.
      * <p>
@@ -1250,46 +1096,23 @@ class SQLiteDatabase private constructor(path: String, openFlags: Int, cursorFac
      * @param bindArgs only byte[], String, Long and Double are supported in bindArgs.
      * @throws SQLException if the SQL string is invalid
      */
-    fun execSQL(sql:String, bindArgs:Array<Any?>?) {
-        if (bindArgs == null)
-        {
-            throw IllegalArgumentException("Empty bindArgs")
-        }
+    fun execSQL(sql:String, bindArgs:Array<Any?>? = null) {
         executeSql(sql, bindArgs)
     }
 
-    private fun executeSql(sql:String, bindArgs:Array<Any?>?):Int {
-        acquireReference()
-        try
-        {
-            if (DatabaseUtils.getSqlStatementType(sql) == DatabaseUtils.STATEMENT_ATTACH)
-            {
-                var disableWal = false
-//                    if (!mHasAttachedDbsLocked)
-//                    {
-//                        mHasAttachedDbsLocked = true
-//                        disableWal = true
-//                    }
-                if (disableWal)
-                {
-                    disableWriteAheadLogging()
-                }
-            }
-            val statement = SQLiteStatement(this, sql, bindArgs)
-            try
-            {
-                return statement.executeUpdateDelete()
-            }
-            finally
-            {
-                statement.close()
-            }
+    private fun executeSql(sql: String, bindArgs: Array<Any?>?): Int {
+        //TODO: Should revisit this part of the framework
+        if (DatabaseUtils.getSqlStatementType(sql) == DatabaseUtils.STATEMENT_ATTACH) {
+            throw UnsupportedOperationException("Database attach not supported")
         }
-        finally
-        {
-            releaseReference()
+        val statement = SQLiteStatement(this, sql, bindArgs)
+        try {
+            return statement.executeUpdateDelete()
+        } finally {
+            statement.close()
         }
     }
+
     /**
      * Returns true if the database is opened as read only.
      *
@@ -1298,9 +1121,12 @@ class SQLiteDatabase private constructor(path: String, openFlags: Int, cursorFac
     fun isReadOnly():Boolean {
         return isReadOnlyLocked()
     }
+
     private fun isReadOnlyLocked():Boolean {
-        return (mConfigurationLocked.openFlags and OPEN_READ_MASK) == OPEN_READONLY
+        val config = sqliteSession.getDbConfig()
+        return (config.openFlags and SQLiteDatabase.OPEN_READ_MASK) == SQLiteDatabase.OPEN_READONLY
     }
+
     /**
      * Returns true if the database is in-memory db.
      *
@@ -1308,14 +1134,15 @@ class SQLiteDatabase private constructor(path: String, openFlags: Int, cursorFac
      * @hide
      */
     fun isInMemoryDatabase():Boolean {
-        return mConfigurationLocked.isInMemoryDb()
+        return sqliteSession.getDbConfig().isInMemoryDb()
     }
+
     /**
      * Returns true if the database is currently open.
      *
      * @return True if the database is currently open (has not been closed).
      */
-    fun isOpen():Boolean = sqliteSession != null
+    fun isOpen():Boolean = sqliteSession.hasConnection()
 
     /**
      * Returns true if the new version code is greater than the current database version.
@@ -1326,13 +1153,14 @@ class SQLiteDatabase private constructor(path: String, openFlags: Int, cursorFac
     fun needUpgrade(newVersion:Int):Boolean {
         return newVersion > getVersion()
     }
+
     /**
      * Gets the path to the database file.
      *
      * @return The path to the database file.
      */
     fun getPath():String {
-        return mConfigurationLocked.path
+        return sqliteSession.getDbConfig().path
     }
 
     /**
@@ -1348,26 +1176,17 @@ class SQLiteDatabase private constructor(path: String, openFlags: Int, cursorFac
      * @param cacheSize the size of the cache. can be (0 to {@link #MAX_SQL_CACHE_SIZE})
      * @throws IllegalStateException if input cacheSize > {@link #MAX_SQL_CACHE_SIZE}.
      */
-    fun setMaxSqlCacheSize(cacheSize:Int) {
-        if (cacheSize > MAX_SQL_CACHE_SIZE || cacheSize < 0)
-        {
+    fun setMaxSqlCacheSize(cacheSize: Int) {
+        if (cacheSize > MAX_SQL_CACHE_SIZE || cacheSize < 0) {
             throw IllegalStateException(
-                    "expected value between 0 and " + MAX_SQL_CACHE_SIZE)
+                    "expected value between 0 and $MAX_SQL_CACHE_SIZE")
         }
-            throwIfNotOpenLocked()
-            val oldMaxSqlCacheSize = mConfigurationLocked.maxSqlCacheSize
-            mConfigurationLocked.maxSqlCacheSize = cacheSize
-        getThreadSession().mConnection.reconfigure(mConfigurationLocked)
-//        TODO()
-        /*    try
-            {
-                mConnectionPoolLocked.reconfigure(mConfigurationLocked)
-            }
-            catch (ex:RuntimeException) {
-                mConfigurationLocked.maxSqlCacheSize = oldMaxSqlCacheSize
-                throw ex
-            }*/
+        throwIfNotOpenLocked()
+        val config = sqliteSession.getDbConfig()
+        sqliteSession.putDbConfig(config.copy(maxSqlCacheSize = cacheSize))
 
+        forceClose()
+        open()
     }
 
     /**
@@ -1399,24 +1218,19 @@ class SQLiteDatabase private constructor(path: String, openFlags: Int, cursorFac
      * @throws IllegalStateException if the are transactions is in progress
      * when this method is called.
      */
-    fun setForeignKeyConstraintsEnabled(enable:Boolean) {
-            throwIfNotOpenLocked()
-            if (mConfigurationLocked.foreignKeyConstraintsEnabled == enable)
-            {
-                return
-            }
-            mConfigurationLocked.foreignKeyConstraintsEnabled = enable
-        getThreadSession().mConnection.reconfigure(mConfigurationLocked)
-//        TODO()
-            /*try
-            {
-                mConnectionPoolLocked.reconfigure(mConfigurationLocked)
-            }
-            catch (ex:RuntimeException) {
-                mConfigurationLocked.foreignKeyConstraintsEnabled = !enable
-                throw ex
-            }*/
+    fun setForeignKeyConstraintsEnabled(enable: Boolean) {
+        throwIfNotOpenLocked()
+        val dbConfig = sqliteSession.getDbConfig()
+
+        if (dbConfig.foreignKeyConstraintsEnabled == enable) {
+            return
+        }
+        sqliteSession.putDbConfig(dbConfig.copy(foreignKeyConstraintsEnabled = enable))
+
+        forceClose()
+        open()
     }
+
     /**
      * This method enables parallel execution of queries from multiple threads on the
      * same database. It does this by opening multiple connections to the database
@@ -1491,39 +1305,29 @@ class SQLiteDatabase private constructor(path: String, openFlags: Int, cursorFac
      * @see #ENABLE_WRITE_AHEAD_LOGGING
      * @see #disableWriteAheadLogging
      */
-    fun enableWriteAheadLogging():Boolean {
+    fun enableWriteAheadLogging(): Boolean {
+        throwIfNotOpenLocked()
+        val config = sqliteSession.getDbConfig()
+        if ((config.openFlags and ENABLE_WRITE_AHEAD_LOGGING) != 0) {
+            return true
+        }
+        if (isReadOnlyLocked()) {
+            // WAL doesn't make sense for readonly-databases.
+            // TODO: True, but connection pooling does still make sense...
+            return false
+        }
+        if (config.isInMemoryDb()) {
+            Log.i(TAG, "can't enable WAL for memory databases.")
+            return false
+        }
 
-            throwIfNotOpenLocked()
-            if ((mConfigurationLocked.openFlags and ENABLE_WRITE_AHEAD_LOGGING) != 0)
-            {
-                return true
-            }
-            if (isReadOnlyLocked())
-            {
-                // WAL doesn't make sense for readonly-databases.
-                // TODO: True, but connection pooling does still make sense...
-                return false
-            }
-            if (mConfigurationLocked.isInMemoryDb())
-            {
-                Log.i(TAG, "can't enable WAL for memory databases.")
-                return false
-            }
+        sqliteSession.putDbConfig(config.copy(openFlags = config.openFlags or ENABLE_WRITE_AHEAD_LOGGING))
 
-            mConfigurationLocked.openFlags = mConfigurationLocked.openFlags or ENABLE_WRITE_AHEAD_LOGGING
         forceClose()
         open()
-//        TODO()
-            /*try
-            {
-                mConnectionPoolLocked.reconfigure(mConfigurationLocked)
-            }
-            catch (ex:RuntimeException) {
-                mConfigurationLocked.openFlags = mConfigurationLocked.openFlags and ENABLE_WRITE_AHEAD_LOGGING.inv()
-                throw ex
-            }*/
         return true
     }
+
     /**
      * This method disables the features enabled by {@link #enableWriteAheadLogging()}.
      *
@@ -1534,24 +1338,17 @@ class SQLiteDatabase private constructor(path: String, openFlags: Int, cursorFac
      * @see #enableWriteAheadLogging
      */
     fun disableWriteAheadLogging() {
-            throwIfNotOpenLocked()
-            if ((mConfigurationLocked.openFlags and ENABLE_WRITE_AHEAD_LOGGING) == 0)
-            {
-                return
-            }
-            mConfigurationLocked.openFlags = mConfigurationLocked.openFlags and ENABLE_WRITE_AHEAD_LOGGING.inv()
+        throwIfNotOpenLocked()
+        val config = sqliteSession.getDbConfig()
+        if ((config.openFlags and ENABLE_WRITE_AHEAD_LOGGING) == 0) {
+            return
+        }
+        sqliteSession.putDbConfig(config.copy(openFlags = config.openFlags and ENABLE_WRITE_AHEAD_LOGGING.inv()))
+
         forceClose()
         open()
-//        TODO()
-            /*try
-            {
-                mConnectionPoolLocked.reconfigure(mConfigurationLocked)
-            }
-            catch (ex:RuntimeException) {
-                mConfigurationLocked.openFlags = mConfigurationLocked.openFlags or ENABLE_WRITE_AHEAD_LOGGING
-                throw ex
-            }*/
-        }
+    }
+
     /**
      * Returns true if write-ahead logging has been enabled for this database.
      *
@@ -1562,18 +1359,17 @@ class SQLiteDatabase private constructor(path: String, openFlags: Int, cursorFac
      */
     fun isWriteAheadLoggingEnabled():Boolean {
             throwIfNotOpenLocked()
-            return (mConfigurationLocked.openFlags and ENABLE_WRITE_AHEAD_LOGGING) !== 0
+            return (sqliteSession.getDbConfig().openFlags and ENABLE_WRITE_AHEAD_LOGGING) != 0
     }
 
-
-    public override fun toString():String {
+    override fun toString():String {
         return "SQLiteDatabase: " + getPath()
     }
 
     private fun throwIfNotOpenLocked() {
-        if (sqliteSession == null)
+        if (!sqliteSession.hasConnection())
         {
-            throw IllegalStateException(("The database '" + mConfigurationLocked.label
+            throw IllegalStateException(("The database '" + sqliteSession.getDbConfig().label
                     + "' is not open."))
         }
     }
@@ -1588,19 +1384,5 @@ class SQLiteDatabase private constructor(path: String, openFlags: Int, cursorFac
         fun newCursor(db:SQLiteDatabase,
                       masterQuery:SQLiteCursorDriver, editTable:String?,
                       query:SQLiteQuery):Cursor
-    }
-    /**
-     * A callback interface for a custom sqlite3 function.
-     * This can be used to create a function that can be called from
-     * sqlite3 database triggers.
-     * @hide
-     */
-    interface CustomFunction {
-        fun callback(args:Array<String>)
-    }
-
-    init {
-        mErrorHandler = errorHandler ?: DefaultDatabaseErrorHandler()
-        mConfigurationLocked = SQLiteDatabaseConfiguration(path, openFlags)
     }
 }

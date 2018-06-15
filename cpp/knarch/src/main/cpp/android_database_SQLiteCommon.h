@@ -30,7 +30,7 @@
 #define SQLITE_PROFILE_TAG "SQLiteTime"
 #define ALOGE(...) knarchLog("ERROR", __VA_ARGS__)
 #define ALOGW(...) knarchLog("WARN", __VA_ARGS__)
-#define ALOGV(...) knarchLog("VERBOSE", __VA_ARGS__)
+#define ALOGV(...) //knarchLog("VERBOSE", __VA_ARGS__)
 #define ALOG(tag, ...) knarchLog(tag, __VA_ARGS__)
 
 extern "C" {
@@ -38,10 +38,6 @@ RUNTIME_NORETURN void ThrowSql_IllegalStateException(KString str);
 RUNTIME_NORETURN void ThrowSql_SQLiteException(KString exceptionClass, KString str);
 };
 namespace android {
-
-    KString makeKString(const char *str);
-
-    KString makeKString(char *str);
 
 /* throw a SQLiteException with a message appropriate for the error in handle */
     void throw_sqlite3_exception(sqlite3 *handle);

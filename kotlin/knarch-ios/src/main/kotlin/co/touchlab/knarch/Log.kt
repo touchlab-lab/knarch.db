@@ -26,7 +26,9 @@ class Log{
         /**
          * Priority constant for the println method; use Log.d.
          */
-        val DEBUG = 3
+        //TODO: Added the underscore because KN/Swift interop wasn't liking DEBUG
+        //Remove in the future
+        val DEBUG_ = 3
 
         /**
          * Priority constant for the println method; use Log.i.

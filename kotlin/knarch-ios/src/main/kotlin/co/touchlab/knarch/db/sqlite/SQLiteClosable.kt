@@ -16,13 +16,11 @@ abstract class SQLiteClosable{
      * been released.
      */
     fun acquireReference() {
-        synchronized(this) {
-            if (mReferenceCount <= 0) {
-                throw IllegalStateException(
-                        "attempt to re-open an already-closed object: " + this)
-            }
-            mReferenceCount++
+        if (mReferenceCount <= 0) {
+            throw IllegalStateException(
+                    "attempt to re-open an already-closed object: " + this)
         }
+        mReferenceCount++
     }
 
     /**
@@ -32,10 +30,7 @@ abstract class SQLiteClosable{
      * @see .onAllReferencesReleased
      */
     fun releaseReference() {
-        var refCountIsZero = false
-        synchronized(this) {
-            refCountIsZero = --mReferenceCount == 0
-        }
+        val refCountIsZero = --mReferenceCount == 0
         if (refCountIsZero) {
             onAllReferencesReleased()
         }
@@ -53,4 +48,17 @@ abstract class SQLiteClosable{
     open fun close() {
         releaseReference()
     }
+
+    internal fun <R> withRef(proc:() -> R):R{
+        acquireReference()
+        try
+        {
+            return proc()
+        }
+        finally
+        {
+            releaseReference()
+        }
+    }
+
 }

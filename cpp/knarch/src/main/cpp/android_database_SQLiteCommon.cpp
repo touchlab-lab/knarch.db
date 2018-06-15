@@ -21,17 +21,6 @@
 
 namespace android {
 
-    KString makeKString(char* str){
-        return makeKString(const_cast<const char*>(str));
-    }
-
-    KString makeKString(const char* str){
-        ObjHolder hold;
-        ObjHeader* res = CreateStringFromCString(str, hold.slot());
-        res->container()->incRefCount<false>();
-        return reinterpret_cast<KString>(res);
-    }
-
 /* throw a SQLiteException with a message appropriate for the error in handle */
 void throw_sqlite3_exception(sqlite3* handle) {
     throw_sqlite3_exception(handle, NULL);
@@ -132,6 +121,9 @@ void throw_sqlite3_exception(int errcode,
             break;
     }
 
+    ObjHolder exHold;
+    CreateStringFromCString(exceptionClass, exHold.slot());
+
     if (sqlite3Message) {
         std::string fullMessage;
         fullMessage.append(sqlite3Message);
@@ -142,11 +134,16 @@ void throw_sqlite3_exception(int errcode,
             fullMessage.append(": ");
             fullMessage.append(message);
         }
-        ThrowSql_SQLiteException(makeKString(exceptionClass),
-                //Can (probably) just go from std::string to KString
-                makeKString(fullMessage.c_str()));
+
+        ObjHolder messageHold;
+        CreateStringFromCString(fullMessage.c_str(), messageHold.slot());
+
+        ThrowSql_SQLiteException((KString)exHold.obj(), (KString)messageHold.obj());
     } else {
-        ThrowSql_SQLiteException(makeKString(exceptionClass), makeKString(message ? message : ""));
+        ObjHolder messageHold;
+        CreateStringFromCString(message ? message : "", messageHold.slot());
+
+        ThrowSql_SQLiteException((KString)exHold.obj(), (KString)messageHold.obj());
     }
 }
 

@@ -17,6 +17,7 @@ abstract class AbstractCursor:CrossProcessCursor {
     abstract val columnNames:Array<String>
     /* -------------------------------------------------------- */
     /* Methods that may optionally be implemented by subclasses */
+
     /**
      * If the cursor is backed by a {@link CursorWindow}, returns a pre-filled
      * window with the contents of the cursor, otherwise null.
@@ -60,15 +61,16 @@ abstract class AbstractCursor:CrossProcessCursor {
         get() {
             return false
         }
-    abstract override fun getString(column:Int):String
-    abstract override fun getShort(column:Int):Short
-    abstract override fun getInt(column:Int):Int
-    abstract override fun getLong(column:Int):Long
-    abstract override fun getFloat(column:Int):Float
-    abstract override fun getDouble(column:Int):Double
-    abstract override fun isNull(column:Int):Boolean
 
-    override fun getType(column:Int):Int {
+    abstract override fun getString(columnIndex:Int):String
+    abstract override fun getShort(columnIndex:Int):Short
+    abstract override fun getInt(columnIndex:Int):Int
+    abstract override fun getLong(columnIndex:Int):Long
+    abstract override fun getFloat(columnIndex:Int):Float
+    abstract override fun getDouble(columnIndex:Int):Double
+    abstract override fun isNull(columnIndex:Int):Boolean
+
+    override fun getType(columnIndex:Int):Int {
         // Reflects the assumption that all commonly used field types (meaning everything
         // but blobs) are convertible to strings so it should be safe to call
         // getString to retrieve them.
@@ -76,13 +78,14 @@ abstract class AbstractCursor:CrossProcessCursor {
     }
 
     // TODO implement getBlob in all cursor types
-    override fun getBlob(column:Int):ByteArray {
+    override fun getBlob(columnIndex:Int):ByteArray {
         throw UnsupportedOperationException("getBlob is not supported")
     }
 
     open fun deactivate() {
         onDeactivateOrClose()
     }
+
     /** @hide */
     open fun onDeactivateOrClose() {
 
@@ -147,21 +150,27 @@ abstract class AbstractCursor:CrossProcessCursor {
     override fun fillWindow(position:Int, window:CursorWindow) {
         DatabaseUtils.cursorFillWindow(this, position, window)
     }
+
     override fun move(offset:Int):Boolean {
         return moveToPosition(position + offset)
     }
+
     override fun moveToFirst():Boolean {
         return moveToPosition(0)
     }
+
     override fun moveToLast():Boolean {
         return moveToPosition(count - 1)
     }
+
     override fun moveToNext():Boolean {
         return moveToPosition(position + 1)
     }
+
     override fun moveToPrevious():Boolean {
         return moveToPosition(position - 1)
     }
+
     override fun getColumnIndex(columnName:String):Int {
 
         var localColumnName = columnName
@@ -182,20 +191,14 @@ abstract class AbstractCursor:CrossProcessCursor {
                 return i
             }
         }
-        if (false)
-        {
-            if (count > 0)
-            {
-                Log.w("AbstractCursor", "Unknown column $localColumnName")
-            }
-        }
         return -1
     }
+
     override fun getColumnIndexOrThrow(columnName:String):Int {
         val index = getColumnIndex(columnName)
         if (index < 0)
         {
-            throw IllegalArgumentException("column '" + columnName + "' does not exist")
+            throw IllegalArgumentException("column '$columnName' does not exist")
         }
         return index
     }

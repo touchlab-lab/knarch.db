@@ -42,7 +42,7 @@ class DatabaseUtils {
          * @param value the value to bind
          */
         fun bindObjectToProgram(prog: SQLiteProgram, index: Int,
-                                value: Any) {
+                                value: Any?) {
             if (value == null) {
                 prog.bindNull(index)
             } else if (value is Double || value is Float) {

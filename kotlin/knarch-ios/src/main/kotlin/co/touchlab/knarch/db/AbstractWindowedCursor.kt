@@ -104,10 +104,10 @@ abstract class AbstractWindowedCursor:AbstractCursor() {
      * @param name The window name.
      * @hide
      */
-    protected fun clearOrCreateWindow(name:String) {
+    protected fun clearOrCreateWindow() {
         if (mWindow == null)
         {
-            mWindow = CursorWindow(name)
+            mWindow = CursorWindow()
         }
         else
         {

@@ -29,32 +29,27 @@
 
 namespace android {
 
-CursorWindow::CursorWindow(const KString& name,
-                               void* data, size_t size, bool readOnly) :
-            mName(name), mData(data), mSize(size), mReadOnly(readOnly) {
+CursorWindow::CursorWindow(void* data, size_t size, bool readOnly) :
+        mData(data), mSize(size), mReadOnly(readOnly) {
         mHeader = static_cast<Header*>(mData);
     }
 
     CursorWindow::~CursorWindow() {
 
-    free(mData);
-    //::munmap(mData, mSize);
-    //::close(mAshmemFd);
+//    free(mData);
     }
 
-    status_t CursorWindow::create(const KString& name, size_t size, CursorWindow** outCursorWindow) {
-        /*String8 ashmemName("CursorWindow: ");
-        ashmemName.append(name);*/
-
+    //TODO: Figure out memory for name
+    status_t CursorWindow::create(size_t size, void* data, CursorWindow** outCursorWindow) {
         status_t result;
-    void* data = malloc(size);
+
         if(data == NULL)
         {
             //NO_MEMORY maybe?
             return UNKNOWN_ERROR;
         }
 
-        CursorWindow* window = new CursorWindow(name, data, size, false /*readOnly*/);
+        CursorWindow* window = new CursorWindow(data, size, false /*readOnly*/);
         result = window->clear();
         if (!result) {
             LOG_WINDOW("Created new CursorWindow: freeOffset=%d, "
@@ -70,41 +65,6 @@ CursorWindow::CursorWindow(const KString& name,
 
         *outCursorWindow = NULL;
         return result;
-
-        /*int ashmemFd = ashmem_create_region(ashmemName.string(), size);
-        if (ashmemFd < 0) {
-            result = -errno;
-        } else {
-            result = ashmem_set_prot_region(ashmemFd, PROT_READ | PROT_WRITE);
-            if (result >= 0) {
-                void* data = ::mmap(NULL, size, PROT_READ | PROT_WRITE, MAP_SHARED, ashmemFd, 0);
-                if (data == MAP_FAILED) {
-                    result = -errno;
-                } else {
-                    result = ashmem_set_prot_region(ashmemFd, PROT_READ);
-                    if (result >= 0) {
-                        CursorWindow* window = new CursorWindow(name, ashmemFd,
-                                                                data, size, false *//*readOnly*//*);
-                        result = window->clear();
-                        if (!result) {
-                            LOG_WINDOW("Created new CursorWindow: freeOffset=%d, "
-                                       "numRows=%d, numColumns=%d, mSize=%d, mData=%p",
-                                       window->mHeader->freeOffset,
-                                       window->mHeader->numRows,
-                                       window->mHeader->numColumns,
-                                       window->mSize, window->mData);
-                            *outCursorWindow = window;
-                            return OK;
-                        }
-                        delete window;
-                    }
-                }
-                ::munmap(data, size);
-            }
-            ::close(ashmemFd);
-        }
-        *outCursorWindow = NULL;
-        return result;*/
     }
 
     status_t CursorWindow::clear() {

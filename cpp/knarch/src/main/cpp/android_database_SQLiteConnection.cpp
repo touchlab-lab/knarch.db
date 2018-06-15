@@ -85,7 +85,6 @@ struct SQLiteConnection {
 
     volatile bool canceled;
 
-    //TODO: WTF is KStdString?
     SQLiteConnection(sqlite3* db, int openFlags, char* path, char* label) :
         db(db), openFlags(openFlags), path(path), label(label), canceled(false) { }
 
@@ -119,7 +118,8 @@ static int sqliteProgressHandlerCallback(void* data) {
 
 
 static KLong nativeOpen(KString pathStr, KInt openFlags,
-        KString labelStr, KBoolean enableTrace, KBoolean enableProfile) {
+        KString labelStr, KBoolean enableTrace, KBoolean enableProfile, KInt lookasideSz,
+        KInt lookasideCnt) {
 
     RuntimeAssert(pathStr->type_info() == theStringTypeInfo, "Must use a string");
     RuntimeAssert(labelStr->type_info() == theStringTypeInfo, "Must use a string");
@@ -137,21 +137,21 @@ static KLong nativeOpen(KString pathStr, KInt openFlags,
     char * path = CreateCStringFromStringWithSize(pathStr, &utf8Size);
     char * label = CreateCStringFromStringWithSize(labelStr, &utf8Size);
 
-//    const KChar* utf16 = CharArrayAddressOfElementAt(pathStr, 0);
-//    ALOGW("A 2a");
-//    utf8::with_replacement::utf16to8(utf16, utf16 + pathStr->count_, back_inserter(path));
-//    ALOGW("A 2b");
-//
-//    utf16 = CharArrayAddressOfElementAt(labelStr, 0);
-//    ALOGW("A 2c");
-//    utf8::with_replacement::utf16to8(utf16, utf16 + labelStr->count_, back_inserter(label));
-//    ALOGW("A 2d");
-
     sqlite3* db;
     int err = sqlite3_open_v2(path, &db, sqliteFlags, NULL);
     if (err != SQLITE_OK) {
         throw_sqlite3_exception_errcode(err, "Could not open database");
         return 0;
+    }
+
+    if (lookasideSz >= 0 && lookasideCnt >= 0) {
+        int err = sqlite3_db_config(db, SQLITE_DBCONFIG_LOOKASIDE, NULL, lookasideSz, lookasideCnt);
+        if (err != SQLITE_OK) {
+            ALOGE("sqlite3_db_config(..., %d, %d) failed: %d", lookasideSz, lookasideCnt, err);
+            throw_sqlite3_exception(db, "Cannot set lookaside");
+            sqlite3_close(db);
+            return 0;
+        }
     }
 
     // Check that the database is really read/write when that is what we asked for.
@@ -169,6 +169,15 @@ static KLong nativeOpen(KString pathStr, KInt openFlags,
         return 0;
     }
 
+    /* No custom fumnctions
+    // Register custom Android functions.
+    err = register_android_functions(db, UTF16_STORAGE);
+    if (err) {
+        throw_sqlite3_exception(env, db, "Could not register Android SQL functions.");
+        sqlite3_close(db);
+        return 0;
+    }
+    */
     // Create wrapper object.
     SQLiteConnection* connection = new SQLiteConnection(db, openFlags, path, label);
 
@@ -180,8 +189,7 @@ static KLong nativeOpen(KString pathStr, KInt openFlags,
         sqlite3_profile(db, &sqliteProfileCallback, connection);
     }
 
-    printf("Opened connection %p with label '%s'", db, label);
-    ALOG("ASDF", "Opened connection %p with label '%s'", db, label);
+    ALOGV("Opened connection %p with label '%s'", db, label);
     return reinterpret_cast<KLong>(connection);
 }
 
@@ -201,6 +209,98 @@ static void nativeClose(KLong connectionPtr) {
         delete connection;
     }
 }
+
+/* No custom functions
+// Called each time a custom function is evaluated.
+static void sqliteCustomFunctionCallback(sqlite3_context *context,
+                                         int argc, sqlite3_value **argv) {
+    JNIEnv* env = AndroidRuntime::getJNIEnv();
+
+    // Get the callback function object.
+    // Create a new local reference to it in case the callback tries to do something
+    // dumb like unregister the function (thereby destroying the global ref) while it is running.
+    jobject functionObjGlobal = reinterpret_cast<jobject>(sqlite3_user_data(context));
+    jobject functionObj = env->NewLocalRef(functionObjGlobal);
+
+    jobjectArray argsArray = env->NewObjectArray(argc, gStringClassInfo.clazz, NULL);
+    if (argsArray) {
+        for (int i = 0; i < argc; i++) {
+            const jchar* arg = static_cast<const jchar*>(sqlite3_value_text16(argv[i]));
+            if (!arg) {
+                ALOGW("NULL argument in custom_function_callback.  This should not happen.");
+            } else {
+                size_t argLen = sqlite3_value_bytes16(argv[i]) / sizeof(jchar);
+                jstring argStr = env->NewString(arg, argLen);
+                if (!argStr) {
+                    goto error; // out of memory error
+                }
+                env->SetObjectArrayElement(argsArray, i, argStr);
+                env->DeleteLocalRef(argStr);
+            }
+        }
+
+        // TODO: Support functions that return values.
+        env->CallVoidMethod(functionObj,
+                            gSQLiteCustomFunctionClassInfo.dispatchCallback, argsArray);
+
+        error:
+        env->DeleteLocalRef(argsArray);
+    }
+
+    env->DeleteLocalRef(functionObj);
+
+    if (env->ExceptionCheck()) {
+        ALOGE("An exception was thrown by custom SQLite function.");
+        LOGE_EX(env);
+        env->ExceptionClear();
+    }
+}
+
+// Called when a custom function is destroyed.
+static void sqliteCustomFunctionDestructor(void* data) {
+    jobject functionObjGlobal = reinterpret_cast<jobject>(data);
+
+    JNIEnv* env = AndroidRuntime::getJNIEnv();
+    env->DeleteGlobalRef(functionObjGlobal);
+}
+
+static void nativeRegisterCustomFunction(JNIEnv* env, jclass clazz, jlong connectionPtr,
+        jobject functionObj) {
+    SQLiteConnection* connection = reinterpret_cast<SQLiteConnection*>(connectionPtr);
+
+    jstring nameStr = jstring(env->GetObjectField(
+            functionObj, gSQLiteCustomFunctionClassInfo.name));
+    jint numArgs = env->GetIntField(functionObj, gSQLiteCustomFunctionClassInfo.numArgs);
+
+    jobject functionObjGlobal = env->NewGlobalRef(functionObj);
+
+    const char* name = env->GetStringUTFChars(nameStr, NULL);
+    int err = sqlite3_create_function_v2(connection->db, name, numArgs, SQLITE_UTF16,
+            reinterpret_cast<void*>(functionObjGlobal),
+            &sqliteCustomFunctionCallback, NULL, NULL, &sqliteCustomFunctionDestructor);
+    env->ReleaseStringUTFChars(nameStr, name);
+
+    if (err != SQLITE_OK) {
+        ALOGE("sqlite3_create_function returned %d", err);
+        env->DeleteGlobalRef(functionObjGlobal);
+        throw_sqlite3_exception(env, connection->db);
+        return;
+    }
+}
+
+static void nativeRegisterLocalizedCollators(JNIEnv* env, jclass clazz, jlong connectionPtr,
+        jstring localeStr) {
+    SQLiteConnection* connection = reinterpret_cast<SQLiteConnection*>(connectionPtr);
+
+    const char* locale = env->GetStringUTFChars(localeStr, NULL);
+    int err = register_localized_collators(connection->db, locale, UTF16_STORAGE);
+    env->ReleaseStringUTFChars(localeStr, locale);
+
+    if (err != SQLITE_OK) {
+        throw_sqlite3_exception(env, connection->db);
+    }
+}
+*/
 
 static KLong nativePrepareStatement(KLong connectionPtr, KString sqlString) {
 
@@ -332,7 +432,6 @@ static void nativeBindBlob(KLong connectionPtr, KLong statementPtr, KInt index, 
 
     KInt valueLength = array->count_;
     const auto * value = ByteArrayAddressOfElementAt(array, 0);
-    //TODO: Do *we* need to copy the array?
     int err = sqlite3_bind_blob(statement, index, value, valueLength, SQLITE_TRANSIENT);
 
     if (err != SQLITE_OK) {
@@ -406,6 +505,82 @@ static KLong nativeExecuteForLong(KLong connectionPtr, KLong statementPtr) {
     }
     return -1;
 }
+
+extern "C" OBJ_GETTER(Android_Database_SQLiteConnection_nativeExecuteForString, KRef thiz, KLong connectionPtr, KLong statementPtr){
+    auto connection = reinterpret_cast<SQLiteConnection*>(connectionPtr);
+    auto statement = reinterpret_cast<sqlite3_stmt*>(statementPtr);
+
+    int err = executeOneRowQuery(connection, statement);
+    if (err == SQLITE_ROW && sqlite3_column_count(statement) >= 1) {
+        auto text = static_cast<const KChar*>(sqlite3_column_text16(statement, 0));
+        if (text) {
+            size_t size = lengthOfString(text);
+            ArrayHeader* result = AllocArrayInstance(
+                    theStringTypeInfo, size, OBJ_RESULT)->array();
+
+            memcpy(CharArrayAddressOfElementAt(result, 0),
+                   text,
+                   size * sizeof(KChar));
+
+            RETURN_OBJ(result->obj());
+        }
+    }
+    RETURN_OBJ(nullptr);
+}
+
+/*
+static int createAshmemRegionWithData(JNIEnv* env, const void* data, size_t length) {
+    int error = 0;
+    int fd = ashmem_create_region(NULL, length);
+    if (fd < 0) {
+        error = errno;
+        ALOGE("ashmem_create_region failed: %s", strerror(error));
+    } else {
+        if (length > 0) {
+            void* ptr = mmap(NULL, length, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
+            if (ptr == MAP_FAILED) {
+                error = errno;
+                ALOGE("mmap failed: %s", strerror(error));
+            } else {
+                memcpy(ptr, data, length);
+                munmap(ptr, length);
+            }
+        }
+
+        if (!error) {
+            if (ashmem_set_prot_region(fd, PROT_READ) < 0) {
+                error = errno;
+                ALOGE("ashmem_set_prot_region failed: %s", strerror(errno));
+            } else {
+                return fd;
+            }
+        }
+
+        close(fd);
+    }
+
+    jniThrowIOException(env, error);
+    return -1;
+}
+
+static jint nativeExecuteForBlobFileDescriptor(JNIEnv* env, jclass clazz,
+        jlong connectionPtr, jlong statementPtr) {
+    SQLiteConnection* connection = reinterpret_cast<SQLiteConnection*>(connectionPtr);
+    sqlite3_stmt* statement = reinterpret_cast<sqlite3_stmt*>(statementPtr);
+
+    int err = executeOneRowQuery(env, connection, statement);
+    if (err == SQLITE_ROW && sqlite3_column_count(statement) >= 1) {
+        const void* blob = sqlite3_column_blob(statement, 0);
+        if (blob) {
+            int length = sqlite3_column_bytes(statement, 0);
+            if (length >= 0) {
+                return createAshmemRegionWithData(env, blob, length);
+            }
+        }
+    }
+    return -1;
+}
+ */
 
 enum CopyRowResult {
     CPR_OK,
@@ -630,10 +805,11 @@ static void nativeResetCancel(KLong connectionPtr,
 
 extern "C"{
 KLong Android_Database_SQLiteConnection_nativeOpen(KRef thiz, KString pathStr, KInt openFlags,
-                                                   KString labelStr, KBoolean enableTrace, KBoolean enableProfile)
+                                                   KString labelStr, KBoolean enableTrace, KBoolean enableProfile, KInt lookasideSz,
+KInt lookasideCnt)
 {
     return nativeOpen(pathStr, openFlags,
-                      labelStr, enableTrace, enableProfile);
+                      labelStr, enableTrace, enableProfile, lookasideSz, lookasideCnt);
 }
 
 void Android_Database_SQLiteConnection_nativeClose(KRef thiz, KLong connectionPtr)
@@ -646,8 +822,7 @@ KLong Android_Database_SQLiteConnection_nativePrepareStatement(KRef thiz, KLong 
     return nativePrepareStatement(connectionPtr, sqlString);
 }
 
-void Android_Database_SQLiteConnection_nativeFinalizeStatement(KRef thiz,
-                                                               KLong connectionPtr, KLong statementPtr)
+void Android_Database_SQLiteConnection_nativeFinalizeStatement(KLong connectionPtr, KLong statementPtr)
 {
     nativeFinalizeStatement(connectionPtr, statementPtr);
 }
@@ -747,28 +922,6 @@ KLong Android_Database_SQLiteConnection_nativeExecuteForLong(KRef thiz,
                                                              KLong connectionPtr, KLong statementPtr)
 {
     return nativeExecuteForLong(connectionPtr, statementPtr);
-}
-
-OBJ_GETTER(Android_Database_SQLiteConnection_nativeExecuteForString, KRef thiz, KLong connectionPtr, KLong statementPtr){
-    auto connection = reinterpret_cast<SQLiteConnection*>(connectionPtr);
-    auto statement = reinterpret_cast<sqlite3_stmt*>(statementPtr);
-
-    int err = executeOneRowQuery(connection, statement);
-    if (err == SQLITE_ROW && sqlite3_column_count(statement) >= 1) {
-        auto text = static_cast<const KChar*>(sqlite3_column_text16(statement, 0));
-        if (text) {
-            size_t size = lengthOfString(text);
-            ArrayHeader* result = AllocArrayInstance(
-                    theStringTypeInfo, size, OBJ_RESULT)->array();
-
-            memcpy(CharArrayAddressOfElementAt(result, 0),
-                   text,
-                   size * sizeof(KChar));
-
-            RETURN_OBJ(result->obj());
-        }
-    }
-    RETURN_OBJ(nullptr);
 }
 
 KLong Android_Database_SQLiteConnection_nativeExecuteForCursorWindow(KRef thiz,

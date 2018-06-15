@@ -9,18 +9,8 @@ class SQLiteStatement internal constructor(db:SQLiteDatabase, sql:String, bindAr
      * some reason
      */
     fun execute() {
-        acquireReference()
-        try
-        {
-            getSession().execute(getSql(), getBindArgs(), getConnectionFlags())
-        }
-        catch (ex:SQLiteDatabaseCorruptException) {
-            onCorruption()
-            throw ex
-        }
-        finally
-        {
-            releaseReference()
+        withRefCorrupt {
+            getSession().execute(getSql(), getBindArgs())
         }
     }
     /**
@@ -32,19 +22,9 @@ class SQLiteStatement internal constructor(db:SQLiteDatabase, sql:String, bindAr
      * some reason
      */
     fun executeUpdateDelete():Int {
-        acquireReference()
-        try
-        {
-            return getSession().executeForChangedRowCount(
-                    getSql(), getBindArgs(), getConnectionFlags())
-        }
-        catch (ex:SQLiteDatabaseCorruptException) {
-            onCorruption()
-            throw ex
-        }
-        finally
-        {
-            releaseReference()
+        return withRefCorrupt {
+            getSession().executeForChangedRowCount(
+                    getSql(), getBindArgs())
         }
     }
     /**
@@ -57,19 +37,9 @@ class SQLiteStatement internal constructor(db:SQLiteDatabase, sql:String, bindAr
      * some reason
      */
     fun executeInsert():Long {
-        acquireReference()
-        try
-        {
-            return getSession().executeForLastInsertedRowId(
-                    getSql(), getBindArgs(), getConnectionFlags())
-        }
-        catch (ex:SQLiteDatabaseCorruptException) {
-            onCorruption()
-            throw ex
-        }
-        finally
-        {
-            releaseReference()
+        return withRefCorrupt {
+            getSession().executeForLastInsertedRowId(
+                    getSql(), getBindArgs())
         }
     }
     /**
@@ -81,19 +51,9 @@ class SQLiteStatement internal constructor(db:SQLiteDatabase, sql:String, bindAr
      * @throws android.database.sqlite.SQLiteDoneException if the query returns zero rows
      */
     fun simpleQueryForLong():Long {
-        acquireReference()
-        try
-        {
-            return getSession().executeForLong(
-                    getSql(), getBindArgs(), getConnectionFlags())
-        }
-        catch (ex:SQLiteDatabaseCorruptException) {
-            onCorruption()
-            throw ex
-        }
-        finally
-        {
-            releaseReference()
+        return withRefCorrupt {
+            getSession().executeForLong(
+                    getSql(), getBindArgs())
         }
     }
     /**
@@ -105,11 +65,18 @@ class SQLiteStatement internal constructor(db:SQLiteDatabase, sql:String, bindAr
      * @throws android.database.sqlite.SQLiteDoneException if the query returns zero rows
      */
     fun simpleQueryForString():String? {
+        return withRefCorrupt {
+            getSession().executeForString(
+                    getSql(), getBindArgs())
+        }
+    }
+
+    //Might be able to compose this with "withRef" from base class. Should also make sure inline is useful.
+    private inline fun <R> withRefCorrupt(proc:() -> R):R{
         acquireReference()
         try
         {
-            return getSession().executeForString(
-                    getSql(), getBindArgs(), getConnectionFlags())
+            return proc()
         }
         catch (ex:SQLiteDatabaseCorruptException) {
             onCorruption()
@@ -120,6 +87,7 @@ class SQLiteStatement internal constructor(db:SQLiteDatabase, sql:String, bindAr
             releaseReference()
         }
     }
+
     override fun toString():String {
         return "SQLiteProgram: " + getSql()
     }

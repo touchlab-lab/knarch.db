@@ -5,8 +5,6 @@ import kotlin.math.max
 object SQLiteGlobal {
     private val TAG = "SQLiteGlobal"
 
-    private val sDefaultPageSize: Int = 0
-
     /**
      * Gets the default page size to use when creating a database.
      */
@@ -48,7 +46,7 @@ object SQLiteGlobal {
         }
 
     /**
-     * Gets the connection pool size when in WAL mode.
+     * ¯\_(ツ)_/¯
      */
     @SymbolName("Android_Database_SQLiteGlobal_nativeReleaseMemory")
     private external fun nativeReleaseMemory(): Int
