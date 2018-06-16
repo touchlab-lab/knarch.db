@@ -45,6 +45,13 @@ task build {
     dependsOn 'distTlRuntime'
 }
 
+task buildCopy(type: Copy){
+  from(project.buildDir)
+  into('../bcdist')
+}
+
+build.finalizedBy(buildCopy)
+
 //task hostRuntime(dependsOn: "${hostName}Runtime")
 
 task clean {

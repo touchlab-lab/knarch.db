@@ -17,8 +17,6 @@ apply plugin: 'kotlin-platform-common'
 apply plugin: 'com.jfrog.bintray'
 
 group = 'co.touchlab.knarch'
-//ext.artifactId = 'common'
-
 version = "0.1"
 
 ext.bintrayGitUrl = 'https://github.com/touchlab/knarch'

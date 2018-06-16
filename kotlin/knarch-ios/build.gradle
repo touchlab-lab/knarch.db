@@ -1,11 +1,12 @@
 buildscript {
+    ext.kotlin_native_version = '0.7.1'
     repositories {
         mavenCentral()
         maven { url "https://dl.bintray.com/jetbrains/kotlin-native-dependencies" }
     }
 
     dependencies {
-        classpath "org.jetbrains.kotlin:kotlin-native-gradle-plugin:${project.property('konan.plugin.version')}"
+        classpath "org.jetbrains.kotlin:kotlin-native-gradle-plugin:$kotlin_native_version"
     }
 }
 
@@ -24,11 +25,11 @@ konanArtifacts {
         srcDir 'src/test/kotlin'
 
         target('iphone_sim') {
-            nativeLibraries '../../cpp/knarch/build/ios_x64/tlruntime.bc'
+            nativeLibraries '../../cpp/bcdist/ios_x64/tlruntime.bc'
         }
 
         target('iphone') {
-            nativeLibraries '../../cpp/knarch/build/ios_arm64/tlruntime.bc'
+            nativeLibraries '../../cpp/bcdist/ios_arm64/tlruntime.bc'
         }
 
         extraOpts "-tr", "-g"
@@ -42,7 +43,7 @@ konanArtifacts {
         srcDir 'src/testexe/kotlin'
 
         target('macos_x64') {
-            nativeLibraries '../../cpp/knarch/build/macos_x64/tlruntime.bc'
+            nativeLibraries '../../cpp/bcdist/macos_x64/tlruntime.bc'
         }
 
         extraOpts "-tr", "-g"
