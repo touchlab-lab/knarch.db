@@ -10,7 +10,7 @@ import UIKit
 import KotlinArithmeticParser
 
 class ViewController: UIViewController {
-    var playRuntime: KAPPlayRuntime?
+    let noteModel = KAPNoteModel()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -23,22 +23,15 @@ class ViewController: UIViewController {
         // Dispose of any resources that can be recreated.
     }
     @IBAction func insertStuffAction(_ sender: Any) {
-        initKotlin()
-        playRuntime?.helloStart(mems: true)
+        noteModel.insertTestNotes()
         outputLabel.text = "Ran with memory dumps"
     }
     
     @IBAction func memoryAction(_ sender: Any) {
-        initKotlin()
-        playRuntime?.helloStart(mems: false)
-        outputLabel.text = "Ran without memory dumps"
+        noteModel.insertTestNotes()
+        outputLabel.text = "Ran with memory dumps"
     }
     
-    func initKotlin(){
-        if(playRuntime == nil){
-            playRuntime = KAPPlayRuntime()
-        }
-    }
     @IBOutlet weak var outputLabel: UILabel!
     @IBOutlet var partialResult: UILabel!
 

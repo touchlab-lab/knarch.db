@@ -87,6 +87,26 @@ fun SQLiteDatabase.update(table: String, conflictAlgorithm: Int = CONFLICT_ABORT
                           values: ContentValues, whereClause: String? = null, whereArgs: Array<String>? = null): Int =
         updateWithOnConflict(table, values, whereClause, whereArgs, conflictAlgorithm)
 
+fun SQLiteDatabase.query(distinct:Boolean=false,
+                         table:String,
+                         columns:Array<String>?=null,
+                         selection:String?=null,
+                             selectionArgs:Array<String>?=null,
+                             orderBy:String?=null,
+                         limit:String?=null):Cursor =
+        query(distinct, table, columns, selection, selectionArgs, null, null, orderBy, limit)
+
+fun <T> SQLiteDatabase.withTransaction(proc:()->T):T{
+    beginTransaction()
+    try {
+        val t = proc()
+        setTransactionSuccessful()
+        return t
+    }
+    finally {
+        endTransaction()
+    }
+}
 expect class SQLiteDatabase{
 
     fun beginTransaction():Unit
