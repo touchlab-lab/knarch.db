@@ -1,0 +1,33 @@
+apply plugin: 'konan'
+
+konan.targets = ['iphone', 'iphone_sim']
+
+konanArtifacts {
+    framework('KotlinArithmeticParser') {
+        target('iphone_sim') {
+            libraries {
+                nativeLibraries '../../../cpp/knarch/build/ios_x64/tlruntime.bc'
+                useRepos '../../../kotlin/knarch-ios/build/konan/libs/ios_x64'
+                klibs 'knarch'
+            }
+        }
+
+        target('iphone') {
+            libraries {
+                nativeLibraries '../../../cpp/knarch/build/ios_arm64/tlruntime.bc'
+                useRepos '../../../kotlin/knarch-ios/build/konan/libs/ios_arm64'
+                klibs 'knarch'
+            }
+        }
+
+        linkerOpts "-lsqlite3"
+        enableMultiplatform true
+    }
+}
+repositories {
+    maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
+}
+
+dependencies {
+    expectedBy project(':notepad')
+}

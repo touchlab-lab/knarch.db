@@ -114,6 +114,7 @@ expect class SQLiteDatabase{
 
     fun delete(table:String, whereClause:String?, whereArgs:Array<String>?):Int
 
+    fun execSQL(sql:String):Unit
     fun execSQL(sql:String, bindArgs:Array<Any?>?):Unit
 
     fun rawQuery(sql:String, selectionArgs:Array<String>?):Cursor

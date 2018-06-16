@@ -21,7 +21,7 @@ group = 'co.touchlab.knarch'
 
 version = "0.1"
 
-ext.bintrayGitUrl = 'https://github.com/doppllib/core-doppl'
+ext.bintrayGitUrl = 'https://github.com/touchlab/knarch'
 
 repositories {
     mavenCentral()

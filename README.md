@@ -1,6 +1,35 @@
 # KNArch.db
 
-KNArch (Kotlin/Native Architecture) is a set of libraries built to facilitate shared mobile architecture. While Kotlin/Native is intended to target many platforms, most of the library is specifically created to support Android and iOS development.
+## What is?
+
+This library is primarily an implementation of sqlite for iOS and MacOS, (roughly) compatible with Android, impelented with Kotlin/Native, to faciliate Kotlin multiplatform development.
+
+## KNArch?
+
+K(otlin)N(ative)Arch(itecture)
+
+Sounds like **narc**. We're still working on a release name, but we'll see.
+
+## Status
+
+There's a lot that's different about Kotlin on native platforms from Kotlin on the JVM. The original goal was to simply port AOSP logic, similar to Doppl. However, there are 2 major issues with that approach.
+
+1. Threading in K/N is *very* different. In demo-size projects, this isn't necessarily obvious, but when you start thinking about what needs to exist for a production level app, this becomes obvious very quickly.
+
+2. How architecture will evolve for multiplatform from "Android" isn't necesarilly clear. But it *should* evolve. Simply copying artifacts is probably not the best choice.
+
+The core database functionality works. That's the start. On top of that, a core suite of tests from Android's CTS suite has been ported and applied. This is to verify that what the 
+classes are supposed to do is what they actually do. The current goal is to create something that can be used in real, production apps by leveraging both AOSP-based logic and tests, to 
+jumpstart the library.
+
+With that in place, we will work on some next-stage goals simultaneously.
+
+1. Use the library in production application development to get feedback and refine the test suite and ensure a reliable core exists on which to base multiplatform mobile development.
+
+2. Refine the design. Changing the interface without a good reason isn't necessarily useful, but retaining everything from AOSP doesn't make sense either.
+
+TL;DR Yes, put this in your app today. It works. There's a lot that's going to change, but if you're looking at Kotlin Multiplatform for your iOS implementation, I assume you have a high tollerace for change. Our goal is to have solid *functionality* testing to verify that things work as expected, and starting with the AOSP base gives us that.
+
 
 ## SQLite
 

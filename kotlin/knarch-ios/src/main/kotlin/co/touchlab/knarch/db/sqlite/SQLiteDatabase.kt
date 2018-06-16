@@ -1096,8 +1096,12 @@ class SQLiteDatabase private constructor(path: String, openFlags: Int, cursorFac
      * @param bindArgs only byte[], String, Long and Double are supported in bindArgs.
      * @throws SQLException if the SQL string is invalid
      */
-    fun execSQL(sql:String, bindArgs:Array<Any?>? = null) {
+    fun execSQL(sql:String, bindArgs:Array<Any?>?) {
         executeSql(sql, bindArgs)
+    }
+
+    fun execSQL(sql:String) {
+        executeSql(sql, null)
     }
 
     private fun executeSql(sql: String, bindArgs: Array<Any?>?): Int {
