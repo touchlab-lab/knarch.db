@@ -12,9 +12,20 @@
 		2C3F384A1FD1738300151601 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 2C3F38481FD1738300151601 /* Main.storyboard */; };
 		2C3F384C1FD1738300151601 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2C3F384B1FD1738300151601 /* Assets.xcassets */; };
 		2C3F384F1FD1738300151601 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 2C3F384D1FD1738300151601 /* LaunchScreen.storyboard */; };
+		634765F720D5C0D600447E70 /* xcodetesttest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 634765F620D5C0D600447E70 /* xcodetesttest.swift */; };
 		7FE128BF205854BA0064CE74 /* KotlinArithmeticParser.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 7FF94AD92058464C00590D0D /* KotlinArithmeticParser.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		7FF94AE32058483900590D0D /* KotlinArithmeticParser.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7FF94AD92058464C00590D0D /* KotlinArithmeticParser.framework */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		634765F920D5C0D600447E70 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 2C3F38391FD1738300151601 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 2C3F38401FD1738300151601;
+			remoteInfo = KotlinCalculator;
+		};
+/* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
 		7FE128BE2058549E0064CE74 /* Embed Frameworks */ = {
@@ -38,6 +49,9 @@
 		2C3F384B1FD1738300151601 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		2C3F384E1FD1738300151601 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		2C3F38501FD1738300151601 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		634765F420D5C0D600447E70 /* xcodetesttest.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = xcodetesttest.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		634765F620D5C0D600447E70 /* xcodetesttest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = xcodetesttest.swift; sourceTree = "<group>"; };
+		634765F820D5C0D600447E70 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		7FF94AD92058464C00590D0D /* KotlinArithmeticParser.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = KotlinArithmeticParser.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		7FF94AEA2058485300590D0D /* Parser.kt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Parser.kt; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -51,6 +65,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		634765F120D5C0D600447E70 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -59,6 +80,7 @@
 			children = (
 				2C3F38431FD1738300151601 /* xcodetest */,
 				7FF94ADA2058464C00590D0D /* KotlinArithmeticParser */,
+				634765F520D5C0D600447E70 /* xcodetesttest */,
 				2C3F38421FD1738300151601 /* Products */,
 				7FF94AE22058483900590D0D /* Frameworks */,
 			);
@@ -69,6 +91,7 @@
 			children = (
 				2C3F38411FD1738300151601 /* KotlinCalculator.app */,
 				7FF94AD92058464C00590D0D /* KotlinArithmeticParser.framework */,
+				634765F420D5C0D600447E70 /* xcodetesttest.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -84,6 +107,15 @@
 				2C3F38501FD1738300151601 /* Info.plist */,
 			);
 			path = xcodetest;
+			sourceTree = "<group>";
+		};
+		634765F520D5C0D600447E70 /* xcodetesttest */ = {
+			isa = PBXGroup;
+			children = (
+				634765F620D5C0D600447E70 /* xcodetesttest.swift */,
+				634765F820D5C0D600447E70 /* Info.plist */,
+			);
+			path = xcodetesttest;
 			sourceTree = "<group>";
 		};
 		7FF94ADA2058464C00590D0D /* KotlinArithmeticParser */ = {
@@ -171,6 +203,24 @@
 			productReference = 2C3F38411FD1738300151601 /* KotlinCalculator.app */;
 			productType = "com.apple.product-type.application";
 		};
+		634765F320D5C0D600447E70 /* xcodetesttest */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 634765FD20D5C0D600447E70 /* Build configuration list for PBXNativeTarget "xcodetesttest" */;
+			buildPhases = (
+				634765F020D5C0D600447E70 /* Sources */,
+				634765F120D5C0D600447E70 /* Frameworks */,
+				634765F220D5C0D600447E70 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				634765FA20D5C0D600447E70 /* PBXTargetDependency */,
+			);
+			name = xcodetesttest;
+			productName = xcodetesttest;
+			productReference = 634765F420D5C0D600447E70 /* xcodetesttest.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 		7FF94AD82058464C00590D0D /* KotlinArithmeticParser */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 7FF94ADE2058464C00590D0D /* Build configuration list for PBXNativeTarget "KotlinArithmeticParser" */;
@@ -192,13 +242,18 @@
 		2C3F38391FD1738300151601 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastSwiftUpdateCheck = 0900;
+				LastSwiftUpdateCheck = 0940;
 				LastUpgradeCheck = 0900;
 				ORGANIZATIONNAME = JetBrains;
 				TargetAttributes = {
 					2C3F38401FD1738300151601 = {
 						CreatedOnToolsVersion = 9.0;
 						ProvisioningStyle = Automatic;
+					};
+					634765F320D5C0D600447E70 = {
+						CreatedOnToolsVersion = 9.4;
+						ProvisioningStyle = Automatic;
+						TestTargetID = 2C3F38401FD1738300151601;
 					};
 					7FF94AD82058464C00590D0D = {
 						CreatedOnToolsVersion = 9.2;
@@ -221,6 +276,7 @@
 			targets = (
 				2C3F38401FD1738300151601 /* KotlinCalculator */,
 				7FF94AD82058464C00590D0D /* KotlinArithmeticParser */,
+				634765F320D5C0D600447E70 /* xcodetesttest */,
 			);
 		};
 /* End PBXProject section */
@@ -233,6 +289,13 @@
 				2C3F384F1FD1738300151601 /* LaunchScreen.storyboard in Resources */,
 				2C3F384C1FD1738300151601 /* Assets.xcassets in Resources */,
 				2C3F384A1FD1738300151601 /* Main.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		634765F220D5C0D600447E70 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -264,7 +327,23 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		634765F020D5C0D600447E70 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				634765F720D5C0D600447E70 /* xcodetesttest.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		634765FA20D5C0D600447E70 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 2C3F38401FD1738300151601 /* KotlinCalculator */;
+			targetProxy = 634765F920D5C0D600447E70 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
 		2C3F38481FD1738300151601 /* Main.storyboard */ = {
@@ -431,6 +510,44 @@
 			};
 			name = Release;
 		};
+		634765FB20D5C0D600447E70 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CODE_SIGN_STYLE = Automatic;
+				INFOPLIST_FILE = xcodetesttest/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.4;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = co.touchlab.xcodetesttest;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 4.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/KotlinCalculator.app/KotlinCalculator";
+			};
+			name = Debug;
+		};
+		634765FC20D5C0D600447E70 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CODE_SIGN_STYLE = Automatic;
+				INFOPLIST_FILE = xcodetesttest/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.4;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = co.touchlab.xcodetesttest;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 4.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/KotlinCalculator.app/KotlinCalculator";
+			};
+			name = Release;
+		};
 		7FF94ADF2058464C00590D0D /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -510,6 +627,15 @@
 			buildConfigurations = (
 				2C3F38541FD1738300151601 /* Debug */,
 				2C3F38551FD1738300151601 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		634765FD20D5C0D600447E70 /* Build configuration list for PBXNativeTarget "xcodetesttest" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				634765FB20D5C0D600447E70 /* Debug */,
+				634765FC20D5C0D600447E70 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
