@@ -12,7 +12,7 @@ Sounds like **narc**. We're still working on a release name, but we'll see.
 
 ## Build
 
-https://build.appcenter.ms/v0.1/apps/61048136-1ab0-4789-9ae4-7ad6e8df7777/branches/master/badge
+![alt text](https://build.appcenter.ms/v0.1/apps/61048136-1ab0-4789-9ae4-7ad6e8df7777/branches/master/badge "Build Badge")
 
 The current build runs against the kotlin/kotlin-ios project only. C++ needs more refactoring to
 build with the CI server, but the tests effectively cover the C++ portions.
