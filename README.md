@@ -10,6 +10,13 @@ K(otlin)N(ative)Arch(itecture)
 
 Sounds like **narc**. We're still working on a release name, but we'll see.
 
+## Build
+
+https://build.appcenter.ms/v0.1/apps/61048136-1ab0-4789-9ae4-7ad6e8df7777/branches/master/badge
+
+The current build runs against the kotlin/kotlin-ios project only. C++ needs more refactoring to
+build with the CI server, but the tests effectively cover the C++ portions.
+
 ## Status
 
 There's a lot that's different about Kotlin on native platforms from Kotlin on the JVM. The original goal was to simply port AOSP logic, similar to Doppl. However, there are 2 major issues with that approach.
@@ -18,8 +25,8 @@ There's a lot that's different about Kotlin on native platforms from Kotlin on t
 
 2. How architecture will evolve for multiplatform from "Android" isn't necesarilly clear. But it *should* evolve. Simply copying artifacts is probably not the best choice.
 
-The core database functionality works. That's the start. On top of that, a core suite of tests from Android's CTS suite has been ported and applied. This is to verify that what the 
-classes are supposed to do is what they actually do. The current goal is to create something that can be used in real, production apps by leveraging both AOSP-based logic and tests, to 
+The core database functionality works. That's the start. On top of that, a core suite of tests from Android's CTS suite has been ported and applied. This is to verify that what the
+classes are supposed to do is what they actually do. The current goal is to create something that can be used in real, production apps by leveraging both AOSP-based logic and tests, to
 jumpstart the library.
 
 With that in place, we will work on some next-stage goals simultaneously.
@@ -64,4 +71,3 @@ You cannot contribute to a transaction from multiple threads. I'm pretty sure yo
 ### Transaction listeners
 
 You can add a transaction listener, but because the data in SQLiteConnection lives across threads, we 'freeze' them. It is *very* likely that this isn't the functionality you want. We will either need to figure out thread local with pools, or a smarter way to keep that data across threads.
-

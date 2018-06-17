@@ -29,5 +29,5 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-common:$kotlin_version"
 }
 
-apply from: "$dopplSharedScriptHome/kotlinpublish.gradle"
-apply from: "$dopplSharedScriptHome/bintray.gradle"
+apply from: "https://raw.githubusercontent.com/doppllib/gradlescripts/master/kotlinpublish.gradle"
+apply from: "https://raw.githubusercontent.com/doppllib/gradlescripts/master/bintray.gradle"
