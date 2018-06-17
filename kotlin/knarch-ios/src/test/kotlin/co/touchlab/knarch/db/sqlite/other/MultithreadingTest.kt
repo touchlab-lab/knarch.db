@@ -1,4 +1,4 @@
-package co.touchlab.knarch.db.sqlite
+package co.touchlab.knarch.db.sqlite.other
 
 import co.touchlab.knarch.*
 import co.touchlab.knarch.db.*

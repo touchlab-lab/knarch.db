@@ -192,13 +192,6 @@ class SQLiteCursorTest {
         assertEquals(TEST_COUNT - TEST_ARG2, cursor.getCount())
     }*/
 
-    @Test
-    fun testOnMove() {
-        // Do not test this API. It is callback which:
-        // 1. The callback mechanism has been tested in super class
-        // 2. The functionality is implementation details, no need to test
-    }
-
     private fun createTable(tableName:String, columnNames:String) {
         val sql = ("Create TABLE " + tableName + " (_id INTEGER PRIMARY KEY, "
                 + columnNames + " );")
@@ -213,36 +206,6 @@ class SQLiteCursorTest {
         }
     }
 
-    /*
-    private inner class MockObserver:DataSetObserver() {
-        private val mHasChanged = false
-        private val mHasInvalidated = false
-        fun onChanged() {
-            super.onChanged()
-            mHasChanged = true
-        }
-        fun onInvalidated() {
-            super.onInvalidated()
-            mHasInvalidated = true
-        }
-        protected fun resetStatus() {
-            mHasChanged = false
-            mHasInvalidated = false
-        }
-        protected fun hasChanged():Boolean {
-            return mHasChanged
-        }
-        protected fun hasInvalidated():Boolean {
-            return mHasInvalidated
-        }
-    }*/
-    private inner class MockCursorWindow(localWindow:Boolean):CursorWindow() {
-        var isClosed = false
-        override fun close() {
-            super.close()
-            isClosed = true
-        }
-    }
     companion object {
         private val COLUMNS = arrayOf<String>("_id", "number_1", "number_2")
         private val TABLE_NAME = "test"

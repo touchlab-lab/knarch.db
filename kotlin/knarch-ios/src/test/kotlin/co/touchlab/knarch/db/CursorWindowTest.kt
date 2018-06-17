@@ -20,52 +20,6 @@ class CursorWindowTest {
             return window
         }
 
-    /*@Test
-    fun testWriteCursorToWindow() {
-        // create cursor
-        var colNames = arrayOf<String>("_id", "name", "number", "profit")
-        var colsize = colNames.size
-        var list = createTestList(10, colsize)
-        var cursor = MatrixCursor(colNames, list.size())
-        for (row in list)
-        {
-            cursor.addRow(row)
-        }
-        // fill window
-        var window = CursorWindow()
-        cursor.fillWindow(0, window)
-        // read from cursor window
-        for (i in 0 until list.size())
-        {
-            var col = list.get(i)
-            for (j in 0 until colsize)
-            {
-                var s = window.getString(i, j)
-                var r2 = col.get(j)
-                var r1 = Integer.parseInt(s)
-                assertEquals(r2, r1)
-            }
-        }
-        // test cursor window handle startpos != 0
-        window.clear()
-        cursor.fillWindow(1, window)
-        // read from cursor from window
-        for (i in 1 until list.size())
-        {
-            var col = list.get(i)
-            for (j in 0 until colsize)
-            {
-                var s = window.getString(i, j)
-                var r2 = col.get(j)
-                var r1 = Integer.parseInt(s)
-                assertEquals(r2, r1)
-            }
-        }
-        // Clear the window and make sure it's empty
-        window.clear()
-        assertEquals(0, window.numRows)
-    }
-*/
     @Test
     fun testNull() {
         var window = oneByOneWindow
@@ -86,30 +40,6 @@ class CursorWindowTest {
         assertEquals(0, window.getLong(0, 0))
         assertEquals(0.0, window.getDouble(0, 0))
     }
-
-    /*@Test
-    fun testConstructors() {
-        var TEST_NUMBER = 5
-        var cursorWindow:CursorWindow
-        // Test constructor with 'true' input, and startPosition should return 0
-        cursorWindow = CursorWindow()
-        assertEquals(0, cursorWindow.startPosition)
-        // Test constructor with 'false' input
-        cursorWindow = CursorWindow()
-        assertEquals(0, cursorWindow.startPosition)
-        // Test newFromParcel
-        var parcel = Parcel.obtain()
-        cursorWindow = CursorWindow()
-        cursorWindow.startPosition = (TEST_NUMBER)
-        cursorWindow.setNumColumns(1)
-        cursorWindow.allocRow()
-        cursorWindow.putString(TEST_STRING, TEST_NUMBER, 0)
-        cursorWindow.writeToParcel(parcel, 0)
-        parcel.setDataPosition(0)
-        cursorWindow = CursorWindow.CREATOR.createFromParcel(parcel)
-        assertEquals(TEST_NUMBER, cursorWindow.startPosition)
-        assertEquals(TEST_STRING, cursorWindow.getString(TEST_NUMBER, 0))
-    }*/
 
     @Test
     fun testDataStructureOperations() {
@@ -272,41 +202,6 @@ class CursorWindowTest {
         // Test isBlob
         assertTrue(cursorWindow.isBlob(0, 4))
     }
-
-    /*@Test
-    fun testCopyStringToBuffer() {
-        var DEFAULT_ARRAY_LENGTH = 64
-        var baseString = "0123456789"
-        var expectedString = ""
-        // Create a 60 characters string.
-        for (i in 0..5)
-        {
-            expectedString += baseString
-        }
-        var charArrayBuffer = CharArrayBuffer(null)
-        var cursorWindow = CursorWindow()
-        cursorWindow.setNumColumns(2)
-        cursorWindow.allocRow()
-        assertEquals(null, charArrayBuffer.data)
-        cursorWindow.putString(expectedString, 0, 0)
-        cursorWindow.copyStringToBuffer(0, 0, charArrayBuffer)
-        assertNotNull(charArrayBuffer.data)
-        // By default, if the field's string is shorter than 64, array will be allocated as 64.
-        assertEquals(DEFAULT_ARRAY_LENGTH, charArrayBuffer.data.length)
-        assertEquals(expectedString,
-                String(charArrayBuffer.data, 0, charArrayBuffer.sizeCopied))
-        // Test in case of string is longer than 64,
-        expectedString += baseString
-        charArrayBuffer = CharArrayBuffer(null)
-        cursorWindow.putString(expectedString, 0, 1)
-        cursorWindow.copyStringToBuffer(0, 1, charArrayBuffer)
-        assertNotNull(charArrayBuffer.data)
-        // If the string is longer than 64, array will be allocated as needed(longer than 64).
-        assertEquals(expectedString,
-                String(charArrayBuffer.data, 0, charArrayBuffer.sizeCopied))
-        assertEquals(70, expectedString.length)
-        assertEquals(expectedString.length, charArrayBuffer.data.length)
-    }*/
 
     @Test
     fun testAccessStartPosition() {

@@ -29,10 +29,6 @@ class DatabaseStatementTest{
         mDatabase.close()
         getContext().deleteDatabase(DATABASE_NAME)
     }
-//    // These test can only be run once.
-//    fun startPerformance(intermediates:Intermediates):Int {
-//        return 1
-//    }
 
     private fun populateDefaultTable() {
         mDatabase.execSQL("CREATE TABLE test (_id INTEGER PRIMARY KEY, data TEXT);")
@@ -48,7 +44,6 @@ class DatabaseStatementTest{
         statement.execute()
         val c = mDatabase.query("test", null, null, null, null, null, null)
         assertEquals(0, c.getCount())
-//        c.deactivate()
         statement.close()
     }
 
@@ -198,55 +193,6 @@ class DatabaseStatementTest{
         }
         c.close()
     }
-
-    /*private class StatementTestThread(db:SQLiteDatabase, statement:SQLiteStatement):Thread() {
-        private val mDatabase:SQLiteDatabase
-        private val mStatement:SQLiteStatement
-        init{
-            mDatabase = db
-            mStatement = statement
-        }
-        public override fun run() {
-            mDatabase.beginTransaction()
-            for (i in 0..9)
-            {
-                mStatement.bindLong(1, i)
-                mStatement.bindString(2, java.lang.Long.toHexString(i))
-                mStatement.execute()
-            }
-            mDatabase.setTransactionSuccessful()
-            mDatabase.endTransaction()
-            val c = mDatabase.query("test", null, null, null, null, null, "ROWID")
-            val numCol = c.getColumnIndexOrThrow("num")
-            val strCol = c.getColumnIndexOrThrow("str")
-            assertTrue(c.moveToFirst())
-            for (i in 0..9)
-            {
-                val num = c.getLong(numCol)
-                val str = c.getString(strCol)
-                assertEquals(i, num)
-                assertEquals(java.lang.Long.toHexString(i), str)
-                c.moveToNext()
-            }
-            c.close()
-        }
-    }*/
-
-    /*@Test
-    fun testStatementMultiThreaded() {
-        mDatabase.execSQL("CREATE TABLE test (num INTEGER, str TEXT);")
-        val statement = mDatabase.compileStatement("INSERT INTO test (num, str) VALUES (?, ?)")
-        val thread = StatementTestThread(mDatabase, statement)
-        thread.start()
-        try
-        {
-            thread.join()
-        }
-        finally
-        {
-            statement.close()
-        }
-    }*/
 
     @Test
     fun testStatementConstraint() {

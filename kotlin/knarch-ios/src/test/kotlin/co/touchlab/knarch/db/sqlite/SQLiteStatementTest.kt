@@ -168,111 +168,11 @@ class SQLiteStatementTest {
         statement.close()
     }
 
-    /*@Test
-    fun testSimpleQueryForBlobFileDescriptorSuccessNormal() {
-        doTestSimpleQueryForBlobFileDescriptorSuccess(0)
-    }
-
-    @Test
-    fun testSimpleQueryForBlobFileDescriptorSuccessEmpty() {
-        doTestSimpleQueryForBlobFileDescriptorSuccess(1)
-    }*/
-
-    /*@Test
-    fun testSimpleQueryForBlobFileDescriptorSuccessNull() {
-        populateBlobTable()
-        val sql = "SELECT data FROM blob_test WHERE _id = " + 2
-        val stm = mDatabase.compileStatement(sql)
-        assertNull(stm.simpleQueryForBlobFileDescriptor())
-    }*/
-/*
-    @Test
-    fun testSimpleQueryForBlobFileDescriptorSuccess00() {
-        doTestSimpleQueryForBlobFileDescriptorSuccess(3)
-    }
-
-    @Test
-    fun testSimpleQueryForBlobFileDescriptorSuccessFF() {
-        doTestSimpleQueryForBlobFileDescriptorSuccess(4)
-    }
-
-    @Test
-    fun testSimpleQueryForBlobFileDescriptorSuccessEmbeddedNul() {
-        doTestSimpleQueryForBlobFileDescriptorSuccess(5)
-    }*/
-
-    /*private fun doTestSimpleQueryForBlobFileDescriptorSuccess(i:Int) {
-        populateBlobTable()
-        val sql = "SELECT data FROM blob_test WHERE _id = " + i
-        val stm = mDatabase.compileStatement(sql)
-        val fd = stm.simpleQueryForBlobFileDescriptor()
-        assertFileDescriptorContent(BLOBS[i], fd)
-    }
-
-    @Test
-    fun testSimpleQueryForBlobFileDescriptorSuccessParam() {
-        populateBlobTable()
-        val sql = "SELECT data FROM blob_test WHERE _id = ?"
-        val stm = mDatabase.compileStatement(sql)
-        stm.bindLong(1, 0)
-        val fd = stm.simpleQueryForBlobFileDescriptor()
-        assertFileDescriptorContent(BLOBS[0], fd)
-    }*/
-
-   /* @Test
-    fun testGetBlobFailureNoParam() {
-        populateBlobTable()
-        val sql = "SELECT data FROM blob_test WHERE _id = 100"
-        val stm = mDatabase.compileStatement(sql)
-        val fd:ParcelFileDescriptor = null
-        val expectedException:SQLiteDoneException = null
-        try
-        {
-            fd = stm.simpleQueryForBlobFileDescriptor()
-        }
-        catch (ex:SQLiteDoneException) {
-            expectedException = ex
-        }
-        finally
-        {
-            if (fd != null)
-            {
-                fd.close()
-                fd = null
-            }
-        }
-        assertNotNull("Should have thrown SQLiteDoneException", expectedException)
-    }*/
-
-    /*@Test
-    fun testGetBlobFailureParam() {
-        populateBlobTable()
-        val sql = "SELECT data FROM blob_test WHERE _id = ?"
-        val stm = mDatabase.compileStatement(sql)
-        stm.bindLong(1, 100)
-        val fd:ParcelFileDescriptor = null
-        val expectedException:SQLiteDoneException = null
-        try
-        {
-            fd = stm.simpleQueryForBlobFileDescriptor()
-        }
-        catch (ex:SQLiteDoneException) {
-            expectedException = ex
-        }
-        finally
-        {
-            if (fd != null)
-            {
-                fd.close()
-                fd = null
-            }
-        }
-        assertNotNull("Should have thrown SQLiteDoneException", expectedException)
-    }*/
     companion object {
         private val STRING1 = "this is a test"
         private val STRING2 = "another test"
-        private val BLOBS = Array<ByteArray?>(6, { i ->
+        private val BLOBS = Array(6
+        ) { i ->
             when (i) {
                 0 -> parseBlob("86FADCF1A820666AEBD0789F47932151A2EF734269E8AC4E39630AB60519DFD8")
                 1 -> ByteArray(1)
@@ -283,15 +183,14 @@ class SQLiteStatementTest {
                 else -> throw IllegalArgumentException("Nuh ugh")
             }
         }
-        )
         private val DATABASE_NAME = "database_test.db"
         private val CURRENT_DATABASE_VERSION = 42
         /*
-     * Convert string of hex digits to byte array.
-     * Results are undefined for poorly formed string.
-     *
-     * @param src hex string
-     */
+         * Convert string of hex digits to byte array.
+         * Results are undefined for poorly formed string.
+         *
+         * @param src hex string
+         */
         private fun parseBlob(src:String):ByteArray {
             val len = src.length
             val result = ByteArray(len / 2)

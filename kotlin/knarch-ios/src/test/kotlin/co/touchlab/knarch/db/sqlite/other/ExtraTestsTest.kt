@@ -1,7 +1,6 @@
-package co.touchlab.knarch.db.sqlite
+package co.touchlab.knarch.db.sqlite.other
 
 import co.touchlab.knarch.*
-import co.touchlab.knarch.db.*
 import co.touchlab.knarch.io.*
 import co.touchlab.knarch.db.sqlite.*
 import kotlin.test.*
@@ -9,7 +8,7 @@ import platform.Foundation.*
 import kotlinx.cinterop.*
 
 class ExtraTestsTest{
-    private var mDatabase:SQLiteDatabase?=null
+    private lateinit var mDatabase:SQLiteDatabase
     private var mDatabaseFile:File?=null
     private var mDatabaseFilePath:String?=null
     private var mDatabaseDir:String?=null
@@ -34,15 +33,15 @@ class ExtraTestsTest{
     }
 
     private fun closeAndDeleteDatabase() {
-        mDatabase!!.close()
+        mDatabase.close()
         SQLiteDatabase.deleteDatabase(mDatabaseFile!!)
     }
 
     @Test
     fun testBigData() {
-        mDatabase!!.execSQL("CREATE TABLE test (num INTEGER, astr TEXT);")
-        val stmt = mDatabase!!.compileStatement("INSERT INTO test (num, astr) VALUES (?, ?)")
-        mDatabase!!.beginTransaction()
+        mDatabase.execSQL("CREATE TABLE test (num INTEGER, astr TEXT);")
+        val stmt = mDatabase.compileStatement("INSERT INTO test (num, astr) VALUES (?, ?)")
+        mDatabase.beginTransaction()
         try {
 
             for(i in 0 until 100000){
@@ -53,15 +52,14 @@ class ExtraTestsTest{
                 stmt.bindLong(1, i.toLong())
                 stmt.bindString(2, insStr)
                 stmt.executeInsert()
-//                mDatabase!!.execSQL("INSERT INTO test (num, astr) VALUES ($i, '${insStr}')")
             }
 
-            mDatabase!!.setTransactionSuccessful()
+            mDatabase.setTransactionSuccessful()
         } finally {
-            mDatabase!!.endTransaction();
+            mDatabase.endTransaction();
         }
 
-        val cursor = mDatabase!!.query("test",
+        val cursor = mDatabase.query("test",
                 null,
                 null,
                 null,

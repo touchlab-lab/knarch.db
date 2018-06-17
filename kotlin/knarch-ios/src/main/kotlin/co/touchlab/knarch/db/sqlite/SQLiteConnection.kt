@@ -290,10 +290,9 @@ class SQLiteConnection(config:SQLiteDatabaseConfiguration) {
                     }
                     else
                     {
-                        outStatementInfo.columnNames = Array(columnCount, {
-                            col -> nativeGetColumnName(
+                        outStatementInfo.columnNames = Array(columnCount) { col -> nativeGetColumnName(
                                 connectionPtr, statement.mStatementPtr, col)
-                        })
+                        }
                     }
                 }
             }
@@ -678,44 +677,6 @@ class SQLiteConnection(config:SQLiteDatabaseConfiguration) {
                     nativeBindString(connectionPtr, statementPtr, i + 1, arg.toString())
                 }
             }
-        }
-    }
-
-    /**
-     * Dumps debugging information about this connection.
-     *
-     * @param printer The printer to receive the dump, not null.
-     * @param verbose True to dump more verbose information.
-     */
-    fun dump(printer:Printer, verbose:Boolean) {
-        dumpUnsafe(printer, verbose)
-    }
-    /**
-     * Dumps debugging information about this connection, in the case where the
-     * caller might not actually own the connection.
-     *
-     * This function is written so that it may be called by a thread that does not
-     * own the connection. We need to be very careful because the connection state is
-     * not synchronized.
-     *
-     * At worst, the method may return stale or slightly wrong data, however
-     * it should not crash. This is ok as it is only used for diagnostic purposes.
-     *
-     * @param printer The printer to receive the dump, not null.
-     * @param verbose True to dump more verbose information.
-     */
-    internal fun dumpUnsafe(printer:Printer, verbose:Boolean) {
-
-        if (verbose)
-        {
-            printer.println(" connectionPtr: 0x" + getConnectionPtr(nativeDataId).toString(16))
-        }
-
-        mRecentOperations.dump(printer, verbose)
-        if (verbose)
-        {
-            //TODO Maybe?
-//            mPreparedStatementCache.dump(printer)
         }
     }
 
