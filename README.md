@@ -72,3 +72,12 @@ it may be something to consider.
 ## Usage
 
 AFAIK, K/N doesn't currently have a public dependency mechanism, so while waiting on that, using KNArch is fairly manual. We'll write up a post on this later. Basically, you add the multiplatform dependency as usual with Gradle, and on the iOS side, copy the C++ (bc) and Kotlin (klib) artifacts and wire them inside your Konan config. For now, see the sample app.
+
+## Design
+
+Sqlite support in AOSP is implemented by Java classes that talk to C++ through JNI. We're using the same basic architecture. The C++ code from AOSP has been ported to use equivalent K/N types. See the cpp folder for that code.
+
+In kotlin/kotlin-ios you'll find the public interface code. The api structure is roughly similar to the AOSP code, but
+there are differences and omissions because various things don't apply and/or aren't supported.
+
+There will be updates to the design docs in the near future. Follow the [Touchlab blog](https://touchlab.co/blog/), [kpgalligan on medium](https://medium.com/@kpgalligan), or the [Touchlab Twitter](https://twitter.com/touchlabhq) for info.
