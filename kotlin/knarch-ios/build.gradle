@@ -20,7 +20,7 @@ konanArtifacts {
     }
 
     //TODO: Rename test framework. Just feels like a lot of Xcode work that I don't want.
-    framework('KotlinArithmeticParser', targets: ['iphone', 'iphone_sim']) {
+    framework('knarchtest', targets: ['iphone', 'iphone_sim']) {
         srcDir 'src/main/kotlin'
         srcDir 'src/test/kotlin'
 
@@ -37,7 +37,7 @@ konanArtifacts {
         enableMultiplatform true
     }
 
-    program("knarchtest", targets: ['macos_x64']) {
+    program("knarchtestcmd", targets: ['macos_x64']) {
         srcDir 'src/main/kotlin'
         srcDir 'src/test/kotlin'
         srcDir 'src/testexe/kotlin'

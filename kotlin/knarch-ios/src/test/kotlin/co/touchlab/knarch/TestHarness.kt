@@ -9,8 +9,8 @@ class TestHarness{
 //        TestRunner.run(arrayOf("--ktest_filter=*testStatementConstraint*"))
 //        TestRunner.run(arrayOf("--ktest_filter=*basicMultithreadingTest*"))
 //        TestRunner.run(arrayOf("--ktest_filter=*testQuery*"))
-        TestRunner.run(arrayOf("--ktest_filter=*testEnableAndDisableForeignKeys*"))
-//        TestRunner.run()
+//        TestRunner.run(arrayOf("--ktest_filter=*testEnableAndDisableForeignKeys*"))
+        TestRunner.run()
 
         return TestRunner.exitCode
     }

@@ -3,7 +3,7 @@
 CMake Error at CMakeLists.txt:9 (add_executable):
   Cannot find source file:
 
-    knarch/src/main/cpp/NativeHelper.m
+    knarch/src/main/cpp/AtomicData.cpp
 
   Tried extensions .c .C .c++ .cc .cpp .cxx .cu .m .M .mm .h .hh .h++ .hm
   .hpp .hxx .in .txx

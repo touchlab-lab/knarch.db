@@ -313,7 +313,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"$SRCROOT/../gradlew\" -p \"$SRCROOT\" \"$KONAN_TASK\"          \\\n-DKOTLIN_NATIVE_DIR=\"/Users/kgalligan/temp4/kotlin-native\" \\\n-Pkonan.configuration.build.dir=\"$CONFIGURATION_BUILD_DIR\" \\\n-Pkonan.debugging.symbols=\"$DEBUGGING_SYMBOLS\"             \\\n-Pkonan.optimizations.enable=\"$KONAN_ENABLE_OPTIMIZATIONS\"";
+			shellScript = "\"$SRCROOT/../gradlew\" -p \"$SRCROOT\" \"$KONAN_TASK\"          \\\n-Pkonan.configuration.build.dir=\"$CONFIGURATION_BUILD_DIR\" \\\n-Pkonan.debugging.symbols=\"$DEBUGGING_SYMBOLS\"             \\\n-Pkonan.optimizations.enable=\"$KONAN_ENABLE_OPTIMIZATIONS\"";
 		};
 /* End PBXShellScriptBuildPhase section */
 

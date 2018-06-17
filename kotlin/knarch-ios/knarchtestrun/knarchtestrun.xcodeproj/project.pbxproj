@@ -1,0 +1,926 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 50;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		6347660B20D6AA3800447E70 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6347660A20D6AA3800447E70 /* AppDelegate.swift */; };
+		6347660D20D6AA3800447E70 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6347660C20D6AA3800447E70 /* ViewController.swift */; };
+		6347661020D6AA3800447E70 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 6347660E20D6AA3800447E70 /* Main.storyboard */; };
+		6347661220D6AA3B00447E70 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6347661120D6AA3B00447E70 /* Assets.xcassets */; };
+		6347661520D6AA3B00447E70 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 6347661320D6AA3B00447E70 /* LaunchScreen.storyboard */; };
+		6347662020D6AA3C00447E70 /* knarchtestrunTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6347661F20D6AA3C00447E70 /* knarchtestrunTests.swift */; };
+		6347663620D6AADB00447E70 /* knarchtest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6347662F20D6AADB00447E70 /* knarchtest.framework */; };
+		6347663720D6AADB00447E70 /* knarchtest.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 6347662F20D6AADB00447E70 /* knarchtest.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		6347661C20D6AA3C00447E70 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 634765FF20D6AA3800447E70 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 6347660620D6AA3800447E70;
+			remoteInfo = knarchtestrun;
+		};
+		6347663420D6AADB00447E70 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 634765FF20D6AA3800447E70 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 6347662E20D6AADB00447E70;
+			remoteInfo = knarchtest;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		6347663B20D6AADB00447E70 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				6347663720D6AADB00447E70 /* knarchtest.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		6347660720D6AA3800447E70 /* knarchtestrun.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = knarchtestrun.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		6347660A20D6AA3800447E70 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		6347660C20D6AA3800447E70 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		6347660F20D6AA3800447E70 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		6347661120D6AA3B00447E70 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		6347661420D6AA3B00447E70 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		6347661620D6AA3B00447E70 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		6347661B20D6AA3C00447E70 /* knarchtestrunTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = knarchtestrunTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		6347661F20D6AA3C00447E70 /* knarchtestrunTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = knarchtestrunTests.swift; sourceTree = "<group>"; };
+		6347662120D6AA3C00447E70 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		6347662F20D6AADB00447E70 /* knarchtest.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = knarchtest.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		6347663120D6AADB00447E70 /* knarchtest.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = knarchtest.h; sourceTree = "<group>"; };
+		6347663220D6AADB00447E70 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		6347664320D6AC9F00447E70 /* GoTest.kt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = GoTest.kt; sourceTree = "<group>"; };
+		6347664520D6AC9F00447E70 /* CursorWindowTest.kt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = CursorWindowTest.kt; sourceTree = "<group>"; };
+		6347664720D6AC9F00447E70 /* SQLiteOpenHelperTest.kt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = SQLiteOpenHelperTest.kt; sourceTree = "<group>"; };
+		6347664820D6AC9F00447E70 /* DatabaseStatementTest.kt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = DatabaseStatementTest.kt; sourceTree = "<group>"; };
+		6347664920D6AC9F00447E70 /* SQLiteCursorTest.kt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = SQLiteCursorTest.kt; sourceTree = "<group>"; };
+		6347664B20D6AC9F00447E70 /* ExtraTestsTest.kt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = ExtraTestsTest.kt; sourceTree = "<group>"; };
+		6347664C20D6AC9F00447E70 /* MultithreadingTest.kt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = MultithreadingTest.kt; sourceTree = "<group>"; };
+		6347664D20D6AC9F00447E70 /* SQLiteQueryBuilderTest.kt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = SQLiteQueryBuilderTest.kt; sourceTree = "<group>"; };
+		6347664E20D6AC9F00447E70 /* SQLiteProgramTest.kt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = SQLiteProgramTest.kt; sourceTree = "<group>"; };
+		6347664F20D6AC9F00447E70 /* SQLiteDatabaseTest.kt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = SQLiteDatabaseTest.kt; sourceTree = "<group>"; };
+		6347665020D6AC9F00447E70 /* SQLiteFtsTest.kt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = SQLiteFtsTest.kt; sourceTree = "<group>"; };
+		6347665120D6AC9F00447E70 /* SQLiteStatementTest.kt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = SQLiteStatementTest.kt; sourceTree = "<group>"; };
+		6347665220D6AC9F00447E70 /* DatabaseUtilsTest.kt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = DatabaseUtilsTest.kt; sourceTree = "<group>"; };
+		6347665320D6AC9F00447E70 /* TestHarness.kt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = TestHarness.kt; sourceTree = "<group>"; };
+		6347665620D6AC9F00447E70 /* TestMain.kt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = TestMain.kt; sourceTree = "<group>"; };
+		6347665C20D6AC9F00447E70 /* SystemContext.kt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = SystemContext.kt; sourceTree = "<group>"; };
+		6347665E20D6AC9F00447E70 /* File.kt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = File.kt; sourceTree = "<group>"; };
+		6347665F20D6AC9F00447E70 /* IOException.kt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = IOException.kt; sourceTree = "<group>"; };
+		6347666120D6AC9F00447E70 /* StdPrinter.kt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = StdPrinter.kt; sourceTree = "<group>"; };
+		6347666220D6AC9F00447E70 /* Printer.kt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Printer.kt; sourceTree = "<group>"; };
+		6347666320D6AC9F00447E70 /* Log.kt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Log.kt; sourceTree = "<group>"; };
+		6347666520D6AC9F00447E70 /* DatabaseUtils.kt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = DatabaseUtils.kt; sourceTree = "<group>"; };
+		6347666620D6AC9F00447E70 /* StaleDataException.kt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = StaleDataException.kt; sourceTree = "<group>"; };
+		6347666720D6AC9F00447E70 /* CrossProcessCursor.kt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = CrossProcessCursor.kt; sourceTree = "<group>"; };
+		6347666820D6AC9F00447E70 /* SQLException.kt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = SQLException.kt; sourceTree = "<group>"; };
+		6347666920D6AC9F00447E70 /* Cursor.kt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Cursor.kt; sourceTree = "<group>"; };
+		6347666A20D6AC9F00447E70 /* AbstractCursor.kt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = AbstractCursor.kt; sourceTree = "<group>"; };
+		6347666C20D6AC9F00447E70 /* SQLiteClosable.kt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = SQLiteClosable.kt; sourceTree = "<group>"; };
+		6347666D20D6AC9F00447E70 /* SQLiteQueryBuilder.kt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = SQLiteQueryBuilder.kt; sourceTree = "<group>"; };
+		6347666E20D6AC9F00447E70 /* SQLiteCursorDriver.kt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = SQLiteCursorDriver.kt; sourceTree = "<group>"; };
+		6347666F20D6AC9F00447E70 /* SQLiteConnection.kt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = SQLiteConnection.kt; sourceTree = "<group>"; };
+		6347667020D6AC9F00447E70 /* SQLiteStatementInfo.kt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = SQLiteStatementInfo.kt; sourceTree = "<group>"; };
+		6347667120D6AC9F00447E70 /* SQLiteCursor.kt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = SQLiteCursor.kt; sourceTree = "<group>"; };
+		6347667220D6AC9F00447E70 /* SQLiteDatabaseConfiguration.kt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = SQLiteDatabaseConfiguration.kt; sourceTree = "<group>"; };
+		6347667320D6AC9F00447E70 /* SQLiteSession.kt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = SQLiteSession.kt; sourceTree = "<group>"; };
+		6347667420D6AC9F00447E70 /* SQLiteDebug.kt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = SQLiteDebug.kt; sourceTree = "<group>"; };
+		6347667520D6AC9F00447E70 /* SQLiteDatabaseCorruptException.kt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = SQLiteDatabaseCorruptException.kt; sourceTree = "<group>"; };
+		6347667620D6AC9F00447E70 /* SQLiteStatement.kt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = SQLiteStatement.kt; sourceTree = "<group>"; };
+		6347667720D6AC9F00447E70 /* SQLiteDatabase.kt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = SQLiteDatabase.kt; sourceTree = "<group>"; };
+		6347667820D6AC9F00447E70 /* SQLiteGlobal.kt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = SQLiteGlobal.kt; sourceTree = "<group>"; };
+		6347667920D6AC9F00447E70 /* SQLiteDirectCursorDriver.kt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = SQLiteDirectCursorDriver.kt; sourceTree = "<group>"; };
+		6347667A20D6AC9F00447E70 /* SQLiteProgram.kt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = SQLiteProgram.kt; sourceTree = "<group>"; };
+		6347667B20D6AC9F00447E70 /* SQLiteException.kt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = SQLiteException.kt; sourceTree = "<group>"; };
+		6347667C20D6AC9F00447E70 /* SQLiteTransactionListener.kt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = SQLiteTransactionListener.kt; sourceTree = "<group>"; };
+		6347667D20D6AC9F00447E70 /* SQLiteQuery.kt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = SQLiteQuery.kt; sourceTree = "<group>"; };
+		6347667E20D6AC9F00447E70 /* SQLiteOpenHelper.kt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = SQLiteOpenHelper.kt; sourceTree = "<group>"; };
+		6347667F20D6AC9F00447E70 /* Functions.kt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Functions.kt; sourceTree = "<group>"; };
+		6347668020D6AC9F00447E70 /* DefaultDatabaseErrorHandler.kt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = DefaultDatabaseErrorHandler.kt; sourceTree = "<group>"; };
+		6347668120D6AC9F00447E70 /* CursorWindow.kt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = CursorWindow.kt; sourceTree = "<group>"; };
+		6347668220D6AC9F00447E70 /* CursorIndexOutOfBoundsException.kt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = CursorIndexOutOfBoundsException.kt; sourceTree = "<group>"; };
+		6347668320D6AC9F00447E70 /* DatabaseErrorHandler.kt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = DatabaseErrorHandler.kt; sourceTree = "<group>"; };
+		6347668420D6AC9F00447E70 /* AbstractWindowedCursor.kt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = AbstractWindowedCursor.kt; sourceTree = "<group>"; };
+		6347668520D6AC9F00447E70 /* ContentValues.kt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = ContentValues.kt; sourceTree = "<group>"; };
+		6347668620D6AC9F00447E70 /* DefaultSystemContext.kt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = DefaultSystemContext.kt; sourceTree = "<group>"; };
+		6347668A20D6AC9F00447E70 /* TypeAliases.kt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = TypeAliases.kt; sourceTree = "<group>"; };
+		6347668C20D6AC9F00447E70 /* PlatformSQLiteOpenHelper.kt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = PlatformSQLiteOpenHelper.kt; sourceTree = "<group>"; };
+		6347668D20D6AC9F00447E70 /* TypeAliases.kt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = TypeAliases.kt; sourceTree = "<group>"; };
+		6347668E20D6AC9F00447E70 /* Functions.kt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Functions.kt; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		6347660420D6AA3800447E70 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6347663620D6AADB00447E70 /* knarchtest.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		6347661820D6AA3C00447E70 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		634765FE20D6AA3800447E70 = {
+			isa = PBXGroup;
+			children = (
+				6347660920D6AA3800447E70 /* knarchtestrun */,
+				6347661E20D6AA3C00447E70 /* knarchtestrunTests */,
+				6347663020D6AADB00447E70 /* knarchtest */,
+				6347660820D6AA3800447E70 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		6347660820D6AA3800447E70 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				6347660720D6AA3800447E70 /* knarchtestrun.app */,
+				6347661B20D6AA3C00447E70 /* knarchtestrunTests.xctest */,
+				6347662F20D6AADB00447E70 /* knarchtest.framework */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		6347660920D6AA3800447E70 /* knarchtestrun */ = {
+			isa = PBXGroup;
+			children = (
+				6347660A20D6AA3800447E70 /* AppDelegate.swift */,
+				6347660C20D6AA3800447E70 /* ViewController.swift */,
+				6347660E20D6AA3800447E70 /* Main.storyboard */,
+				6347661120D6AA3B00447E70 /* Assets.xcassets */,
+				6347661320D6AA3B00447E70 /* LaunchScreen.storyboard */,
+				6347661620D6AA3B00447E70 /* Info.plist */,
+			);
+			path = knarchtestrun;
+			sourceTree = "<group>";
+		};
+		6347661E20D6AA3C00447E70 /* knarchtestrunTests */ = {
+			isa = PBXGroup;
+			children = (
+				6347661F20D6AA3C00447E70 /* knarchtestrunTests.swift */,
+				6347662120D6AA3C00447E70 /* Info.plist */,
+			);
+			path = knarchtestrunTests;
+			sourceTree = "<group>";
+		};
+		6347663020D6AADB00447E70 /* knarchtest */ = {
+			isa = PBXGroup;
+			children = (
+				6347663D20D6AC9F00447E70 /* src */,
+				6347663120D6AADB00447E70 /* knarchtest.h */,
+				6347663220D6AADB00447E70 /* Info.plist */,
+			);
+			path = knarchtest;
+			sourceTree = "<group>";
+		};
+		6347663D20D6AC9F00447E70 /* src */ = {
+			isa = PBXGroup;
+			children = (
+				6347663E20D6AC9F00447E70 /* test */,
+				6347665420D6AC9F00447E70 /* testexe */,
+				6347665720D6AC9F00447E70 /* main */,
+			);
+			name = src;
+			path = ../../src;
+			sourceTree = "<group>";
+		};
+		6347663E20D6AC9F00447E70 /* test */ = {
+			isa = PBXGroup;
+			children = (
+				6347663F20D6AC9F00447E70 /* kotlin */,
+			);
+			path = test;
+			sourceTree = "<group>";
+		};
+		6347663F20D6AC9F00447E70 /* kotlin */ = {
+			isa = PBXGroup;
+			children = (
+				6347664020D6AC9F00447E70 /* co */,
+			);
+			path = kotlin;
+			sourceTree = "<group>";
+		};
+		6347664020D6AC9F00447E70 /* co */ = {
+			isa = PBXGroup;
+			children = (
+				6347664120D6AC9F00447E70 /* touchlab */,
+			);
+			path = co;
+			sourceTree = "<group>";
+		};
+		6347664120D6AC9F00447E70 /* touchlab */ = {
+			isa = PBXGroup;
+			children = (
+				6347664220D6AC9F00447E70 /* knarch */,
+			);
+			path = touchlab;
+			sourceTree = "<group>";
+		};
+		6347664220D6AC9F00447E70 /* knarch */ = {
+			isa = PBXGroup;
+			children = (
+				6347664320D6AC9F00447E70 /* GoTest.kt */,
+				6347664420D6AC9F00447E70 /* db */,
+				6347665320D6AC9F00447E70 /* TestHarness.kt */,
+			);
+			path = knarch;
+			sourceTree = "<group>";
+		};
+		6347664420D6AC9F00447E70 /* db */ = {
+			isa = PBXGroup;
+			children = (
+				6347664520D6AC9F00447E70 /* CursorWindowTest.kt */,
+				6347664620D6AC9F00447E70 /* sqlite */,
+				6347665220D6AC9F00447E70 /* DatabaseUtilsTest.kt */,
+			);
+			path = db;
+			sourceTree = "<group>";
+		};
+		6347664620D6AC9F00447E70 /* sqlite */ = {
+			isa = PBXGroup;
+			children = (
+				6347664720D6AC9F00447E70 /* SQLiteOpenHelperTest.kt */,
+				6347664820D6AC9F00447E70 /* DatabaseStatementTest.kt */,
+				6347664920D6AC9F00447E70 /* SQLiteCursorTest.kt */,
+				6347664A20D6AC9F00447E70 /* other */,
+				6347664D20D6AC9F00447E70 /* SQLiteQueryBuilderTest.kt */,
+				6347664E20D6AC9F00447E70 /* SQLiteProgramTest.kt */,
+				6347664F20D6AC9F00447E70 /* SQLiteDatabaseTest.kt */,
+				6347665020D6AC9F00447E70 /* SQLiteFtsTest.kt */,
+				6347665120D6AC9F00447E70 /* SQLiteStatementTest.kt */,
+			);
+			path = sqlite;
+			sourceTree = "<group>";
+		};
+		6347664A20D6AC9F00447E70 /* other */ = {
+			isa = PBXGroup;
+			children = (
+				6347664B20D6AC9F00447E70 /* ExtraTestsTest.kt */,
+				6347664C20D6AC9F00447E70 /* MultithreadingTest.kt */,
+			);
+			path = other;
+			sourceTree = "<group>";
+		};
+		6347665420D6AC9F00447E70 /* testexe */ = {
+			isa = PBXGroup;
+			children = (
+				6347665520D6AC9F00447E70 /* kotlin */,
+			);
+			path = testexe;
+			sourceTree = "<group>";
+		};
+		6347665520D6AC9F00447E70 /* kotlin */ = {
+			isa = PBXGroup;
+			children = (
+				6347665620D6AC9F00447E70 /* TestMain.kt */,
+			);
+			path = kotlin;
+			sourceTree = "<group>";
+		};
+		6347665720D6AC9F00447E70 /* main */ = {
+			isa = PBXGroup;
+			children = (
+				6347665820D6AC9F00447E70 /* kotlin */,
+			);
+			path = main;
+			sourceTree = "<group>";
+		};
+		6347665820D6AC9F00447E70 /* kotlin */ = {
+			isa = PBXGroup;
+			children = (
+				6347665920D6AC9F00447E70 /* co */,
+			);
+			path = kotlin;
+			sourceTree = "<group>";
+		};
+		6347665920D6AC9F00447E70 /* co */ = {
+			isa = PBXGroup;
+			children = (
+				6347665A20D6AC9F00447E70 /* touchlab */,
+			);
+			path = co;
+			sourceTree = "<group>";
+		};
+		6347665A20D6AC9F00447E70 /* touchlab */ = {
+			isa = PBXGroup;
+			children = (
+				6347665B20D6AC9F00447E70 /* knarch */,
+				6347668720D6AC9F00447E70 /* multiplatform */,
+			);
+			path = touchlab;
+			sourceTree = "<group>";
+		};
+		6347665B20D6AC9F00447E70 /* knarch */ = {
+			isa = PBXGroup;
+			children = (
+				6347665C20D6AC9F00447E70 /* SystemContext.kt */,
+				6347665D20D6AC9F00447E70 /* io */,
+				6347666020D6AC9F00447E70 /* other */,
+				6347666320D6AC9F00447E70 /* Log.kt */,
+				6347666420D6AC9F00447E70 /* db */,
+				6347668620D6AC9F00447E70 /* DefaultSystemContext.kt */,
+			);
+			path = knarch;
+			sourceTree = "<group>";
+		};
+		6347665D20D6AC9F00447E70 /* io */ = {
+			isa = PBXGroup;
+			children = (
+				6347665E20D6AC9F00447E70 /* File.kt */,
+				6347665F20D6AC9F00447E70 /* IOException.kt */,
+			);
+			path = io;
+			sourceTree = "<group>";
+		};
+		6347666020D6AC9F00447E70 /* other */ = {
+			isa = PBXGroup;
+			children = (
+				6347666120D6AC9F00447E70 /* StdPrinter.kt */,
+				6347666220D6AC9F00447E70 /* Printer.kt */,
+			);
+			path = other;
+			sourceTree = "<group>";
+		};
+		6347666420D6AC9F00447E70 /* db */ = {
+			isa = PBXGroup;
+			children = (
+				6347666520D6AC9F00447E70 /* DatabaseUtils.kt */,
+				6347666620D6AC9F00447E70 /* StaleDataException.kt */,
+				6347666720D6AC9F00447E70 /* CrossProcessCursor.kt */,
+				6347666820D6AC9F00447E70 /* SQLException.kt */,
+				6347666920D6AC9F00447E70 /* Cursor.kt */,
+				6347666A20D6AC9F00447E70 /* AbstractCursor.kt */,
+				6347666B20D6AC9F00447E70 /* sqlite */,
+				6347667F20D6AC9F00447E70 /* Functions.kt */,
+				6347668020D6AC9F00447E70 /* DefaultDatabaseErrorHandler.kt */,
+				6347668120D6AC9F00447E70 /* CursorWindow.kt */,
+				6347668220D6AC9F00447E70 /* CursorIndexOutOfBoundsException.kt */,
+				6347668320D6AC9F00447E70 /* DatabaseErrorHandler.kt */,
+				6347668420D6AC9F00447E70 /* AbstractWindowedCursor.kt */,
+				6347668520D6AC9F00447E70 /* ContentValues.kt */,
+			);
+			path = db;
+			sourceTree = "<group>";
+		};
+		6347666B20D6AC9F00447E70 /* sqlite */ = {
+			isa = PBXGroup;
+			children = (
+				6347666C20D6AC9F00447E70 /* SQLiteClosable.kt */,
+				6347666D20D6AC9F00447E70 /* SQLiteQueryBuilder.kt */,
+				6347666E20D6AC9F00447E70 /* SQLiteCursorDriver.kt */,
+				6347666F20D6AC9F00447E70 /* SQLiteConnection.kt */,
+				6347667020D6AC9F00447E70 /* SQLiteStatementInfo.kt */,
+				6347667120D6AC9F00447E70 /* SQLiteCursor.kt */,
+				6347667220D6AC9F00447E70 /* SQLiteDatabaseConfiguration.kt */,
+				6347667320D6AC9F00447E70 /* SQLiteSession.kt */,
+				6347667420D6AC9F00447E70 /* SQLiteDebug.kt */,
+				6347667520D6AC9F00447E70 /* SQLiteDatabaseCorruptException.kt */,
+				6347667620D6AC9F00447E70 /* SQLiteStatement.kt */,
+				6347667720D6AC9F00447E70 /* SQLiteDatabase.kt */,
+				6347667820D6AC9F00447E70 /* SQLiteGlobal.kt */,
+				6347667920D6AC9F00447E70 /* SQLiteDirectCursorDriver.kt */,
+				6347667A20D6AC9F00447E70 /* SQLiteProgram.kt */,
+				6347667B20D6AC9F00447E70 /* SQLiteException.kt */,
+				6347667C20D6AC9F00447E70 /* SQLiteTransactionListener.kt */,
+				6347667D20D6AC9F00447E70 /* SQLiteQuery.kt */,
+				6347667E20D6AC9F00447E70 /* SQLiteOpenHelper.kt */,
+			);
+			path = sqlite;
+			sourceTree = "<group>";
+		};
+		6347668720D6AC9F00447E70 /* multiplatform */ = {
+			isa = PBXGroup;
+			children = (
+				6347668820D6AC9F00447E70 /* architecture */,
+			);
+			path = multiplatform;
+			sourceTree = "<group>";
+		};
+		6347668820D6AC9F00447E70 /* architecture */ = {
+			isa = PBXGroup;
+			children = (
+				6347668920D6AC9F00447E70 /* db */,
+			);
+			path = architecture;
+			sourceTree = "<group>";
+		};
+		6347668920D6AC9F00447E70 /* db */ = {
+			isa = PBXGroup;
+			children = (
+				6347668A20D6AC9F00447E70 /* TypeAliases.kt */,
+				6347668B20D6AC9F00447E70 /* sqlite */,
+			);
+			path = db;
+			sourceTree = "<group>";
+		};
+		6347668B20D6AC9F00447E70 /* sqlite */ = {
+			isa = PBXGroup;
+			children = (
+				6347668C20D6AC9F00447E70 /* PlatformSQLiteOpenHelper.kt */,
+				6347668D20D6AC9F00447E70 /* TypeAliases.kt */,
+				6347668E20D6AC9F00447E70 /* Functions.kt */,
+			);
+			path = sqlite;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		6347660620D6AA3800447E70 /* knarchtestrun */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 6347662420D6AA3C00447E70 /* Build configuration list for PBXNativeTarget "knarchtestrun" */;
+			buildPhases = (
+				6347660320D6AA3800447E70 /* Sources */,
+				6347660420D6AA3800447E70 /* Frameworks */,
+				6347660520D6AA3800447E70 /* Resources */,
+				6347663B20D6AADB00447E70 /* Embed Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				6347663520D6AADB00447E70 /* PBXTargetDependency */,
+			);
+			name = knarchtestrun;
+			productName = knarchtestrun;
+			productReference = 6347660720D6AA3800447E70 /* knarchtestrun.app */;
+			productType = "com.apple.product-type.application";
+		};
+		6347661A20D6AA3C00447E70 /* knarchtestrunTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 6347662720D6AA3C00447E70 /* Build configuration list for PBXNativeTarget "knarchtestrunTests" */;
+			buildPhases = (
+				6347661720D6AA3C00447E70 /* Sources */,
+				6347661820D6AA3C00447E70 /* Frameworks */,
+				6347661920D6AA3C00447E70 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				6347661D20D6AA3C00447E70 /* PBXTargetDependency */,
+			);
+			name = knarchtestrunTests;
+			productName = knarchtestrunTests;
+			productReference = 6347661B20D6AA3C00447E70 /* knarchtestrunTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		6347662E20D6AADB00447E70 /* knarchtest */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 6347663820D6AADB00447E70 /* Build configuration list for PBXNativeTarget "knarchtest" */;
+			buildPhases = (
+				6347663C20D6AC2500447E70 /* ShellScript */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = knarchtest;
+			productName = knarchtest;
+			productReference = 6347662F20D6AADB00447E70 /* knarchtest.framework */;
+			productType = "com.apple.product-type.framework";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		634765FF20D6AA3800447E70 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastSwiftUpdateCheck = 0940;
+				LastUpgradeCheck = 0940;
+				ORGANIZATIONNAME = "Kevin Galligan";
+				TargetAttributes = {
+					6347660620D6AA3800447E70 = {
+						CreatedOnToolsVersion = 9.4;
+					};
+					6347661A20D6AA3C00447E70 = {
+						CreatedOnToolsVersion = 9.4;
+						TestTargetID = 6347660620D6AA3800447E70;
+					};
+					6347662E20D6AADB00447E70 = {
+						CreatedOnToolsVersion = 9.4;
+					};
+				};
+			};
+			buildConfigurationList = 6347660220D6AA3800447E70 /* Build configuration list for PBXProject "knarchtestrun" */;
+			compatibilityVersion = "Xcode 9.3";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 634765FE20D6AA3800447E70;
+			productRefGroup = 6347660820D6AA3800447E70 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				6347660620D6AA3800447E70 /* knarchtestrun */,
+				6347661A20D6AA3C00447E70 /* knarchtestrunTests */,
+				6347662E20D6AADB00447E70 /* knarchtest */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		6347660520D6AA3800447E70 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6347661520D6AA3B00447E70 /* LaunchScreen.storyboard in Resources */,
+				6347661220D6AA3B00447E70 /* Assets.xcassets in Resources */,
+				6347661020D6AA3800447E70 /* Main.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		6347661920D6AA3C00447E70 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		6347663C20D6AC2500447E70 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"$SRCROOT/../../gradlew\" -p \"$SRCROOT/..\" \"$KONAN_TASK\" \\\n-Pkonan.configuration.build.dir=\"$CONFIGURATION_BUILD_DIR\"        \\\n-Pkonan.debugging.symbols=\"$DEBUGGING_SYMBOLS\"                    \\\n-Pkonan.optimizations.enable=\"$KONAN_ENABLE_OPTIMIZATIONS\"";
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		6347660320D6AA3800447E70 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6347660D20D6AA3800447E70 /* ViewController.swift in Sources */,
+				6347660B20D6AA3800447E70 /* AppDelegate.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		6347661720D6AA3C00447E70 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6347662020D6AA3C00447E70 /* knarchtestrunTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		6347661D20D6AA3C00447E70 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 6347660620D6AA3800447E70 /* knarchtestrun */;
+			targetProxy = 6347661C20D6AA3C00447E70 /* PBXContainerItemProxy */;
+		};
+		6347663520D6AADB00447E70 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 6347662E20D6AADB00447E70 /* knarchtest */;
+			targetProxy = 6347663420D6AADB00447E70 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		6347660E20D6AA3800447E70 /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				6347660F20D6AA3800447E70 /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+		6347661320D6AA3B00447E70 /* LaunchScreen.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				6347661420D6AA3B00447E70 /* Base */,
+			);
+			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		6347662220D6AA3C00447E70 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.4;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		6347662320D6AA3C00447E70 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.4;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		6347662520D6AA3C00447E70 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 8UD86646U9;
+				INFOPLIST_FILE = knarchtestrun/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = co.touchlab.knarchtestrun;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 4.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		6347662620D6AA3C00447E70 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 8UD86646U9;
+				INFOPLIST_FILE = knarchtestrun/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = co.touchlab.knarchtestrun;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 4.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		6347662820D6AA3C00447E70 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				INFOPLIST_FILE = knarchtestrunTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = co.touchlab.knarchtestrunTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 4.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/knarchtestrun.app/knarchtestrun";
+			};
+			name = Debug;
+		};
+		6347662920D6AA3C00447E70 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				INFOPLIST_FILE = knarchtestrunTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = co.touchlab.knarchtestrunTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 4.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/knarchtestrun.app/knarchtestrun";
+			};
+			name = Release;
+		};
+		6347663920D6AADB00447E70 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = 8UD86646U9;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				INFOPLIST_FILE = knarchtest/Info.plist;
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				KONAN_ENABLE_OPTIMIZATIONS = NO;
+				KONAN_TASK = "";
+				"KONAN_TASK[sdk=iphoneos*]" = compileKonanKnarchtestIos_arm64;
+				"KONAN_TASK[sdk=iphonesimulator*]" = compileKonanKnarchtestIos_x64;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = co.touchlab.knarchtest;
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Debug;
+		};
+		6347663A20D6AADB00447E70 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = 8UD86646U9;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				INFOPLIST_FILE = knarchtest/Info.plist;
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				KONAN_ENABLE_OPTIMIZATIONS = YES;
+				KONAN_TASK = "";
+				"KONAN_TASK[sdk=iphoneos*]" = compileKonanKnarchtestIos_arm64;
+				"KONAN_TASK[sdk=iphonesimulator*]" = compileKonanKnarchtestIos_x64;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = co.touchlab.knarchtest;
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		6347660220D6AA3800447E70 /* Build configuration list for PBXProject "knarchtestrun" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				6347662220D6AA3C00447E70 /* Debug */,
+				6347662320D6AA3C00447E70 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		6347662420D6AA3C00447E70 /* Build configuration list for PBXNativeTarget "knarchtestrun" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				6347662520D6AA3C00447E70 /* Debug */,
+				6347662620D6AA3C00447E70 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		6347662720D6AA3C00447E70 /* Build configuration list for PBXNativeTarget "knarchtestrunTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				6347662820D6AA3C00447E70 /* Debug */,
+				6347662920D6AA3C00447E70 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		6347663820D6AADB00447E70 /* Build configuration list for PBXNativeTarget "knarchtest" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				6347663920D6AADB00447E70 /* Debug */,
+				6347663A20D6AADB00447E70 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 634765FF20D6AA3800447E70 /* Project object */;
+}
