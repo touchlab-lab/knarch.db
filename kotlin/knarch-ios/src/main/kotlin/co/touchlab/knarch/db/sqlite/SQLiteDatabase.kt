@@ -25,7 +25,7 @@ import co.touchlab.knarch.io.*
 import platform.Foundation.*
 import konan.worker.*
 
-class SQLiteDatabase private constructor(path: String, openFlags: Int, cursorFactory: CursorFactory?, errorHandler: DatabaseErrorHandler?)  {
+class SQLiteDatabase private constructor(cursorFactory: CursorFactory?, errorHandler: DatabaseErrorHandler?)  {
 
     companion object {
         val CONNECTION_FLAG_PRIMARY_CONNECTION_AFFINITY = 1 shl 1
@@ -186,8 +186,8 @@ class SQLiteDatabase private constructor(path: String, openFlags: Int, cursorFac
          */
         fun openDatabase(path:String , factory:CursorFactory?, flags:Int,
                          errorHandler:DatabaseErrorHandler? = null):SQLiteDatabase {
-            val db = SQLiteDatabase(path, flags, factory, errorHandler);
-            db.open()
+            val db = SQLiteDatabase(factory, errorHandler)
+            db.open(SQLiteDatabaseConfiguration(path, flags))
             return db
         }
 
@@ -277,7 +277,7 @@ class SQLiteDatabase private constructor(path: String, openFlags: Int, cursorFac
         }
     }
 
-    private val sqliteSession = SQLiteSession(SQLiteConnection(SQLiteDatabaseConfiguration(path, openFlags)))
+    private val sqliteSession = SQLiteSession(SQLiteConnection())
 
     // The optional factory to use when creating new Cursors.  May be null.
     // INVARIANT: Immutable.
@@ -286,10 +286,6 @@ class SQLiteDatabase private constructor(path: String, openFlags: Int, cursorFac
     // Error handler to be used when SQLite returns corruption errors.
     // INVARIANT: Immutable.
     private val mErrorHandler:DatabaseErrorHandler = errorHandler ?: DefaultDatabaseErrorHandler()
-
-    private fun dispose(finalized:Boolean) {
-        forceClose()
-    }
 
     /**
      * Gets a label to use when describing the database in log messages.
@@ -322,7 +318,8 @@ class SQLiteDatabase private constructor(path: String, openFlags: Int, cursorFac
      * the database is not open.
      */
     fun getThreadSession():SQLiteSession {
-        sqliteSession.checkOpenConnection()
+        if(!sqliteSession.hasConnection())
+            throw IllegalStateException("Database not open")
         return sqliteSession
     }
 
@@ -505,21 +502,22 @@ class SQLiteDatabase private constructor(path: String, openFlags: Int, cursorFac
         val config = sqliteSession.getDbConfig()
         sqliteSession.putDbConfig(config.copy(openFlags = (config.openFlags.and(OPEN_READ_MASK.inv())).or(OPEN_READWRITE)))
 
-        forceClose()
-        open()
+        reopen()
     }
 
-    fun forceClose(){
-        sqliteSession.closeConnection()
+    private fun reopen(){
+        val config = sqliteSession.getDbConfig()
+        close()
+        open(config)
     }
 
-    fun open() {
+    fun open(config:SQLiteDatabaseConfiguration) {
         try {
             try {
-                openInner()
+                sqliteSession.checkOpenConnection(config)
             } catch (ex:SQLiteDatabaseCorruptException) {
                 onCorruption()
-                openInner()
+                sqliteSession.checkOpenConnection(config)
             }
         } catch (ex:SQLiteException) {
             Log.e(TAG, "Failed to open database '" + getLabel() + "'.", ex)
@@ -529,11 +527,7 @@ class SQLiteDatabase private constructor(path: String, openFlags: Int, cursorFac
     }
 
     fun close(){
-        forceClose()
-    }
-
-    private fun openInner() {
-        sqliteSession.checkOpenConnection()
+        sqliteSession.closeConnection()
     }
 
     /**
@@ -1208,8 +1202,7 @@ class SQLiteDatabase private constructor(path: String, openFlags: Int, cursorFac
         val config = sqliteSession.getDbConfig()
         sqliteSession.putDbConfig(config.copy(maxSqlCacheSize = cacheSize))
 
-        forceClose()
-        open()
+        reopen()
     }
 
     /**
@@ -1248,10 +1241,20 @@ class SQLiteDatabase private constructor(path: String, openFlags: Int, cursorFac
         if (dbConfig.foreignKeyConstraintsEnabled == enable) {
             return
         }
+
+        checkThrowIfInTransaction()
+
         sqliteSession.putDbConfig(dbConfig.copy(foreignKeyConstraintsEnabled = enable))
 
-        forceClose()
-        open()
+        reopen()
+    }
+
+    private fun checkThrowIfInTransaction() {
+        if (sqliteSession.hasTransaction())
+            throw IllegalStateException("Foreign Key Constraints cannot "
+                    + "be enabled or disabled while there are transactions in "
+                    + "progress.  Finish all transactions and release all active "
+                    + "database connections first.")
     }
 
     /**
@@ -1339,6 +1342,9 @@ class SQLiteDatabase private constructor(path: String, openFlags: Int, cursorFac
             // TODO: True, but connection pooling does still make sense...
             return false
         }
+
+        checkThrowIfInTransaction()
+
         if (config.isInMemoryDb()) {
             Log.i(TAG, "can't enable WAL for memory databases.")
             return false
@@ -1346,8 +1352,7 @@ class SQLiteDatabase private constructor(path: String, openFlags: Int, cursorFac
 
         sqliteSession.putDbConfig(config.copy(openFlags = config.openFlags or ENABLE_WRITE_AHEAD_LOGGING))
 
-        forceClose()
-        open()
+        reopen()
         return true
     }
 
@@ -1368,8 +1373,7 @@ class SQLiteDatabase private constructor(path: String, openFlags: Int, cursorFac
         }
         sqliteSession.putDbConfig(config.copy(openFlags = config.openFlags and ENABLE_WRITE_AHEAD_LOGGING.inv()))
 
-        forceClose()
-        open()
+        reopen()
     }
 
     /**

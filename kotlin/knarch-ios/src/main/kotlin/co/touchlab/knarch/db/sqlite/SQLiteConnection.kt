@@ -29,26 +29,11 @@ import konan.worker.*
 import kotlinx.cinterop.*
 import konan.internal.ExportForCppRuntime
 
-class SQLiteConnection(config:SQLiteDatabaseConfiguration) {
-    private val mIsReadOnlyConnection:Boolean
-
+class SQLiteConnection() {
     // The recent operations log.
     private val mRecentOperations = OperationLog()
     // The native SQLiteConnection pointer. (FOR INTERNAL USE ONLY)
-    private val nativeDataId: Int = createDataStore(config.maxSqlCacheSize)
-
-    init{
-        putDbConfig(config)
-        mIsReadOnlyConnection = (config.openFlags and SQLiteDatabase.OPEN_READONLY) != 0
-        try
-        {
-            open()
-        }
-        catch (ex:SQLiteException) {
-            dispose()
-            throw ex
-        }
-    }
+    private val nativeDataId: Int = nextDataId()
 
     fun getDbConfig():SQLiteDatabaseConfiguration{
         val dbConfig = getDbConfig(nativeDataId)
@@ -116,14 +101,14 @@ class SQLiteConnection(config:SQLiteDatabaseConfiguration) {
         dispose()
     }
 
-    fun open() {
-        val mConfiguration = getDbConfig()
-
-        val connectionPtr = nativeOpen(mConfiguration.path, mConfiguration.openFlags,
-                mConfiguration.label,
+    fun open(config:SQLiteDatabaseConfiguration) {
+        val connectionPtr = nativeOpen(config.path, config.openFlags,
+                config.label,
                 SQLiteDebug.DEBUG_SQL_STATEMENTS, SQLiteDebug.DEBUG_SQL_TIME,
-                mConfiguration.lookasideSlotSize, mConfiguration.lookasideSlotCount)
+                config.lookasideSlotSize, config.lookasideSlotCount)
 
+        createDataStore(nativeDataId, config.maxSqlCacheSize)
+        putDbConfig(config)
         putConnectionPtr(nativeDataId, connectionPtr)
 
         setPageSize()
@@ -148,6 +133,7 @@ class SQLiteConnection(config:SQLiteDatabaseConfiguration) {
                 nativeClose(connectionPtr)
                 removeDbConfig(nativeDataId)
                 putConnectionPtr(nativeDataId, 0)
+                removeDataStore(nativeDataId)
             }
             finally
             {
@@ -157,7 +143,8 @@ class SQLiteConnection(config:SQLiteDatabaseConfiguration) {
     }
 
     private fun setPageSize() {
-        if (!getDbConfig().isInMemoryDb() && !mIsReadOnlyConnection)
+        val dbConfig = getDbConfig()
+        if (!dbConfig.isInMemoryDb() && !dbConfig.isReadOnlyConnection())
         {
             val newValue = SQLiteGlobal.defaultPageSize
             val value = executeForLong("PRAGMA page_size", null).toInt()
@@ -169,7 +156,8 @@ class SQLiteConnection(config:SQLiteDatabaseConfiguration) {
     }
 
     private fun setAutoCheckpointInterval() {
-        if (!getDbConfig().isInMemoryDb() && !mIsReadOnlyConnection)
+        val dbConfig = getDbConfig()
+        if (!dbConfig.isInMemoryDb() && !dbConfig.isReadOnlyConnection())
         {
             val newValue = SQLiteGlobal.walAutoCheckpoint
             val value = executeForLong("PRAGMA wal_autocheckpoint", null).toInt()
@@ -180,7 +168,8 @@ class SQLiteConnection(config:SQLiteDatabaseConfiguration) {
         }
     }
     private fun setJournalSizeLimit() {
-        if (!getDbConfig().isInMemoryDb() && !mIsReadOnlyConnection)
+        val dbConfig = getDbConfig()
+        if (!dbConfig.isInMemoryDb() && !dbConfig.isReadOnlyConnection())
         {
             val newValue = SQLiteGlobal.journalSizeLimit
             val value = executeForLong("PRAGMA journal_size_limit", null).toInt()
@@ -191,7 +180,7 @@ class SQLiteConnection(config:SQLiteDatabaseConfiguration) {
         }
     }
     private fun setForeignKeyModeFromConfiguration() {
-        if (!mIsReadOnlyConnection)
+        if (!getDbConfig().isReadOnlyConnection())
         {
             val newValue = (if (getDbConfig().foreignKeyConstraintsEnabled) 1 else 0).toLong()
             val value = executeForLong("PRAGMA foreign_keys", null)
@@ -203,9 +192,10 @@ class SQLiteConnection(config:SQLiteDatabaseConfiguration) {
     }
 
     private fun setWalModeFromConfiguration() {
-        if (!getDbConfig().isInMemoryDb() && !mIsReadOnlyConnection)
+        val dbConfig = getDbConfig()
+        if (!dbConfig.isInMemoryDb() && !dbConfig.isReadOnlyConnection())
         {
-            if ((getDbConfig().openFlags and SQLiteDatabase.ENABLE_WRITE_AHEAD_LOGGING) != 0)
+            if ((dbConfig.openFlags and SQLiteDatabase.ENABLE_WRITE_AHEAD_LOGGING) != 0)
             {
                 setJournalMode("WAL")
                 setSyncMode(SQLiteGlobal.walSyncMode)
@@ -949,8 +939,14 @@ class SQLiteConnection(config:SQLiteDatabaseConfiguration) {
     }
 }
 
+@SymbolName("SQLiteSupport_nextDataId")
+private external fun nextDataId():Int
+
 @SymbolName("SQLiteSupport_createDataStore")
-private external fun createDataStore(maxCacheSize:Int):Int
+private external fun createDataStore(dataId:Int, maxCacheSize:Int)
+
+@SymbolName("SQLiteSupport_removeDataStore")
+private external fun removeDataStore(dataId:Int)
 
 @SymbolName("SQLiteSupport_getConnectionPtr")
 private external fun getConnectionPtr(dataId:Int):Long

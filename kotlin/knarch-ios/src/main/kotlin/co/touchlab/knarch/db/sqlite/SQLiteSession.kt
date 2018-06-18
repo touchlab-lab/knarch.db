@@ -39,10 +39,10 @@ class SQLiteSession(private val mConnection: SQLiteConnection) {
     private val sessionRecursiveLock = NSRecursiveLock()
     private val transLock = NSRecursiveLock()
 
-    internal fun checkOpenConnection(){
+    internal fun checkOpenConnection(config:SQLiteDatabaseConfiguration){
         withLock {
             if(!mConnection.hasConnection())
-                mConnection.open()
+                mConnection.open(config)
         }
     }
 

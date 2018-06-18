@@ -991,7 +991,7 @@ class SQLiteDatabaseTest {
         assertEquals(2, cursor.getInt(1))
     }
 
-    /*@Test
+    @Test
     fun testEnableAndDisableForeignKeys() {
         println("testEnableAndDisableForeignKeys A")
         // Initially off.
@@ -1023,7 +1023,7 @@ class SQLiteDatabaseTest {
         println("testEnableAndDisableForeignKeys G")
         mDatabase.setForeignKeyConstraintsEnabled(true)
         assertEquals(1, DatabaseUtils.longForQuery(mDatabase, "PRAGMA foreign_keys", null), "Enable foreign keys should work again after transaction complete")
-    }*/
+    }
 
     /*
 

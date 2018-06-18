@@ -100,4 +100,5 @@ data class SQLiteDatabaseConfiguration(
         return lookasideSlotCount >= 0 && lookasideSlotSize >= 0
     }
 
+    fun isReadOnlyConnection() = (openFlags and SQLiteDatabase.OPEN_READONLY) != 0
 }

@@ -128,17 +128,6 @@ namespace {
             pthread_mutex_destroy(&lock_);
         }
 
-        KInt createDataStore(KInt maxCacheSize) {
-            KInt dataId = 0;
-
-            Locker locker(&lock_);
-
-            dataId = nextDataId();
-            data_[dataId] = new DatabaseInfo(maxCacheSize);
-
-            return dataId;
-        }
-
         void putStmt(KInt dataId, KString sql, KRef stmt) {
             Locker locker(&lock_);
             auto it = data_.find(dataId);
@@ -196,7 +185,10 @@ namespace {
         KLong getConnectionPtr(KInt dataId) {
             Locker locker(&lock_);
             auto it = data_.find(dataId);
-            return it->second->connectionPtr;
+            if (it == data_.end())
+                return 0l;
+            else
+                return it->second->connectionPtr;
         }
 
         void evictAll(KInt dataId) {
@@ -209,6 +201,16 @@ namespace {
             Locker locker(&lock_);
             auto it = data_.find(dataId);
             it->second->remove(sql);
+        }
+
+        KInt nextDataId() {
+            Locker locker(&lock_);
+            return currentDataId_++;
+        }
+
+        void createDataStore(KInt dataId, KInt maxCacheSize) {
+            Locker locker(&lock_);
+            data_[dataId] = new DatabaseInfo(maxCacheSize);
         }
 
         void removeDataStore(KInt dataId) {
@@ -243,10 +245,6 @@ namespace {
         }
 
     private:
-
-        KInt nextDataId() {
-            return currentDataId_++;
-        }
 
         void removeHelperInfo(KInt dataId) {
             auto it = helperData_.find(dataId);
@@ -304,21 +302,8 @@ void DisposeCString(char* cstring) {
 
 extern "C" {
 
-KRef SQLiteSupport_getHelperInfo(KInt dataId) {
-    return dataState()->getHelperInfo(dataId);
-}
 
-void SQLiteSupport_putHelperInfo(KInt dataId, KRef helperInfo) {
-    dataState()->putHelperInfo(dataId, helperInfo);
-}
 
-KInt SQLiteSupport_nextHelperInfoId() {
-    return dataState()->nextHelperInfoId();
-}
-
-KInt SQLiteSupport_createDataStore(KInt maxCacheSize) {
-    return dataState()->createDataStore(maxCacheSize);
-}
 
 void SQLiteSupport_putConnectionPtr(KInt dataId, KLong connectionPtr) {
     dataState()->putConnectionPtr(dataId, connectionPtr);
@@ -370,6 +355,29 @@ void SQLiteSupport_evictAll(KInt dataId) {
 
 void SQLiteSupport_remove(KInt dataId, KString sql) {
     return dataState()->remove(dataId, sql);
+}
+
+KInt SQLiteSupport_nextDataId(){
+    return dataState()->nextDataId();
+}
+void SQLiteSupport_createDataStore(KInt dataId, KInt maxCacheSize) {
+    return dataState()->createDataStore(dataId, maxCacheSize);
+}
+
+void SQLiteSupport_removeDataStore(KInt dataId) {
+    return dataState()->removeDataStore(dataId);
+}
+
+void SQLiteSupport_putHelperInfo(KInt dataId, KRef helperInfo) {
+    dataState()->putHelperInfo(dataId, helperInfo);
+}
+
+KRef SQLiteSupport_getHelperInfo(KInt dataId) {
+    return dataState()->getHelperInfo(dataId);
+}
+
+KInt SQLiteSupport_nextHelperInfoId() {
+    return dataState()->nextHelperInfoId();
 }
 
 }
