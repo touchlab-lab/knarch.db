@@ -40,6 +40,12 @@ With that in place, we will work on some next-stage goals simultaneously.
 
 TL;DR Yes, put this in your app today. It works. There's a lot that's going to change, but if you're looking at Kotlin Multiplatform for your iOS implementation, I assume you have a high tolerance for change. Our goal is to have solid *functionality* testing to verify that things work as expected, and starting with the AOSP base gives us that.
 
+### Multiplatform
+
+The MP portion of the framework is very much in flux. The core public structures of Android's sqlite stack are represented
+sufficiently to support basic database work, but it is **far** from fully thought out. How your shared code creates and
+interacts with databases still needs some design. Feedback and PR's highly encouraged.
+
 ## Differences
 
 Due to the KN differences, primarily threading but others as well, the internals of the implementation have had fairly significant changes from the original code.
@@ -68,6 +74,14 @@ Transaction listeners are currently frozen, but we're going to make them thread 
 are not the same, and there are some rules to follow. You can't interact with a transaction from another thread
 currently, so making the listener thread local shouldn't be an issue. If you're using transaction listeners,
 it may be something to consider.
+
+### Attached databases
+
+This functionality was removed during porting because of threading issues and how relatively uncommon this is. Will be [added back](https://github.com/touchlab/knarch.db/issues/41).
+
+### Custom Functions
+
+Not available. This is a relatively complex feature that will have C++ and K/N repercussions (threading, etc). Something to look into down the road if desired.
 
 ## Usage
 
