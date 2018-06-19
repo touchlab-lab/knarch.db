@@ -24,15 +24,14 @@ private fun makeQueue():Worker{
  *
  * Expect everything you pass in to be frozen, and if that's not possible, it'll all fail. Just FYI.
  */
-actual fun <A, B> backgroundTask(backJob:(A)-> B, arg:A, mainJob:(B) -> Unit){
+actual fun <B> backgroundTask(backJob:()-> B, mainJob:(B) -> Unit){
 
-    val jobWrapper = JobWrapper(backJob, arg, mainJob).freeze()
+    val jobWrapper = JobWrapper(backJob, mainJob).freeze()
 
     val worker = makeQueue()
     worker.schedule(TransferMode.CHECKED,
             { jobWrapper }){
-        println("${it.arg}")
-        val result  = detachObjectGraph { it.backJob(it.arg).freeze() as Any }
+        val result  = detachObjectGraph { it.backJob().freeze() as Any }
         dispatch_async(dispatch_get_main_queue()){
             val mainResult = attachObjectGraph<Any>(result) as B
             it.mainJob(mainResult)
@@ -40,4 +39,4 @@ actual fun <A, B> backgroundTask(backJob:(A)-> B, arg:A, mainJob:(B) -> Unit){
     }
 }
 
-data class JobWrapper<A, B>(val backJob:(A)-> B, val arg:A, val mainJob:(B) -> Unit)
+data class JobWrapper<B>(val backJob:()-> B, val mainJob:(B) -> Unit)

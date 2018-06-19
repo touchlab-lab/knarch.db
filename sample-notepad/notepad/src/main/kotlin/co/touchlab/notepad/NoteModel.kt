@@ -13,7 +13,7 @@ class NoteModel {
             dbHelper.noteUpdate = {
                 backgroundTask({
                     dbHelper.getNotes()
-                }, null){notes ->
+                }){notes ->
                     println("Found ${notes.size} notes")
                     for (n in notes) {
                         println(n)
@@ -46,8 +46,8 @@ class NoteModel {
         }
 
         backgroundTask(
-                { dbHelper.insertNotes(it) }
-                , notes) {
+                { dbHelper.insertNotes(notes) }
+        ) {
             println("Done inserting!!!")
         }
     }
