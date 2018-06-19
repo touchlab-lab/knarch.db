@@ -5,7 +5,7 @@ import co.touchlab.multiplatform.architecture.db.sqlite.*
 import co.touchlab.notepad.db.NoteColumns.Companion.NOTES_TABLE_NAME
 
 class NoteDbHelper {
-    var noteUpdate: ((notes:Array<Note>)->Unit)? = null
+    var noteUpdate: (()->Unit)? = null
     private var helper:SQLiteOpenHelper
     init {
         helper = createOpenHelper("holla", initCallback(), null)
@@ -88,7 +88,7 @@ class NoteDbHelper {
         }
 
         if (noteUpdate != null) {
-            noteUpdate!!(getNotes())
+            noteUpdate!!()
         }
     }
 
