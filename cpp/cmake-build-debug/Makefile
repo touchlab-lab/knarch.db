@@ -150,60 +150,6 @@ knarch/src/main/cpp/AndroidfwCursorWindow.cpp.s:
 	$(MAKE) -f CMakeFiles/cpp.dir/build.make CMakeFiles/cpp.dir/knarch/src/main/cpp/AndroidfwCursorWindow.cpp.s
 .PHONY : knarch/src/main/cpp/AndroidfwCursorWindow.cpp.s
 
-knarch/src/main/cpp/Atomic.o: knarch/src/main/cpp/Atomic.cpp.o
-
-.PHONY : knarch/src/main/cpp/Atomic.o
-
-# target to build an object file
-knarch/src/main/cpp/Atomic.cpp.o:
-	$(MAKE) -f CMakeFiles/cpp.dir/build.make CMakeFiles/cpp.dir/knarch/src/main/cpp/Atomic.cpp.o
-.PHONY : knarch/src/main/cpp/Atomic.cpp.o
-
-knarch/src/main/cpp/Atomic.i: knarch/src/main/cpp/Atomic.cpp.i
-
-.PHONY : knarch/src/main/cpp/Atomic.i
-
-# target to preprocess a source file
-knarch/src/main/cpp/Atomic.cpp.i:
-	$(MAKE) -f CMakeFiles/cpp.dir/build.make CMakeFiles/cpp.dir/knarch/src/main/cpp/Atomic.cpp.i
-.PHONY : knarch/src/main/cpp/Atomic.cpp.i
-
-knarch/src/main/cpp/Atomic.s: knarch/src/main/cpp/Atomic.cpp.s
-
-.PHONY : knarch/src/main/cpp/Atomic.s
-
-# target to generate assembly for a file
-knarch/src/main/cpp/Atomic.cpp.s:
-	$(MAKE) -f CMakeFiles/cpp.dir/build.make CMakeFiles/cpp.dir/knarch/src/main/cpp/Atomic.cpp.s
-.PHONY : knarch/src/main/cpp/Atomic.cpp.s
-
-knarch/src/main/cpp/AtomicData.o: knarch/src/main/cpp/AtomicData.cpp.o
-
-.PHONY : knarch/src/main/cpp/AtomicData.o
-
-# target to build an object file
-knarch/src/main/cpp/AtomicData.cpp.o:
-	$(MAKE) -f CMakeFiles/cpp.dir/build.make CMakeFiles/cpp.dir/knarch/src/main/cpp/AtomicData.cpp.o
-.PHONY : knarch/src/main/cpp/AtomicData.cpp.o
-
-knarch/src/main/cpp/AtomicData.i: knarch/src/main/cpp/AtomicData.cpp.i
-
-.PHONY : knarch/src/main/cpp/AtomicData.i
-
-# target to preprocess a source file
-knarch/src/main/cpp/AtomicData.cpp.i:
-	$(MAKE) -f CMakeFiles/cpp.dir/build.make CMakeFiles/cpp.dir/knarch/src/main/cpp/AtomicData.cpp.i
-.PHONY : knarch/src/main/cpp/AtomicData.cpp.i
-
-knarch/src/main/cpp/AtomicData.s: knarch/src/main/cpp/AtomicData.cpp.s
-
-.PHONY : knarch/src/main/cpp/AtomicData.s
-
-# target to generate assembly for a file
-knarch/src/main/cpp/AtomicData.cpp.s:
-	$(MAKE) -f CMakeFiles/cpp.dir/build.make CMakeFiles/cpp.dir/knarch/src/main/cpp/AtomicData.cpp.s
-.PHONY : knarch/src/main/cpp/AtomicData.cpp.s
-
 knarch/src/main/cpp/KonanHelper.o: knarch/src/main/cpp/KonanHelper.cpp.o
 
 .PHONY : knarch/src/main/cpp/KonanHelper.o
@@ -231,59 +177,59 @@ knarch/src/main/cpp/KonanHelper.cpp.s:
 	$(MAKE) -f CMakeFiles/cpp.dir/build.make CMakeFiles/cpp.dir/knarch/src/main/cpp/KonanHelper.cpp.s
 .PHONY : knarch/src/main/cpp/KonanHelper.cpp.s
 
-knarch/src/main/cpp/NativeHelper.o: knarch/src/main/cpp/NativeHelper.m.o
+knarch/src/main/cpp/SQLiteSupport.o: knarch/src/main/cpp/SQLiteSupport.cpp.o
 
-.PHONY : knarch/src/main/cpp/NativeHelper.o
-
-# target to build an object file
-knarch/src/main/cpp/NativeHelper.m.o:
-	$(MAKE) -f CMakeFiles/cpp.dir/build.make CMakeFiles/cpp.dir/knarch/src/main/cpp/NativeHelper.m.o
-.PHONY : knarch/src/main/cpp/NativeHelper.m.o
-
-knarch/src/main/cpp/NativeHelper.i: knarch/src/main/cpp/NativeHelper.m.i
-
-.PHONY : knarch/src/main/cpp/NativeHelper.i
-
-# target to preprocess a source file
-knarch/src/main/cpp/NativeHelper.m.i:
-	$(MAKE) -f CMakeFiles/cpp.dir/build.make CMakeFiles/cpp.dir/knarch/src/main/cpp/NativeHelper.m.i
-.PHONY : knarch/src/main/cpp/NativeHelper.m.i
-
-knarch/src/main/cpp/NativeHelper.s: knarch/src/main/cpp/NativeHelper.m.s
-
-.PHONY : knarch/src/main/cpp/NativeHelper.s
-
-# target to generate assembly for a file
-knarch/src/main/cpp/NativeHelper.m.s:
-	$(MAKE) -f CMakeFiles/cpp.dir/build.make CMakeFiles/cpp.dir/knarch/src/main/cpp/NativeHelper.m.s
-.PHONY : knarch/src/main/cpp/NativeHelper.m.s
-
-knarch/src/main/cpp/TLAssert.o: knarch/src/main/cpp/TLAssert.cpp.o
-
-.PHONY : knarch/src/main/cpp/TLAssert.o
+.PHONY : knarch/src/main/cpp/SQLiteSupport.o
 
 # target to build an object file
-knarch/src/main/cpp/TLAssert.cpp.o:
-	$(MAKE) -f CMakeFiles/cpp.dir/build.make CMakeFiles/cpp.dir/knarch/src/main/cpp/TLAssert.cpp.o
-.PHONY : knarch/src/main/cpp/TLAssert.cpp.o
+knarch/src/main/cpp/SQLiteSupport.cpp.o:
+	$(MAKE) -f CMakeFiles/cpp.dir/build.make CMakeFiles/cpp.dir/knarch/src/main/cpp/SQLiteSupport.cpp.o
+.PHONY : knarch/src/main/cpp/SQLiteSupport.cpp.o
 
-knarch/src/main/cpp/TLAssert.i: knarch/src/main/cpp/TLAssert.cpp.i
+knarch/src/main/cpp/SQLiteSupport.i: knarch/src/main/cpp/SQLiteSupport.cpp.i
 
-.PHONY : knarch/src/main/cpp/TLAssert.i
+.PHONY : knarch/src/main/cpp/SQLiteSupport.i
 
 # target to preprocess a source file
-knarch/src/main/cpp/TLAssert.cpp.i:
-	$(MAKE) -f CMakeFiles/cpp.dir/build.make CMakeFiles/cpp.dir/knarch/src/main/cpp/TLAssert.cpp.i
-.PHONY : knarch/src/main/cpp/TLAssert.cpp.i
+knarch/src/main/cpp/SQLiteSupport.cpp.i:
+	$(MAKE) -f CMakeFiles/cpp.dir/build.make CMakeFiles/cpp.dir/knarch/src/main/cpp/SQLiteSupport.cpp.i
+.PHONY : knarch/src/main/cpp/SQLiteSupport.cpp.i
 
-knarch/src/main/cpp/TLAssert.s: knarch/src/main/cpp/TLAssert.cpp.s
+knarch/src/main/cpp/SQLiteSupport.s: knarch/src/main/cpp/SQLiteSupport.cpp.s
 
-.PHONY : knarch/src/main/cpp/TLAssert.s
+.PHONY : knarch/src/main/cpp/SQLiteSupport.s
 
 # target to generate assembly for a file
-knarch/src/main/cpp/TLAssert.cpp.s:
-	$(MAKE) -f CMakeFiles/cpp.dir/build.make CMakeFiles/cpp.dir/knarch/src/main/cpp/TLAssert.cpp.s
-.PHONY : knarch/src/main/cpp/TLAssert.cpp.s
+knarch/src/main/cpp/SQLiteSupport.cpp.s:
+	$(MAKE) -f CMakeFiles/cpp.dir/build.make CMakeFiles/cpp.dir/knarch/src/main/cpp/SQLiteSupport.cpp.s
+.PHONY : knarch/src/main/cpp/SQLiteSupport.cpp.s
+
+knarch/src/main/cpp/ThreadSupport.o: knarch/src/main/cpp/ThreadSupport.cpp.o
+
+.PHONY : knarch/src/main/cpp/ThreadSupport.o
+
+# target to build an object file
+knarch/src/main/cpp/ThreadSupport.cpp.o:
+	$(MAKE) -f CMakeFiles/cpp.dir/build.make CMakeFiles/cpp.dir/knarch/src/main/cpp/ThreadSupport.cpp.o
+.PHONY : knarch/src/main/cpp/ThreadSupport.cpp.o
+
+knarch/src/main/cpp/ThreadSupport.i: knarch/src/main/cpp/ThreadSupport.cpp.i
+
+.PHONY : knarch/src/main/cpp/ThreadSupport.i
+
+# target to preprocess a source file
+knarch/src/main/cpp/ThreadSupport.cpp.i:
+	$(MAKE) -f CMakeFiles/cpp.dir/build.make CMakeFiles/cpp.dir/knarch/src/main/cpp/ThreadSupport.cpp.i
+.PHONY : knarch/src/main/cpp/ThreadSupport.cpp.i
+
+knarch/src/main/cpp/ThreadSupport.s: knarch/src/main/cpp/ThreadSupport.cpp.s
+
+.PHONY : knarch/src/main/cpp/ThreadSupport.s
+
+# target to generate assembly for a file
+knarch/src/main/cpp/ThreadSupport.cpp.s:
+	$(MAKE) -f CMakeFiles/cpp.dir/build.make CMakeFiles/cpp.dir/knarch/src/main/cpp/ThreadSupport.cpp.s
+.PHONY : knarch/src/main/cpp/ThreadSupport.cpp.s
 
 knarch/src/main/cpp/android_database_CursorWindow.o: knarch/src/main/cpp/android_database_CursorWindow.cpp.o
 
@@ -405,21 +351,15 @@ help:
 	@echo "... knarch/src/main/cpp/AndroidfwCursorWindow.o"
 	@echo "... knarch/src/main/cpp/AndroidfwCursorWindow.i"
 	@echo "... knarch/src/main/cpp/AndroidfwCursorWindow.s"
-	@echo "... knarch/src/main/cpp/Atomic.o"
-	@echo "... knarch/src/main/cpp/Atomic.i"
-	@echo "... knarch/src/main/cpp/Atomic.s"
-	@echo "... knarch/src/main/cpp/AtomicData.o"
-	@echo "... knarch/src/main/cpp/AtomicData.i"
-	@echo "... knarch/src/main/cpp/AtomicData.s"
 	@echo "... knarch/src/main/cpp/KonanHelper.o"
 	@echo "... knarch/src/main/cpp/KonanHelper.i"
 	@echo "... knarch/src/main/cpp/KonanHelper.s"
-	@echo "... knarch/src/main/cpp/NativeHelper.o"
-	@echo "... knarch/src/main/cpp/NativeHelper.i"
-	@echo "... knarch/src/main/cpp/NativeHelper.s"
-	@echo "... knarch/src/main/cpp/TLAssert.o"
-	@echo "... knarch/src/main/cpp/TLAssert.i"
-	@echo "... knarch/src/main/cpp/TLAssert.s"
+	@echo "... knarch/src/main/cpp/SQLiteSupport.o"
+	@echo "... knarch/src/main/cpp/SQLiteSupport.i"
+	@echo "... knarch/src/main/cpp/SQLiteSupport.s"
+	@echo "... knarch/src/main/cpp/ThreadSupport.o"
+	@echo "... knarch/src/main/cpp/ThreadSupport.i"
+	@echo "... knarch/src/main/cpp/ThreadSupport.s"
 	@echo "... knarch/src/main/cpp/android_database_CursorWindow.o"
 	@echo "... knarch/src/main/cpp/android_database_CursorWindow.i"
 	@echo "... knarch/src/main/cpp/android_database_CursorWindow.s"

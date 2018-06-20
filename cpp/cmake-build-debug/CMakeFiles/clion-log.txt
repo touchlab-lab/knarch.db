@@ -1,16 +1,4 @@
 "/Applications/CLion 2018.2 EAP.app/Contents/bin/cmake/bin/cmake" -DCMAKE_BUILD_TYPE=Debug -G "CodeBlocks - Unix Makefiles" /Users/kgalligan/temp4/knarch/cpp
 -- Configuring done
-CMake Error at CMakeLists.txt:9 (add_executable):
-  Cannot find source file:
-
-    knarch/src/main/cpp/AtomicData.cpp
-
-  Tried extensions .c .C .c++ .cc .cpp .cxx .cu .m .M .mm .h .hh .h++ .hm
-  .hpp .hxx .in .txx
-
-
-CMake Error at CMakeLists.txt:9 (add_executable):
-  No SOURCES given to target: cpp
-
-
+-- Generating done
 -- Build files have been written to: /Users/kgalligan/temp4/knarch/cpp/cmake-build-debug

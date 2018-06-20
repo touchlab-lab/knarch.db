@@ -92,31 +92,16 @@
 		<Unit filename="/Users/kgalligan/temp4/knarch/cpp/knarch/src/main/cpp/AndroidfwCursorWindow.h">
 			<Option target="cpp"/>
 		</Unit>
-		<Unit filename="/Users/kgalligan/temp4/knarch/cpp/knarch/src/main/cpp/Atomic.cpp">
-			<Option target="cpp"/>
-		</Unit>
-		<Unit filename="/Users/kgalligan/temp4/knarch/cpp/knarch/src/main/cpp/AtomicData.cpp">
-			<Option target="cpp"/>
-		</Unit>
-		<Unit filename="/Users/kgalligan/temp4/knarch/cpp/knarch/src/main/cpp/AtomicData.h">
-			<Option target="cpp"/>
-		</Unit>
 		<Unit filename="/Users/kgalligan/temp4/knarch/cpp/knarch/src/main/cpp/KonanHelper.cpp">
 			<Option target="cpp"/>
 		</Unit>
 		<Unit filename="/Users/kgalligan/temp4/knarch/cpp/knarch/src/main/cpp/KonanHelper.h">
 			<Option target="cpp"/>
 		</Unit>
-		<Unit filename="/Users/kgalligan/temp4/knarch/cpp/knarch/src/main/cpp/NativeHelper.h">
+		<Unit filename="/Users/kgalligan/temp4/knarch/cpp/knarch/src/main/cpp/SQLiteSupport.cpp">
 			<Option target="cpp"/>
 		</Unit>
-		<Unit filename="/Users/kgalligan/temp4/knarch/cpp/knarch/src/main/cpp/NativeHelper.m">
-			<Option target="cpp"/>
-		</Unit>
-		<Unit filename="/Users/kgalligan/temp4/knarch/cpp/knarch/src/main/cpp/TLAssert.cpp">
-			<Option target="cpp"/>
-		</Unit>
-		<Unit filename="/Users/kgalligan/temp4/knarch/cpp/knarch/src/main/cpp/TLAssert.h">
+		<Unit filename="/Users/kgalligan/temp4/knarch/cpp/knarch/src/main/cpp/ThreadSupport.cpp">
 			<Option target="cpp"/>
 		</Unit>
 		<Unit filename="/Users/kgalligan/temp4/knarch/cpp/knarch/src/main/cpp/UtilsErrors.h">
