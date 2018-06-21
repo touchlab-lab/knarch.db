@@ -1,5 +1,6 @@
 package co.touchlab.notepad
 
+import co.touchlab.multiplatform.architecture.threads.ThreadLocal
 import co.touchlab.notepad.db.Note
 import co.touchlab.notepad.db.NoteDbHelper
 import co.touchlab.notepad.utils.backgroundTask
@@ -8,47 +9,60 @@ import co.touchlab.notepad.utils.currentTimeMillis
 class NoteModel {
     companion object {
         val dbHelper = NoteDbHelper()
+    }
 
-        init {
-            dbHelper.noteUpdate = {
-                backgroundTask({
-                    dbHelper.getNotes()
-                }){notes ->
-                    println("Found ${notes.size} notes")
-                    for (n in notes) {
-                        println(n)
-                    }
+    init {
+        dbHelper.noteUpdate = {
+
+            backgroundTask({
+                dbHelper.getNotes()
+            }) {
+                val proc = updateLocal.get()
+                println("proc null? ${proc == null}")
+                if (proc != null) {
+                    proc(it)
                 }
-
             }
         }
     }
 
-    fun insertTestNotes() {
+    val updateLocal = ThreadLocal<(notes:Array<Note>)->Unit>()
 
-        val notes = Array(10) { i ->
-            val now = currentTimeMillis()
-            Note(
-                    "Title $i",
-                    "Desc $i",
-                    now,
-                    now,
-                    ByteArray(4) {
-                        when (it) {
-                            0 -> 1
-                            1 -> 2
-                            2 -> 3
-                            3 -> 5
-                            else -> 0
-                        }
-                    }
-            )
-        }
-
+    fun insertNote(title:String, description:String){
         backgroundTask(
-                { dbHelper.insertNotes(notes) }
-        ) {
-            println("Done inserting!!!")
+                {
+                    val now = currentTimeMillis()
+                    dbHelper.insertNotes(
+                            Array(1) {
+                                Note(title, description, now, now, null)
+                            })
+                }
+        ){
+            println("It worked?")
+            runUpdate()
         }
+    }
+
+    fun deleteNotes(){
+        backgroundTask({
+            dbHelper.deleteNotes()
+        }){
+            runUpdate()
+        }
+    }
+
+
+    fun runUpdate(){
+        if (dbHelper.noteUpdate != null) {
+            dbHelper.noteUpdate!!()
+        }
+    }
+
+    fun initUpdate(proc:(notes:Array<Note>)->Unit){
+        updateLocal.set(proc)
+    }
+
+    fun clearUpdate(){
+        updateLocal.remove()
     }
 }

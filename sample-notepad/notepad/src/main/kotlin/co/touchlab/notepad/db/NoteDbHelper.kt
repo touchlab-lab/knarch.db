@@ -50,9 +50,19 @@ class NoteDbHelper {
         )
     }
 
+    fun deleteNotes(){
+        helper.getWritableDatabase().delete(
+                NoteColumns.NOTES_TABLE_NAME,null, null
+        )
+    }
+
+
     fun getNotes(): Array<Note> {
         val db = helper.getWritableDatabase()
-        val cursor = db.query(table = NoteColumns.NOTES_TABLE_NAME)
+        val cursor = db.query(
+                table = NoteColumns.NOTES_TABLE_NAME,
+                orderBy = "${NoteColumns.MODIFIED_DATE} desc"
+        )
 
         cursor.moveToFirst()
 
@@ -86,45 +96,7 @@ class NoteDbHelper {
                 insertNote(s)
             }
         }
-
-        if (noteUpdate != null) {
-            noteUpdate!!()
-        }
     }
-
-/*
-        fun queryData(db: SQLiteDatabase, count:Int) {
-            val list = ArrayList<Pair<String,String>>(TEST_NOTE_COUNT)
-
-            val cursor = db.rawQuery(
-                    "select * from $NOTES_TABLE_NAME " +
-                            "order by ${NoteColumns.CREATED_DATE} desc " +
-                            "limit $count",
-                    null
-            )
-
-            val titleColumn = cursor.getColumnIndex(TITLE)
-            val noteColumn = cursor.getColumnIndex(NOTE)
-//            val blobColumn = cursor.getColumnIndex(HI_BLOB)
-
-            println("queryData titleColumn $titleColumn")
-            println("queryData noteColumn $noteColumn")
-            while (cursor.moveToNext()){
-                list.add(Pair(cursor.getString(titleColumn), cursor.getString(noteColumn)))
-//                val blobColString = utf8ToString(cursor.getBlob(blobColumn))
-//                if(list.size < 30)
-//                {
-//                    println("The Blob: $blobColString")
-//                }
-            }
-
-            println("Count Result ${list.size}")
-            for (i in 0..20) {
-                val pair = list[i]
-                println("title: ${pair.first}/note: ${pair.second}")
-            }
-        }*/
-
 }
 
 interface NoteUpdate {
