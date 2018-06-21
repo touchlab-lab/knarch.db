@@ -1,0 +1,26 @@
+apply plugin: 'kotlin-platform-common'
+//apply plugin: 'org.jetbrains.kotlin.platform.common'
+apply plugin: 'com.squareup.sqldelight'
+
+//group = 'org.jetbrains.kotlin.konan.samples'
+
+dependencies {
+    implementation deps.kotlin.stdlib.common
+//    implementation deps.sqldelight.runtime
+//    implementation "com.squareup.sqldelight:multiplatform-driver:0.1"
+    implementation fileTree(dir: '../libs/jars', include: '*.jar')
+}
+
+kotlin {
+    experimental {
+        coroutines 'enable'
+    }
+}
+
+sqldelight {
+    packageName = "co.touchlab.notepad.sqldelight"
+}
+
+//compileKotlinCommon.dependsOn("generateSqlDelightInterface")
+//tasks.findByName("compileKotlinCommon")?.dependsOn(tasks.findByName("generateSqlDelightInterface"))
+//tasks.getByName("build").dependsOn("generateSqlDelightInterface")
