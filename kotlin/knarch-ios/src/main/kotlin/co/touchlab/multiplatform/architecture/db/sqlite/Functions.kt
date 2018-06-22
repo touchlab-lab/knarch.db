@@ -22,16 +22,25 @@ import co.touchlab.knarch.io.File
 import co.touchlab.multiplatform.architecture.db.DatabaseErrorHandler
 
 
-val systemContext = DefaultSystemContext()
-fun getContext(): SystemContext = systemContext
+var systemContext:SystemContext?=null
+
+/**
+ * Not pretty, but you know
+ */
+fun initSystemContext(sc:SystemContext){
+    systemContext = sc
+}
 
 actual fun createOpenHelper(
         name:String?,
         callback:PlatformSQLiteOpenHelperCallback,
         errorHandler: DatabaseErrorHandler?):SQLiteOpenHelper{
 
+    if(systemContext == null)
+        throw NullPointerException("Must call initSystemContext")
+
     return PlatformSQLiteOpenHelper(callback,
-            getContext(),
+            systemContext!!,
             name,
             callback.version,
             errorHandler

@@ -5,11 +5,14 @@ import co.touchlab.notepad.sqldelight.NoteQueries
 import co.touchlab.notepad.sqldelight.QueryWrapper
 import com.squareup.sqldelight.multiplatform.create
 
+import co.touchlab.notepad.utils.initContext
+
 class NoteDbHelper {
     var noteUpdate: (()->Unit)? = null
     private val noteQueries:NoteQueries
 
     init {
+        initContext()
         val wrapper = QueryWrapper(QueryWrapper.create("holla2"))
 
         noteQueries = wrapper.noteQueries

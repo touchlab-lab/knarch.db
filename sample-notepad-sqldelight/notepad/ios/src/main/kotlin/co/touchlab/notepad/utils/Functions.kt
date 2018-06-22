@@ -3,10 +3,20 @@ package co.touchlab.notepad.utils
 import kotlin.system.getTimeMillis
 import platform.darwin.*
 import konan.worker.*
+import co.touchlab.multiplatform.architecture.db.sqlite.*
+import co.touchlab.knarch.*
 
 actual fun currentTimeMillis():Long = getTimeMillis()
 
+//This definitely needs a rethink
+actual fun initContext(){
+    if(systemContext == null)
+        initSystemContext(DefaultSystemContext())
+}
+
 private var worker :Worker?=null
+
+
 
 //Multiple worker contexts get a copy of global state. Not sure about threads created outside of K/N (probably not)
 //Lazy create ensures we don't try to create multiple queues

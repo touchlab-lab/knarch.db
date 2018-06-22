@@ -6,9 +6,8 @@ apply plugin: 'com.squareup.sqldelight'
 
 dependencies {
     implementation deps.kotlin.stdlib.common
-//    implementation deps.sqldelight.runtime
-//    implementation "com.squareup.sqldelight:multiplatform-driver:0.1"
-    implementation fileTree(dir: '../libs/jars', include: '*.jar')
+    implementation deps.sqldelight.runtime
+    implementation deps.sqldelight.multiplatformdriver
 }
 
 kotlin {

@@ -19,7 +19,7 @@
 //Ugly, but functional.
 
 buildscript {
-    ext.kotlin_version = '1.2.41'
+    ext.kotlin_version = '1.2.50'
     repositories {
         mavenCentral()
         maven { url "https://dl.bintray.com/jetbrains/kotlin-native-dependencies" }

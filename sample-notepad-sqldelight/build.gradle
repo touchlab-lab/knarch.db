@@ -43,21 +43,23 @@ buildscript {
 
             'sqldelight': [
                     'android': "com.squareup.sqldelight:android-driver:${versions.sqldelight}",
-                    'runtime': "com.squareup.sqldelight:runtime:${versions.sqldelight}",
+                    'runtime': "com.squareup.sqldelight:sqldelight-runtime-common:${versions.sqldelight}",
+                    'multiplatformdriver': "com.squareup.sqldelight:sqldelight-multiplatform-driver:${versions.sqldelight}",
             ]
     ]
 
     repositories {
         jcenter()
         google()
+        mavenCentral()
         maven { url "https://kotlin.bintray.com/kotlinx" }
         gradlePluginPortal()
         maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
         maven {
             url "https://dl.bintray.com/jetbrains/kotlin-native-dependencies"
         }
-        // maven { url 'https://dl.bintray.com/doppllib/j2objc' }
-       maven { url j2objcMavenDeploy }
+        maven { url 'https://dl.bintray.com/touchlabpublic/kotlin' }
+//       maven { url j2objcMavenDeploy }
     }
 
     dependencies {
@@ -72,9 +74,10 @@ allprojects {
     repositories {
         jcenter()
         google()
+        mavenCentral()
         maven { url "https://kotlin.bintray.com/kotlinx" }
         maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
-        // maven { url 'https://dl.bintray.com/doppllib/j2objc' }
-       maven { url j2objcMavenDeploy }
+        maven { url 'https://dl.bintray.com/touchlabpublic/kotlin' }
+//       maven { url j2objcMavenDeploy }
     }
 }

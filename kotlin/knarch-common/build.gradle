@@ -15,7 +15,7 @@
  */
 
 buildscript {
-    ext.kotlin_version = '1.2.41'
+    ext.kotlin_version = '1.2.50'
 
     repositories {
         mavenCentral()
@@ -33,7 +33,7 @@ apply plugin: 'kotlin-platform-common'
 apply plugin: 'com.jfrog.bintray'
 
 group = 'co.touchlab.knarch'
-version = "0.1"
+version = "0.5-alpha1"
 
 ext.bintrayGitUrl = 'https://github.com/touchlab/knarch'
 
@@ -46,4 +46,4 @@ dependencies {
 }
 
 apply from: "https://raw.githubusercontent.com/doppllib/gradlescripts/master/kotlinpublish.gradle"
-apply from: "https://raw.githubusercontent.com/doppllib/gradlescripts/master/bintray.gradle"
+apply from: "https://raw.githubusercontent.com/doppllib/gradlescripts/master/kotlinbintray.gradle"
