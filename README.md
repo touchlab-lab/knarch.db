@@ -10,6 +10,10 @@ K(otlin)N(ative)Arch(itecture)
 
 Sounds like **narc**. We're still working on a release name, but we'll see.
 
+## TL;DR
+
+Clone repo, open [sample-notepad-sqldelight](sample-notepad-sqldelight) and build.
+
 ## Build
 
 ![alt text](https://build.appcenter.ms/v0.1/apps/61048136-1ab0-4789-9ae4-7ad6e8df7777/branches/master/badge "Build Badge")
