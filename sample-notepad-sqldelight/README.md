@@ -16,12 +16,12 @@ Run
 ./gradlew build
 ```
 
-Open the ios project in the ios folder. Select a simulator and run.
+Assuming that builds, open the iosApp/iosApp.xcodeproj project in Xcode and run the sample.
 
 ## Status
 
 This release of db support and SQLDelight libraries is *very* early and will be going under 
-significant refactoring over the next few weeks.
+significant refactoring in the near future.
 
 [SQLDelight branch with multiplatform iOS support](https://github.com/touchlab/sqldelight/tree/iossupport)
 

@@ -40,11 +40,24 @@ With that in place, we will work on some next-stage goals simultaneously.
 
 TL;DR Yes, put this in your app today. It works. There's a lot that's going to change, but if you're looking at Kotlin Multiplatform for your iOS implementation, I assume you have a high tolerance for change. Our goal is to have solid *functionality* testing to verify that things work as expected, and starting with the AOSP base gives us that.
 
+## Samples
+
+There are 2 samples in the repo currently. Both implement a very basic "notepad" app. You can type in a title and a note,
+then add it. The list of notes appears below.
+
+### sample-notepad
+
+Simple sample that uses the database code directly with SQL.
+
+### sample-notepad-sqldelight
+
+Uses [SQLDelight multiplatform](https://github.com/square/sqldelight/blob/master/ALPHA.md) to interact with the database.
+
 ### Multiplatform
 
-The MP portion of the framework is very much in flux. The core public structures of Android's sqlite stack are represented
-sufficiently to support basic database work, but it is **far** from fully thought out. How your shared code creates and
-interacts with databases still needs some design. Feedback and PR's highly encouraged.
+The MP portion of the framework is very much in flux. After getting iOS to function, the common code was minimally
+implemented to support testing in apps and providing a driver for SQLDelight. The common code is going to get a
+rethink, mostly around initialization, in the near future.
 
 ## Differences
 
@@ -63,7 +76,7 @@ As this implementation stabilizes, pooling may be added back. We're going to pus
 
 ### Transactions
 
-To simplify the implementation, transactions block. That means if you neglect to call "endTransaction", you'll deadlock other threads. If you neglect to call "endTransaction" in any db app you'll probably have issues, but you'll definitely have them here. This is a deliberate limitation, and will be reviewed when we revisit connection pools and WAL support.
+To simplify the implementation, transactions block. That means if you neglect to call "endTransaction", you'll deadlock other threads that try to start transactions. If you neglect to call "endTransaction" in any db app you'll probably have issues, but you'll definitely have them here. This is a deliberate limitation, and will be reviewed when we revisit connection pools and WAL support.
 
 This isn't a huge deal, but you *definitely* want to make sure you're not reading from the main thread if you're doing
 big transactions.
