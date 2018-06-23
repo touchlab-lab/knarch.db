@@ -15,7 +15,7 @@ buildscript {
     ext.versions = [
             'supportLibrary'  : '27.1.0',
             'kotlin'          : '1.2.50',
-            'kotlin_native_version' : '0.7.1',
+            'kotlin_native_version' : '0.8-dev-2538',
             'kotlinCoroutines': '0.22.5',
             'sqldelight'      : '1.0.0-alpha4'
     ]

@@ -15,23 +15,47 @@
  */
 
 buildscript {
-    ext.kotlin_native_version = '0.7.1'
     repositories {
         mavenCentral()
+        jcenter()
         maven { url "https://dl.bintray.com/jetbrains/kotlin-native-dependencies" }
     }
 
     dependencies {
         classpath "org.jetbrains.kotlin:kotlin-native-gradle-plugin:$kotlin_native_version"
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7.3'
     }
 }
 
 apply plugin: 'konan'
 
+apply plugin: 'maven-publish'
+apply plugin: 'com.jfrog.bintray'
+
+group = 'co.touchlab.knarch'
+version = "0.5-alpha1"
+
+ext.bintrayGitUrl = 'https://github.com/touchlab/knarch'
+
+apply from: "https://raw.githubusercontent.com/doppllib/gradlescripts/master/kotlinnativepublish.gradle"
+apply from: "https://raw.githubusercontent.com/doppllib/gradlescripts/master/kotlinbintray.gradle"
+
 konan.targets = ['iphone', 'iphone_sim', 'macos_x64']
 
 konanArtifacts {
     library("knarch"){
+        target('iphone_sim') {
+            nativeLibraries '../../cpp/bcdist/ios_x64/tlruntime.bc'
+        }
+
+        target('iphone') {
+            nativeLibraries '../../cpp/bcdist/ios_arm64/tlruntime.bc'
+        }
+
+        target('macos_x64') {
+            nativeLibraries '../../cpp/bcdist/macos_x64/tlruntime.bc'
+        }
+
         enableMultiplatform true
     }
 
