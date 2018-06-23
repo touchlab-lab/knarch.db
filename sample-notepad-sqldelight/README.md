@@ -8,6 +8,10 @@ It's a simple "notepad" app. Obviously not super useful on its own. You type in 
 This will add the note to the local database and update the table view. If you click on a note title in the table, it'll 
 write the note detail to the log.
 
+### NO ANDROID!!!
+
+We haven't completed the android side yet, but that's not really the interesting part of the sample. Soon...
+
 ## Building
 
 Run 
