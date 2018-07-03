@@ -102,7 +102,47 @@ Not available. This is a relatively complex feature that will have C++ and K/N r
 
 ## Usage
 
-AFAIK, K/N doesn't currently have a public dependency mechanism, so while waiting on that, using KNArch is fairly manual. We'll write up a post on this later. Basically, you add the multiplatform dependency as usual with Gradle, and on the iOS side, copy the C++ (bc) and Kotlin (klib) artifacts and wire them inside your Konan config. For now, see the sample app.
+To see a self-contained example, look at [sample-notepad-sqldelight](sample-notepad-sqldelight). The common and Android portions are configured as general multiplatform projects
+are set up. The iOS portion is set up somewhat differently.
+
+Dependencies are set up on a per-artifact and per-target basis. They are *not* transitive, so you'll need to configure all of them.
+
+```groovy
+apply plugin: 'konan'
+
+konan.targets = ['iphone', 'iphone_sim']
+
+konanArtifacts {
+    framework('NotepadArchitecture') {
+        dependencies {
+            artifactNotepadArchitecture_ios_x64 "${deps.knarch.dbPrefix}ios_x64:${versions.knarch}"
+            artifactNotepadArchitecture_ios_x64 "${deps.sqldelight.runtimeNativePrefix}ios_x64:${versions.sqldelight}"
+            artifactNotepadArchitecture_ios_x64 "${deps.sqldelight.multiplatformdriverNativePrefix}ios_x64:${versions.sqldelight}"
+
+            artifactNotepadArchitecture_ios_arm64 "${deps.knarch.dbPrefix}ios_arm64:${versions.knarch}"
+            artifactNotepadArchitecture_ios_arm64 "${deps.sqldelight.runtimeNativePrefix}ios_arm64:${versions.sqldelight}"
+            artifactNotepadArchitecture_ios_arm64 "${deps.sqldelight.multiplatformdriverNativePrefix}ios_arm64:${versions.sqldelight}"
+        }
+
+        linkerOpts "-lsqlite3"
+        enableMultiplatform true
+    }
+}
+
+dependencies {
+    expectedBy project(':notepad')
+}
+```
+
+In our example, the artifact is called 'NotepadArchitecture' and there are two build targets: 'iphone', 'iphone_sim', which translate to 'ios_arm64' and 'ios_x64' respectfully.
+
+In the dependencies, there are 3 dependencies: knard.db, sqlite runtime, and sqlite multiplatform driver. These are each defined twice, one for each target. The dependency configuration is in the form:
+
+```
+artifact[artifact name]_[target name] "[maven id]"
+```
+
+**NOTE** The dependency mechanism is almost certainly going to change as K/N matures, but this is how you do it today.
 
 ## Design
 
