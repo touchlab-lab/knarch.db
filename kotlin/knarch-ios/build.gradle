@@ -23,7 +23,7 @@ buildscript {
 
     dependencies {
         classpath "org.jetbrains.kotlin:kotlin-native-gradle-plugin:$kotlin_native_version"
-        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7.3'
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.1-SNAPSHOT'
     }
 }
 
@@ -37,8 +37,13 @@ version = "0.5-alpha1"
 
 ext.bintrayGitUrl = 'https://github.com/touchlab/knarch'
 
-apply from: "https://raw.githubusercontent.com/doppllib/gradlescripts/master/kotlinnativepublish.gradle"
-apply from: "https://raw.githubusercontent.com/doppllib/gradlescripts/master/kotlinbintray.gradle"
+bintrayUpload.doFirst {
+    publications = project.publishing.publications
+}
+
+apply from: 'publish.gradle'
+//apply from: "https://raw.githubusercontent.com/doppllib/gradlescripts/master/kotlinnativepublish.gradle"
+//apply from: "https://raw.githubusercontent.com/doppllib/gradlescripts/master/kotlinbintray.gradle"
 
 konan.targets = ['iphone', 'iphone_sim', 'macos_x64']
 
@@ -59,7 +64,6 @@ konanArtifacts {
         enableMultiplatform true
     }
 
-    //TODO: Rename test framework. Just feels like a lot of Xcode work that I don't want.
     framework('knarchtest', targets: ['iphone', 'iphone_sim']) {
         srcDir 'src/main/kotlin'
         srcDir 'src/test/kotlin'

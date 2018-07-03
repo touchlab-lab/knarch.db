@@ -15,8 +15,9 @@ buildscript {
     ext.versions = [
             'supportLibrary'  : '27.1.0',
             'kotlin'          : '1.2.50',
-            'kotlin_native_version' : '0.8-dev-2538',
+            'kotlin_native_version' : '0.8-dev-2632',
             'kotlinCoroutines': '0.22.5',
+            'knarch'      : '0.5-alpha1',
             'sqldelight'      : '1.0.0-alpha4'
     ]
 
@@ -40,11 +41,15 @@ buildscript {
                             'dbFramework': 'android.arch.persistence:db-framework:1.0.0',
                     ],
             ],
-
+            'knarch': [
+                    'dbPrefix': 'co.touchlab.knarch:knarch_knarch_'
+            ],
             'sqldelight': [
                     'android': "com.squareup.sqldelight:android-driver:${versions.sqldelight}",
                     'runtime': "com.squareup.sqldelight:sqldelight-runtime-common:${versions.sqldelight}",
+                    'runtimeNativePrefix': 'com.squareup.sqldelight:sqldelightruntimeios_sqldelightruntimeios_',
                     'multiplatformdriver': "com.squareup.sqldelight:sqldelight-multiplatform-driver:${versions.sqldelight}",
+                    'multiplatformdriverNativePrefix': 'com.squareup.sqldelight:sqldelightmultiplatformdriverios_sqldelightmultiplatformdriverios_',
             ]
     ]
 
@@ -59,7 +64,6 @@ buildscript {
             url "https://dl.bintray.com/jetbrains/kotlin-native-dependencies"
         }
         maven { url 'https://dl.bintray.com/touchlabpublic/kotlin' }
-//       maven { url j2objcMavenDeploy }
     }
 
     dependencies {
@@ -78,6 +82,5 @@ allprojects {
         maven { url "https://kotlin.bintray.com/kotlinx" }
         maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
         maven { url 'https://dl.bintray.com/touchlabpublic/kotlin' }
-//       maven { url j2objcMavenDeploy }
     }
 }

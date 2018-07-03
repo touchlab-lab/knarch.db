@@ -17,3 +17,5 @@
 include ':knarch-android'
 include ':knarch-common'
 include ':knarch-ios'
+
+enableFeaturePreview('GRADLE_METADATA')
