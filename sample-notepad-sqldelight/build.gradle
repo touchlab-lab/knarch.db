@@ -41,15 +41,11 @@ buildscript {
                             'dbFramework': 'android.arch.persistence:db-framework:1.0.0',
                     ],
             ],
-            'knarch': [
-                    'dbPrefix': 'co.touchlab.knarch:knarch_knarch_'
-            ],
             'sqldelight': [
                     'android': "com.squareup.sqldelight:android-driver:${versions.sqldelight}",
                     'runtime': "com.squareup.sqldelight:sqldelight-runtime-common:${versions.sqldelight}",
-                    'runtimeNativePrefix': 'com.squareup.sqldelight:sqldelightruntimeios_sqldelightruntimeios_',
                     'multiplatformdriver': "com.squareup.sqldelight:sqldelight-multiplatform-driver:${versions.sqldelight}",
-                    'multiplatformdriverNativePrefix': 'com.squareup.sqldelight:sqldelightmultiplatformdriverios_sqldelightmultiplatformdriverios_',
+                    'multiplatformdriverNative': "com.squareup.sqldelight:sqldelightmultiplatformdriverios:${versions.sqldelight}",
             ]
     ]
 

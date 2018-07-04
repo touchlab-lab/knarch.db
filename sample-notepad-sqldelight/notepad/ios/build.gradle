@@ -6,13 +6,7 @@ konan.targets = ['iphone', 'iphone_sim']
 konanArtifacts {
     framework('NotepadArchitecture') {
         dependencies {
-            artifactNotepadArchitecture_ios_x64 "${deps.knarch.dbPrefix}ios_x64:${versions.knarch}"
-            artifactNotepadArchitecture_ios_x64 "${deps.sqldelight.runtimeNativePrefix}ios_x64:${versions.sqldelight}"
-            artifactNotepadArchitecture_ios_x64 "${deps.sqldelight.multiplatformdriverNativePrefix}ios_x64:${versions.sqldelight}"
-
-            artifactNotepadArchitecture_ios_arm64 "${deps.knarch.dbPrefix}ios_arm64:${versions.knarch}"
-            artifactNotepadArchitecture_ios_arm64 "${deps.sqldelight.runtimeNativePrefix}ios_arm64:${versions.sqldelight}"
-            artifactNotepadArchitecture_ios_arm64 "${deps.sqldelight.multiplatformdriverNativePrefix}ios_arm64:${versions.sqldelight}"
+            artifactNotepadArchitecture deps.sqldelight.multiplatformdriverNative
         }
 
         linkerOpts "-lsqlite3"
