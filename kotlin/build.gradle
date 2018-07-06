@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 task build {
     subprojects.each {
         dependsOn("${it.path}:build")
@@ -21,20 +20,21 @@ task build {
 }
 
 allprojects {
+    group = GROUP
+    version = VERSION
+
     repositories {
         jcenter()
         google()
+        mavenCentral()
         maven { url "https://kotlin.bintray.com/kotlinx" }
         maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
     }
 }
 
 buildscript{
-    ext.versions = [
-            'knarch'  : '0.6-alpha1'
-    ]
-
     ext.kotlin_version = '1.2.50'
+    ext.bintrayGitUrl = 'https://github.com/touchlab/knarch.db'
 
     repositories {
         google()

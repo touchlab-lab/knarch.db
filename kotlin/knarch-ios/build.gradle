@@ -18,11 +18,6 @@ apply plugin: 'maven-publish'
 
 apply from: '../gradle/configpublishnative.gradle'
 
-group = GROUP
-version = versions.knarch
-
-ext.bintrayGitUrl = 'https://github.com/touchlab/knarch.db'
-
 if(project.hasProperty('deployIos')) {
     apply from: '../gradle/configbintray.gradle'
 }

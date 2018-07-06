@@ -16,20 +16,11 @@
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-platform-android'
 
-group = GROUP
-version = versions.knarch
-
 android {
     compileSdkVersion 27
     defaultConfig {
         minSdkVersion 14
     }
-}
-
-repositories {
-    google()
-    jcenter()
-    mavenCentral()
 }
 
 dependencies {
