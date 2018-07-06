@@ -18,34 +18,12 @@ package co.touchlab.multiplatform.architecture.db.sqlite
 
 import co.touchlab.multiplatform.architecture.db.DatabaseErrorHandler
 
-expect fun createOpenHelper(
-        name:String?,
-        callback:PlatformSQLiteOpenHelperCallback,
-        errorHandler: DatabaseErrorHandler?):SQLiteOpenHelper
-
-/*expect class PlatformSQLiteOpenHelper:SQLiteOpenHelper{
-    var callback:PlatformSQLiteOpenHelperCallback
-
-    override fun onCreate(db: SQLiteDatabase) {
-        callback.onCreate(db)
-    }
-
-    override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
-        callback.onUpgrade(db, oldVersion, newVersion)
-    }
-
-    override fun onDowngrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
-        callback.onDowngrade(db, oldVersion, newVersion)
-    }
-
-    override fun onOpen(db: SQLiteDatabase) {
-        callback.onOpen(db)
-    }
-
-    override fun onConfigure(db: SQLiteDatabase) {
-        callback.onConfigure(db)
-    }
-}*/
+interface NativeOpenHelperFactory{
+    fun createOpenHelper(
+            name:String?,
+            callback:PlatformSQLiteOpenHelperCallback,
+            errorHandler: DatabaseErrorHandler?):SQLiteOpenHelper
+}
 
 abstract class PlatformSQLiteOpenHelperCallback(val version:Int) {
     val TAG = "PlatformSQLiteOpenHelper"

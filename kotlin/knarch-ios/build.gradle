@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 buildscript {
     repositories {
         mavenCentral()
@@ -28,22 +27,17 @@ buildscript {
 }
 
 apply plugin: 'konan'
-
 apply plugin: 'maven-publish'
-apply plugin: 'com.jfrog.bintray'
+
+apply from: '../gradle/configpublishnative.gradle'
 
 group = 'co.touchlab.knarch'
-version = "0.5-alpha1"
+version = versions.knarch
+ext.bintrayGitUrl = 'https://github.com/touchlab/knarch.db'
 
-ext.bintrayGitUrl = 'https://github.com/touchlab/knarch'
-
-bintrayUpload.doFirst {
-    publications = project.publishing.publications
+if(project.hasProperty('deployIos')) {
+    apply from: '../gradle/configbintray.gradle'
 }
-
-apply from: 'publish.gradle'
-//apply from: "https://raw.githubusercontent.com/doppllib/gradlescripts/master/kotlinnativepublish.gradle"
-//apply from: "https://raw.githubusercontent.com/doppllib/gradlescripts/master/kotlinbintray.gradle"
 
 konan.targets = ['iphone', 'iphone_sim', 'macos_x64']
 
@@ -94,6 +88,7 @@ konanArtifacts {
         linkerOpts "-lsqlite3"
         enableMultiplatform true
     }
+
 }
 
 dependencies {
@@ -103,3 +98,4 @@ dependencies {
 repositories {
     maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
 }
+

@@ -20,6 +20,20 @@ import android.content.Context
 import android.database.sqlite.SQLiteOpenHelper
 import co.touchlab.multiplatform.architecture.db.DatabaseErrorHandler
 
+class AndroidNativeOpenHelperFactory(val context: Context):NativeOpenHelperFactory{
+    override fun createOpenHelper(
+            name:String?,
+            callback:PlatformSQLiteOpenHelperCallback,
+            errorHandler: DatabaseErrorHandler?):SQLiteOpenHelper{
+        return PlatformSQLiteOpenHelper(callback,
+                context,
+                name,
+                callback.version,
+                errorHandler
+        )
+    }
+}
+
 class PlatformSQLiteOpenHelper(
         val callback:PlatformSQLiteOpenHelperCallback,
         context: Context,

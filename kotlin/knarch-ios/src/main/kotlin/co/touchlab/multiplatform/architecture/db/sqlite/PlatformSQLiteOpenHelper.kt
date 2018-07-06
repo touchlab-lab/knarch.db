@@ -20,6 +20,20 @@ import co.touchlab.knarch.SystemContext
 import co.touchlab.multiplatform.architecture.db.DatabaseErrorHandler
 import co.touchlab.multiplatform.architecture.db.sqlite.PlatformSQLiteOpenHelperCallback
 
+class IosNativeOpenHelperFactory(val context: SystemContext):NativeOpenHelperFactory{
+    override fun createOpenHelper(
+            name:String?,
+            callback:PlatformSQLiteOpenHelperCallback,
+            errorHandler: DatabaseErrorHandler?):SQLiteOpenHelper{
+        return PlatformSQLiteOpenHelper(callback,
+                context,
+                name,
+                callback.version,
+                errorHandler
+        )
+    }
+}
+
 class PlatformSQLiteOpenHelper(
         val callback:PlatformSQLiteOpenHelperCallback,
         context: SystemContext,

@@ -13,10 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 buildscript {
-    ext.kotlin_version = '1.2.50'
-
     repositories {
         mavenCentral()
         jcenter()
@@ -28,14 +25,18 @@ buildscript {
     }
 }
 
-apply plugin: 'maven-publish'
 apply plugin: 'kotlin-platform-common'
-apply plugin: 'com.jfrog.bintray'
+apply plugin: 'maven-publish'
+
+apply from: '../gradle/configpublish.gradle'
 
 group = 'co.touchlab.knarch'
-version = "0.5-alpha1"
+version = versions.knarch
+ext.bintrayGitUrl = 'https://github.com/touchlab/knarch.db'
 
-ext.bintrayGitUrl = 'https://github.com/touchlab/knarch'
+if(project.hasProperty('deployCommon')) {
+    apply from: '../gradle/configbintray.gradle'
+}
 
 repositories {
     mavenCentral()
@@ -45,5 +46,3 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-common:$kotlin_version"
 }
 
-apply from: "https://raw.githubusercontent.com/doppllib/gradlescripts/master/kotlinpublish.gradle"
-apply from: "https://raw.githubusercontent.com/doppllib/gradlescripts/master/kotlinbintray.gradle"

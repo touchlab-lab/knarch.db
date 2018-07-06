@@ -17,7 +17,7 @@ buildscript {
             'kotlin'          : '1.2.50',
             'kotlin_native_version' : '0.8-dev-2632',
             'kotlinCoroutines': '0.22.5',
-            'knarch'      : '0.5-alpha1',
+            'knarch'      : '0.6-alpha1',
             'sqldelight'      : '1.0.0-alpha4'
     ]
 
@@ -59,6 +59,8 @@ buildscript {
         maven {
             url "https://dl.bintray.com/jetbrains/kotlin-native-dependencies"
         }
+
+//        maven { url j2objcMavenDeploy }
         maven { url 'https://dl.bintray.com/touchlabpublic/kotlin' }
     }
 
@@ -77,6 +79,7 @@ allprojects {
         mavenCentral()
         maven { url "https://kotlin.bintray.com/kotlinx" }
         maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
+//        maven { url j2objcMavenDeploy }
         maven { url 'https://dl.bintray.com/touchlabpublic/kotlin' }
     }
 }

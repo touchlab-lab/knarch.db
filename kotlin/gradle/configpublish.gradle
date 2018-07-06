@@ -1,0 +1,60 @@
+
+
+def pomConfig = {
+    licenses {
+        license {
+            name "The Apache Software License, Version 2.0"
+            url "http://www.apache.org/licenses/LICENSE-2.0.txt"
+            distribution "repo"
+        }
+    }
+    developers {
+        developer {
+            id "Touchlab"
+            name "Touchlab"
+            organization "Touchlab"
+            organizationUrl "https://touchlab.co/"
+        }
+    }
+    scm {
+        url "https://github.com/touchlab/knarch.db"
+    }
+}
+
+task sourcesJar(type: Jar, dependsOn: classes) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+artifacts {
+    archives sourcesJar
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+            artifactId project.ext.has("artifactId") ? project.ext.get("artifactId") : project.name
+            artifact sourcesJar
+        }
+    }
+
+    repositories {
+        maven {
+            url (project.hasProperty('j2objcMavenDeploy') ? project.property('j2objcMavenDeploy') : 'file://nope/')
+        }
+    }
+}
+
+afterEvaluate {
+    project.publishing.publications.forEach { publication ->
+        println("pub.groupId ${publication.groupId}, artifactId ${publication.artifactId}, publication ${publication}")
+        publication.pom.withXml {
+            def root = asNode()
+            root.appendNode('name', project.name)
+            root.appendNode('description', 'KNArch.db iOS')
+            root.appendNode('url', 'https://github.com/touchlab/knarch.db')
+            root.children().last() + pomConfig
+        }
+    }
+}

@@ -21,32 +21,6 @@ import co.touchlab.knarch.SystemContext
 import co.touchlab.knarch.io.File
 import co.touchlab.multiplatform.architecture.db.DatabaseErrorHandler
 
-
-var systemContext:SystemContext?=null
-
-/**
- * Not pretty, but you know
- */
-fun initSystemContext(sc:SystemContext){
-    systemContext = sc
-}
-
-actual fun createOpenHelper(
-        name:String?,
-        callback:PlatformSQLiteOpenHelperCallback,
-        errorHandler: DatabaseErrorHandler?):SQLiteOpenHelper{
-
-    if(systemContext == null)
-        throw NullPointerException("Must call initSystemContext")
-
-    return PlatformSQLiteOpenHelper(callback,
-            systemContext!!,
-            name,
-            callback.version,
-            errorHandler
-            )
-}
-
 actual fun deleteDatabase(path:String):Boolean{
     return SQLiteDatabase.deleteDatabase(File(path))
 }
