@@ -13,26 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-buildscript {
-    repositories {
-        mavenCentral()
-        jcenter()
-        maven { url "https://dl.bintray.com/jetbrains/kotlin-native-dependencies" }
-    }
-
-    dependencies {
-        classpath "org.jetbrains.kotlin:kotlin-native-gradle-plugin:$kotlin_native_version"
-        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.1-SNAPSHOT'
-    }
-}
-
 apply plugin: 'konan'
 apply plugin: 'maven-publish'
 
 apply from: '../gradle/configpublishnative.gradle'
 
-group = 'co.touchlab.knarch'
+group = GROUP
 version = versions.knarch
+
 ext.bintrayGitUrl = 'https://github.com/touchlab/knarch.db'
 
 if(project.hasProperty('deployIos')) {

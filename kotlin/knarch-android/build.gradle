@@ -13,23 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-buildscript {
-    repositories {
-        google()
-        jcenter()
-    }
-
-    dependencies {
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-        classpath 'com.android.tools.build:gradle:3.1.2'
-    }
-}
-
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-platform-android'
 
-group = 'co.touchlab.knarch'
+group = GROUP
 version = versions.knarch
 
 android {
