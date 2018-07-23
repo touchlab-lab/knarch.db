@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-//include ':knarch-android'
+include ':knarch-android'
 include ':knarch-common'
 include ':knarch-ios'
 

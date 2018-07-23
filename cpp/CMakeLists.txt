@@ -17,5 +17,4 @@ add_executable(cpp
         knarch/src/main/cpp/SQLiteSupport.cpp
         knarch/src/main/cpp/KonanHelper.cpp
         knarch/src/main/cpp/KonanHelper.h
-        knarch/src/main/cpp/ThreadSupport.cpp
         knarch/src/main/cpp/UtilsErrors.h)

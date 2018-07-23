@@ -15,6 +15,13 @@
  */
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-platform-android'
+apply plugin: 'digital.wup.android-maven-publish'
+
+apply from: '../gradle/configpublishaar.gradle'
+
+if(project.hasProperty('deployAndroid')) {
+    apply from: '../gradle/configbintray.gradle'
+}
 
 android {
     compileSdkVersion 27

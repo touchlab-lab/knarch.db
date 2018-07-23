@@ -23,6 +23,8 @@ allprojects {
     group = GROUP
     version = VERSION
 
+    ext.bintrayGitUrl = 'https://github.com/touchlab/knarch.db'
+
     repositories {
         jcenter()
         google()
@@ -30,11 +32,11 @@ allprojects {
         maven { url "https://kotlin.bintray.com/kotlinx" }
         maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
     }
+
 }
 
 buildscript{
     ext.kotlin_version = '1.2.50'
-    ext.bintrayGitUrl = 'https://github.com/touchlab/knarch.db'
 
     repositories {
         google()
@@ -48,5 +50,6 @@ buildscript{
         classpath 'com.android.tools.build:gradle:3.1.2'
         classpath "org.jetbrains.kotlin:kotlin-native-gradle-plugin:$kotlin_native_version"
         classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.2-SNAPSHOT'
+        classpath 'digital.wup:android-maven-publish:3.6.2'
     }
 }

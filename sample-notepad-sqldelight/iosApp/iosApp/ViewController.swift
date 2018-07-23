@@ -10,7 +10,7 @@ import UIKit
 import NotepadArchitecture
 
 class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
-    let noteModel =  NotepadArchitectureNoteModel()
+    let viewModel =  NotepadArchitectureNotesViewModel()
     
     @IBOutlet weak var inputText: UITextField!
     @IBOutlet weak var inputDescription: UITextField!
@@ -21,18 +21,18 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        print("swift A")
         
-        noteModel.doInitUpdate(proc:updateUi)
+        viewModel.registerForChanges(proc: updateUi)
         
+        print("swift B")
         tableView.delegate = self
         tableView.dataSource = self
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: "cell")
-        
-        noteModel.runUpdate()
     }
     
     deinit {
-        noteModel.clearUpdate()
+        viewModel.unregister()
     }
     
     func updateUi(notes:[NotepadArchitectureNote]) -> NotepadArchitectureStdlibUnit{
@@ -51,7 +51,7 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
     @IBAction func insertStuffAction(_ sender: Any) {
         inputButton.isEnabled = false
         
-        noteModel.insertNote(title: inputText.text!, description: inputDescription.text!)
+        viewModel.insertNote(title: inputText.text!, description: inputDescription.text!)
         
         inputText.text = ""
         inputDescription.text = ""

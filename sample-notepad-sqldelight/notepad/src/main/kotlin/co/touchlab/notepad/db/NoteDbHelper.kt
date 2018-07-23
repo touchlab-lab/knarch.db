@@ -6,18 +6,22 @@ import co.touchlab.notepad.sqldelight.QueryWrapper
 import com.squareup.sqldelight.multiplatform.create
 
 import co.touchlab.notepad.utils.initContext
+import com.squareup.sqldelight.Query
+import com.squareup.sqldelight.db.SqlDatabase
 
 class NoteDbHelper {
-    var noteUpdate: (()->Unit)? = null
-    private val noteQueries:NoteQueries
 
+    private val noteQueries: NoteQueries
+    private val database:SqlDatabase
     init {
-        initContext()
-        val wrapper = QueryWrapper(QueryWrapper.create("holla2"))
-
-        noteQueries = wrapper.noteQueries
+        val helperFactory = initContext()
+        database = QueryWrapper.create("holla2", openHelperFactory = helperFactory)
+        noteQueries = QueryWrapper(database).noteQueries
     }
 
+    private fun makeQueries():NoteQueries {
+        return noteQueries
+    }
     private fun insertNote(note: Note) {
         noteQueries.insertNote(note = note.note,
                 title = note.title,
@@ -26,7 +30,7 @@ class NoteDbHelper {
                 hiblob = note.hiblob)
     }
 
-    fun getNotes(): List<Note> = noteQueries.selectAll().executeAsList()
+    fun getNotes(): Query<Note> = noteQueries.selectAll()
 
     fun insertNotes(note: Array<Note>) {
         noteQueries.transaction {

@@ -17,10 +17,11 @@
 package co.touchlab.multiplatform.architecture.db.sqlite
 
 import co.touchlab.knarch.DefaultSystemContext
+import co.touchlab.knarch.db.Cursor
+import co.touchlab.knarch.db.sqlite.SQLiteCursor
 import co.touchlab.knarch.SystemContext
 import co.touchlab.knarch.io.File
 import co.touchlab.multiplatform.architecture.db.DatabaseErrorHandler
 
-actual fun deleteDatabase(path:String):Boolean{
-    return SQLiteDatabase.deleteDatabase(File(path))
-}
+actual fun deleteDatabase(path:String):Boolean = SQLiteDatabase.deleteDatabase(File(path))
+actual fun createSQLiteCursor(masterQuery: SQLiteCursorDriver, query: SQLiteQuery) = SQLiteCursor(masterQuery, query) as Cursor

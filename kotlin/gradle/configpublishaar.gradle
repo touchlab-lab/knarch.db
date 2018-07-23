@@ -1,0 +1,101 @@
+/*
+ * Copyright (c) 2018 Touchlab Inc
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+/*task sourcesJar(type: Jar*//*, dependsOn: classes*//*) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}*/
+
+/*artifacts {
+    archives sourcesJar
+}*/
+
+publishing {
+    publications {
+        mavenAar(MavenPublication) {
+            from components.android
+            artifactId project.ext.has("artifactId") ? project.ext.get("artifactId") : project.name
+//            artifact sourcesJar
+        }
+    }
+    /*publications {
+        Production(MavenPublication) {
+            groupId GROUP
+            version VERSION
+            artifact("$buildDir/outputs/aar/knarch-android-debug.aar")
+            artifactId project.ext.has("artifactId") ? project.ext.get("artifactId") : project.name
+
+            //The publication doesn't know about our dependencies, so we have to manually add them to the pom
+            pom.withXml {
+                def dependenciesNode = asNode().appendNode('dependencies')
+
+                //Iterate over the compile dependencies (we don't want the test ones), adding a <dependency> node for each
+                configurations.implementation.allDependencies.each {
+                    def dependencyNode = dependenciesNode.appendNode('dependency')
+                    dependencyNode.appendNode('groupId', it.group)
+                    dependencyNode.appendNode('artifactId', it.name)
+                    dependencyNode.appendNode('version', it.version)
+                }
+            }
+        }
+    }*/
+    repositories {
+        maven {
+            url (project.hasProperty('j2objcMavenDeploy') ? project.property('j2objcMavenDeploy') : 'file://nope/')
+        }
+    }
+}
+
+/*afterEvaluate {
+    project.publishing.publications.forEach { publication ->
+        println("pub.groupId ${publication.groupId}, artifactId ${publication.artifactId}, publication ${publication}")
+        publication.pom.withXml {
+            def root = asNode()
+            root.appendNode('name', project.name)
+            root.appendNode('description', 'KNArch.db iOS')
+            root.appendNode('url', 'https://github.com/touchlab/knarch.db')
+            root.children().last() + pomConfig
+
+            def dependenciesNode = asNode().appendNode('dependencies')
+
+            //Iterate over the compile dependencies (we don't want the test ones), adding a <dependency> node for each
+            configurations.compile.allDependencies.each {
+                def dependencyNode = dependenciesNode.appendNode('dependency')
+                dependencyNode.appendNode('groupId', it.group)
+                dependencyNode.appendNode('artifactId', it.name)
+                dependencyNode.appendNode('version', it.version)
+            }
+        }
+    }
+}*/
+
+/*
+bintray {
+    // Get Bintray credential from environment variable
+    user = System.getenv('BINTRAY_USER') // Get bintray User
+    key = System.getenv('BINTRAY_KEY') // Get bintray Secret Key
+    configurations = ['archives']
+    pkg {
+        repo = 'maven'
+        name = project.name
+        userOrg = 'owner-name'
+        licenses = ['Apache-2.0']
+        desc = 'Payment module SDK'
+        websiteUrl = "https://domain.com"
+        publish = true
+    }
+    publications = ['Production', 'Sandbox']
+
+}*/

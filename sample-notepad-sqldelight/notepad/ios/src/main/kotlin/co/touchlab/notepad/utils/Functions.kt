@@ -9,10 +9,7 @@ import co.touchlab.knarch.*
 actual fun currentTimeMillis():Long = getTimeMillis()
 
 //This definitely needs a rethink
-actual fun initContext(){
-    if(systemContext == null)
-        initSystemContext(DefaultSystemContext())
-}
+actual fun initContext():NativeOpenHelperFactory = IosNativeOpenHelperFactory(DefaultSystemContext())
 
 private var worker :Worker?=null
 
@@ -46,6 +43,15 @@ actual fun <B> backgroundTask(backJob:()-> B, mainJob:(B) -> Unit){
             val mainResult = attachObjectGraph<Any>(result) as B
             it.mainJob(mainResult)
         }
+    }
+}
+
+actual fun backgroundTask(backJob:()->Unit){
+
+    val worker = makeQueue()
+    worker.schedule(TransferMode.CHECKED,
+            { backJob.freeze() }){
+        it()
     }
 }
 

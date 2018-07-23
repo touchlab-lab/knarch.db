@@ -7,6 +7,8 @@ apply plugin: 'com.squareup.sqldelight'
 dependencies {
     implementation deps.kotlin.stdlib.common
     implementation deps.sqldelight.runtime
+    implementation deps.knarch.db
+    implementation deps.knarch.threads
     implementation deps.sqldelight.multiplatformdriver
 }
 

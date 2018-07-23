@@ -17,10 +17,11 @@
 package co.touchlab.multiplatform.architecture.db.sqlite
 
 import android.app.Application
+import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
+import android.database.sqlite.SQLiteCursor
 import co.touchlab.multiplatform.architecture.db.DatabaseErrorHandler
 import java.io.File
 
-actual fun deleteDatabase(path:String):Boolean{
-    return SQLiteDatabase.deleteDatabase(File(path))
-}
+actual fun deleteDatabase(path:String):Boolean = SQLiteDatabase.deleteDatabase(File(path))
+actual fun createSQLiteCursor(masterQuery: SQLiteCursorDriver, query: SQLiteQuery) = SQLiteCursor(masterQuery, null, query) as Cursor

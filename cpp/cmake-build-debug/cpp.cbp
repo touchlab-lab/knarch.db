@@ -44,7 +44,7 @@
 				<Option type="1"/>
 				<Option compiler="gcc"/>
 				<Compiler>
-					<Add directory="/Users/kgalligan/temp4/kotlin-native/runtime/src/main/cpp"/>
+					<Add directory="/Users/kgalligan/temp4/kotlin-native-latest/runtime/src/main/cpp"/>
 					<Add directory="/Users/kgalligan/temp4/knarch/cpp/knarch/src/main/cpp"/>
 					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include/c++/v1"/>
 					<Add directory="/usr/local/include"/>
@@ -68,7 +68,7 @@
 				<Option type="1"/>
 				<Option compiler="gcc"/>
 				<Compiler>
-					<Add directory="/Users/kgalligan/temp4/kotlin-native/runtime/src/main/cpp"/>
+					<Add directory="/Users/kgalligan/temp4/kotlin-native-latest/runtime/src/main/cpp"/>
 					<Add directory="/Users/kgalligan/temp4/knarch/cpp/knarch/src/main/cpp"/>
 					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include/c++/v1"/>
 					<Add directory="/usr/local/include"/>

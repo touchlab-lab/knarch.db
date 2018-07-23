@@ -16,4 +16,7 @@
 
 package co.touchlab.multiplatform.architecture.db.sqlite
 
+import co.touchlab.multiplatform.architecture.db.*
+
 expect fun deleteDatabase(path:String):Boolean
+expect fun createSQLiteCursor(masterQuery: SQLiteCursorDriver, query: SQLiteQuery):Cursor
