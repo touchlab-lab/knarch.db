@@ -1,13 +1,9 @@
 apply plugin: 'kotlin-platform-common'
-// apply plugin: 'org.jetbrains.kotlin.platform.common'
-// apply plugin: 'com.squareup.sqldelight'
-
-//group = 'org.jetbrains.kotlin.konan.samples'
 
 dependencies {
     implementation deps.kotlin.stdlib.common
-    // implementation deps.sqldelight.runtime
-    implementation "co.touchlab.knarch:knarch-common:0.1"
+    implementation "co.touchlab.knarch.threads:threads-common:0.2.0"
+    implementation "co.touchlab.knarch:knarch-common:0.7-alpha1"
 }
 
 kotlin {
@@ -15,11 +11,3 @@ kotlin {
         coroutines 'enable'
     }
 }
-
-// sqldelight {
-//     packageName = "co.touchlab.knarch.sample.notepad"
-// }
-
-//compileKotlinCommon.dependsOn("generateSqlDelightInterface")
-//tasks.findByName("compileKotlinCommon")?.dependsOn(tasks.findByName("generateSqlDelightInterface"))
-//tasks.getByName("build").dependsOn("generateSqlDelightInterface")

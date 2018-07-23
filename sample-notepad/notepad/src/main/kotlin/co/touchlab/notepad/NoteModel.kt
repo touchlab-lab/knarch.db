@@ -1,6 +1,6 @@
 package co.touchlab.notepad
 
-import co.touchlab.multiplatform.architecture.threads.ThreadLocal
+import co.touchlab.multiplatform.architecture.threads.ThreadLocalImpl
 import co.touchlab.notepad.db.Note
 import co.touchlab.notepad.db.NoteDbHelper
 import co.touchlab.notepad.utils.backgroundTask
@@ -26,7 +26,7 @@ class NoteModel {
         }
     }
 
-    val updateLocal = ThreadLocal<(notes:Array<Note>)->Unit>()
+    val updateLocal = ThreadLocalImpl<(notes:Array<Note>)->Unit>()
 
     fun insertNote(title:String, description:String){
         backgroundTask(

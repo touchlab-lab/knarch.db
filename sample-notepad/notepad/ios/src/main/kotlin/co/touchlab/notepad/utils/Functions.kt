@@ -3,6 +3,8 @@ package co.touchlab.notepad.utils
 import kotlin.system.getTimeMillis
 import platform.darwin.*
 import konan.worker.*
+import co.touchlab.multiplatform.architecture.db.sqlite.*
+import co.touchlab.knarch.*
 
 actual fun currentTimeMillis():Long = getTimeMillis()
 
@@ -40,3 +42,7 @@ actual fun <B> backgroundTask(backJob:()-> B, mainJob:(B) -> Unit){
 }
 
 data class JobWrapper<B>(val backJob:()-> B, val mainJob:(B) -> Unit)
+
+actual fun createNativeOpenHelperFactory(): NativeOpenHelperFactory{
+    return IosNativeOpenHelperFactory(DefaultSystemContext())
+}
