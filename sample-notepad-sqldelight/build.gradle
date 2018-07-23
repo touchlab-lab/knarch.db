@@ -19,8 +19,9 @@ buildscript {
             'kotlinCoroutines': '0.22.5',
             'knarchDb'      : '0.7-alpha1',
             'knarchThreads'      : '0.2.0',
-            'sqldelight'      : '1.0.0-alpha4',
-            'sqldelightKnarch'      : '1.0.0-alpha4.6'
+            'sqldelight'      : '1.0.0-alpha4.7'
+//            ,
+//            'sqldelightKnarch'      : '1.0.0-alpha4.7'
     ]
 
     ext.deps = [
@@ -54,10 +55,10 @@ buildscript {
                     'android': "com.squareup.sqldelight:android-driver:${versions.sqldelight}",
                     'runtime': "com.squareup.sqldelight:runtime-common:${versions.sqldelight}",
                     'runtimeJdk': "com.squareup.sqldelight:runtime-jdk:${versions.sqldelight}",
-                    'runtimeNative': "com.squareup.sqldelight:sqldelightruntimeios:${versions.sqldelightKnarch}",
-                    'multiplatformdriver': "com.squareup.sqldelight:sqldelight-multiplatform-driver:${versions.sqldelightKnarch}",
-                    'multiplatformdriverAndroid': "com.squareup.sqldelight:sqldelight-multiplatform-android:${versions.sqldelightKnarch}",
-                    'multiplatformdriverNative': "com.squareup.sqldelight:sqldelightmultiplatformdriverios:${versions.sqldelightKnarch}",
+                    'runtimeNative': "com.squareup.sqldelight:sqldelightruntimeios:${versions.sqldelight}",
+                    'multiplatformdriver': "com.squareup.sqldelight:sqldelight-multiplatform-driver:${versions.sqldelight}",
+                    'multiplatformdriverAndroid': "com.squareup.sqldelight:sqldelight-multiplatform-android:${versions.sqldelight}",
+                    'multiplatformdriverNative': "com.squareup.sqldelight:sqldelightmultiplatformdriverios:${versions.sqldelight}",
             ]
     ]
 
@@ -82,8 +83,7 @@ buildscript {
     dependencies {
         classpath 'com.android.tools.build:gradle:3.2.0-alpha08'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:${versions.kotlin}"
-        classpath "com.squareup.sqldelight:gradle-plugin:${versions.sqldelightKnarch}"
-        classpath "com.squareup.sqldelight:android-gradle-plugin:${versions.sqldelight}"
+        classpath "com.squareup.sqldelight:gradle-plugin:${versions.sqldelight}"
         classpath "org.jetbrains.kotlin:kotlin-native-gradle-plugin:${versions.kotlin_native_version}"
     }
 }
