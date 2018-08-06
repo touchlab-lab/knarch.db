@@ -42,29 +42,29 @@ namespace {
 
         }
 
-        void putStmt(KString kstring, KRef stmtRef) {
+        void putStmt(KLong connectionPtr, KString kstring, KRef stmtRef) {
             KStdString utf8 = makeStdString(kstring);
             KNativePtr stmt = CreateStablePointer(stmtRef);
             KNativePtr removedPair = stmtCache.put(utf8, stmt);
             if (removedPair != nullptr) {
-                removeStmt(removedPair);
+                removeStmt(connectionPtr, removedPair);
             }
         }
 
-        void evictAll() {
+        void evictAll(KLong connectionPtr) {
             auto all = stmtCache.allEntries();
             std::list<std::pair<KStdString, KNativePtr>>::const_iterator iterator;
             for (iterator = all.begin(); iterator != all.end(); ++iterator) {
                 if (stmtCache.exists(iterator->first))
-                    removeStmt(iterator->second);
+                    removeStmt(connectionPtr, iterator->second);
             }
             stmtCache.removeAll();
         }
 
-        void remove(KString sql) {
+        void remove(KLong connectionPtr, KString sql) {
             auto key = makeStdString(sql);
             if (stmtCache.exists(key)) {
-                removeStmt(stmtCache.get(key));
+                removeStmt(connectionPtr, stmtCache.get(key));
                 stmtCache.remove(key);
             }
         }
@@ -77,43 +77,12 @@ namespace {
                 return nullptr;
         }
 
-        KRef getTransaction() {
-            return (KRef) transaction;
-        }
-
-        void putTransaction(KRef tl) {
-            transaction = CreateStablePointer(tl);
-        }
-
-        void removeTransaction() {
-            DisposeStablePointer(transaction);
-            transaction = nullptr;
-        }
-
-        KRef getDbConfig() {
-            return (KRef) dbConfig;
-        }
-
-        void putDbConfig(KRef tl) {
-            dbConfig = CreateStablePointer(tl);
-        }
-
-        void removeDbConfig() {
-            DisposeStablePointer(dbConfig);
-            dbConfig = nullptr;
-        }
-
-        KLong connectionPtr;
-
-
     private:
-        void removeStmt(KNativePtr stmtPtr) {
+        void removeStmt(KLong connectionPtr, KNativePtr stmtPtr) {
             finalizeStmt(connectionPtr, stmtPtr);
             DisposeStablePointer(stmtPtr);
         }
 
-        KNativePtr transaction = nullptr;
-        KNativePtr dbConfig = nullptr;
         cache::lru_cache<KStdString, KNativePtr> stmtCache;
     };
 
@@ -128,10 +97,10 @@ namespace {
             pthread_mutex_destroy(&lock_);
         }
 
-        void putStmt(KInt dataId, KString sql, KRef stmt) {
+        void putStmt(KInt dataId, KLong connectionPtr, KString sql, KRef stmt) {
             Locker locker(&lock_);
             auto it = data_.find(dataId);
-            it->second->putStmt(sql, stmt);
+            it->second->putStmt(connectionPtr, sql, stmt);
         }
 
         KRef getStmt(KInt dataId, KString sql) {
@@ -140,67 +109,16 @@ namespace {
             return it->second->getStmt(sql);
         }
 
-        KRef getTransaction(KInt dataId) {
+        void evictAll(KInt dataId, KLong connectionPtr) {
             Locker locker(&lock_);
             auto it = data_.find(dataId);
-            return it->second->getTransaction();
+            it->second->evictAll(connectionPtr);
         }
 
-        void putTransaction(KInt dataId, KRef tl) {
+        void remove(KInt dataId, KLong connectionPtr, KString sql) {
             Locker locker(&lock_);
             auto it = data_.find(dataId);
-            it->second->putTransaction(tl);
-        }
-
-        void removeTransaction(KInt dataId) {
-            Locker locker(&lock_);
-            auto it = data_.find(dataId);
-            it->second->removeTransaction();
-        }
-
-        KRef getDbConfig(KInt dataId) {
-            Locker locker(&lock_);
-            auto it = data_.find(dataId);
-            return it->second->getDbConfig();
-        }
-
-        void putDbConfig(KInt dataId, KRef tl) {
-            Locker locker(&lock_);
-            auto it = data_.find(dataId);
-            it->second->putDbConfig(tl);
-        }
-
-        void removeDbConfig(KInt dataId) {
-            Locker locker(&lock_);
-            auto it = data_.find(dataId);
-            it->second->removeDbConfig();
-        }
-
-        void putConnectionPtr(KInt dataId, KLong connectionPtr) {
-            Locker locker(&lock_);
-            auto it = data_.find(dataId);
-            it->second->connectionPtr = connectionPtr;
-        }
-
-        KLong getConnectionPtr(KInt dataId) {
-            Locker locker(&lock_);
-            auto it = data_.find(dataId);
-            if (it == data_.end())
-                return 0l;
-            else
-                return it->second->connectionPtr;
-        }
-
-        void evictAll(KInt dataId) {
-            Locker locker(&lock_);
-            auto it = data_.find(dataId);
-            it->second->evictAll();
-        }
-
-        void remove(KInt dataId, KString sql) {
-            Locker locker(&lock_);
-            auto it = data_.find(dataId);
-            it->second->remove(sql);
+            it->second->remove(connectionPtr, sql);
         }
 
         KInt nextDataId() {
@@ -218,7 +136,9 @@ namespace {
 
             auto it = data_.find(dataId);
             if (it == data_.end()) return;
+            DatabaseInfo* removing = it->second;
             data_.erase(dataId);
+            delete removing;
         }
 
         void putHelperInfo(KInt dataId, KRef helperInfo) {
@@ -282,39 +202,10 @@ namespace {
     }
 }
 
-/*
-
-char* CreateCStringFromString(KConstRef kref) {
-  KString kstring = kref->array();
-  const KChar* utf16 = CharArrayAddressOfElementAt(kstring, 0);
-  KStdString utf8;
-  utf8::unchecked::utf16to8(utf16, utf16 + kstring->count_, back_inserter(utf8));
-  char* result = reinterpret_cast<char*>(konan::calloc(1, utf8.size() + 1));
-  ::memcpy(result, utf8.c_str(), utf8.size());
-  return result;
-}
-
-void DisposeCString(char* cstring) {
-  if (cstring) konan::free(cstring);
-}
-
-     */
-
 extern "C" {
 
-
-
-
-void SQLiteSupport_putConnectionPtr(KInt dataId, KLong connectionPtr) {
-    dataState()->putConnectionPtr(dataId, connectionPtr);
-}
-
-KLong SQLiteSupport_getConnectionPtr(KInt dataId) {
-    return dataState()->getConnectionPtr(dataId);
-}
-
-void SQLiteSupport_putStmt(KInt dataId, KString sql, KRef stmt) {
-    dataState()->putStmt(dataId, sql, stmt);
+void SQLiteSupport_putStmt(KInt dataId, KLong connectionPtr, KString sql, KRef stmt) {
+    dataState()->putStmt(dataId, connectionPtr, sql, stmt);
 }
 
 OBJ_GETTER(SQLiteSupport_getStmt, KInt dataId, KString sql) {
@@ -325,36 +216,12 @@ KBoolean SQLiteSupport_hasStmt(KInt dataId, KString sql) {
     return dataState()->getStmt(dataId, sql) != nullptr;
 }
 
-void SQLiteSupport_putTransaction(KInt dataId, KRef tl) {
-    dataState()->putTransaction(dataId, tl);
+void SQLiteSupport_evictAll(KInt dataId, KLong connectionPtr) {
+    return dataState()->evictAll(dataId, connectionPtr);
 }
 
-OBJ_GETTER(SQLiteSupport_getTransaction, KInt dataId) {
-    RETURN_OBJ(dataState()->getTransaction(dataId));
-}
-
-void SQLiteSupport_removeTransaction(KInt dataId) {
-    dataState()->removeTransaction(dataId);
-}
-
-void SQLiteSupport_putDbConfig(KInt dataId, KRef tl) {
-    dataState()->putDbConfig(dataId, tl);
-}
-
-OBJ_GETTER(SQLiteSupport_getDbConfig, KInt dataId) {
-    RETURN_OBJ(dataState()->getDbConfig(dataId));
-}
-
-void SQLiteSupport_removeDbConfig(KInt dataId) {
-    dataState()->removeDbConfig(dataId);
-}
-
-void SQLiteSupport_evictAll(KInt dataId) {
-    return dataState()->evictAll(dataId);
-}
-
-void SQLiteSupport_remove(KInt dataId, KString sql) {
-    return dataState()->remove(dataId, sql);
+void SQLiteSupport_remove(KInt dataId, KLong connectionPtr, KString sql) {
+    return dataState()->remove(dataId, connectionPtr, sql);
 }
 
 KInt SQLiteSupport_nextDataId(){

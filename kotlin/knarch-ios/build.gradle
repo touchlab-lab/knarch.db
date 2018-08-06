@@ -41,7 +41,7 @@ konanArtifacts {
         enableMultiplatform true
     }
 
-    framework('knarchtest', targets: ['iphone', 'iphone_sim']) {
+    /*framework('knarchtest', targets: ['iphone', 'iphone_sim']) {
         srcDir 'src/main/kotlin'
         srcDir 'src/test/kotlin'
 
@@ -56,7 +56,7 @@ konanArtifacts {
         extraOpts "-tr", "-g"
         linkerOpts "-lsqlite3"
         enableMultiplatform true
-    }
+    }*/
 
     program("knarchtestcmd", targets: ['macos_x64']) {
         srcDir 'src/main/kotlin'

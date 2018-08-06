@@ -6,7 +6,6 @@ file(REMOVE_RECURSE
   "CMakeFiles/cpp.dir/knarch/src/main/cpp/AndroidfwCursorWindow.cpp.o"
   "CMakeFiles/cpp.dir/knarch/src/main/cpp/SQLiteSupport.cpp.o"
   "CMakeFiles/cpp.dir/knarch/src/main/cpp/KonanHelper.cpp.o"
-  "CMakeFiles/cpp.dir/knarch/src/main/cpp/ThreadSupport.cpp.o"
   "cpp.pdb"
   "cpp"
 )

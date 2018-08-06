@@ -18,9 +18,10 @@ import konan.test.*
 import kotlin.test.*
 
 fun main(args: Array<String>):Int {
-//    TestRunner.run(arrayOf("--ktest_filter=*testEnableAndDisableForeignKeys*"))
+//    TestRunner.run(arrayOf("--ktest_filter=*testStatementConstraint*"))
 
-    return testLauncherEntryPoint(Array<String>(0 ){""})
+//    return testLauncherEntryPoint(Array<String>(0 ){""})
+    return testLauncherEntryPoint(arrayOf("--ktest_filter=*testStatementConstraint*"))
 
     /*TestRunner.run()
     return TestRunner.exitCode*/

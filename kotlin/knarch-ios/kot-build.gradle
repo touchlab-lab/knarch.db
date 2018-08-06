@@ -19,7 +19,7 @@
 //Ugly, but functional.
 
 buildscript {
-    ext.kotlin_version = '1.2.50'
+    ext.kotlin_version = '1.2.60'
     repositories {
         mavenCentral()
         maven { url "https://dl.bintray.com/jetbrains/kotlin-native-dependencies" }
@@ -46,7 +46,7 @@ konanArtifacts {
 /*interop ("objcsrc"){
         includeDirs ".", "${j2objcRuntime}/include", "dbarch"
         linkerOpts "-L${j2objcRuntime}/lib", "-Ldbarch/Build/Products/Debug-universal"
-    }*//*
+    }*//*createDataStore
 
 
     library("kurgan"){
