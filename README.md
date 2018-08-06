@@ -1,6 +1,8 @@
 # KNArch.db
 
-## What is?
+![alt text](https://build.appcenter.ms/v0.1/apps/61048136-1ab0-4789-9ae4-7ad6e8df7777/branches/master/badge "Build Badge")
+
+## What is this?
 
 This library is primarily an implementation of sqlite for iOS and MacOS, (roughly) compatible with Android, impelented with Kotlin/Native, to faciliate Kotlin multiplatform development.
 
@@ -8,7 +10,7 @@ This library is primarily an implementation of sqlite for iOS and MacOS, (roughl
 
 K(otlin)N(ative)Arch(itecture)
 
-Sounds like **narc**. We're still working on a release name, but we'll see.
+Sounds like **narc**.
 
 ## TL;DR
 
@@ -16,11 +18,8 @@ Clone repo, open [sample-notepad-sqldelight](sample-notepad-sqldelight) and buil
 
 ## Build
 
-![alt text](https://build.appcenter.ms/v0.1/apps/61048136-1ab0-4789-9ae4-7ad6e8df7777/branches/master/badge "Build Badge")
-
 The CI build is run on [MS App Center](https://appcenter.ms/). Currently it runs the Kotlin/Native iOS tests
-only, but that's the bulk of the framework. C++ builds are still done locally until we start fixing to
-specific K/N releases and sort out include files.
+only, but that's the bulk of the framework. C++ builds are still done locally. Will be added to CI when K/N releases slow down a bit.
 
 [Looking for help to sort out multiplatform testing](https://github.com/touchlab/knarch.db/issues/38)
 
