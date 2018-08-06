@@ -29,24 +29,16 @@ import konan.worker.*
 import kotlinx.cinterop.*
 import konan.internal.ExportForCppRuntime
 
-class SQLiteConnection {
+class SQLiteConnection() {
     // The recent operations log.
     private val mRecentOperations = OperationLog()
     // The native SQLiteConnection pointer. (FOR INTERNAL USE ONLY)
     private val nativeDataId: Int = nextDataId()
 
     private val connectionPtr = konan.worker.AtomicReference<Long>(0L)
-    private val transaction = konan.worker.AtomicReference<SQLiteSession.Transaction>()
-    private val dbConfig = konan.worker.AtomicReference<SQLiteDatabaseConfiguration>()
-
-    private fun getConnectionPtr():Long = connectionPtr.get()!!
-
-    private fun putConnectionPtr(ptr:Long){
-        connectionPtr.compareAndSwap(connectionPtr.get(), ptr)
-    }
 
     fun getDbConfig():SQLiteDatabaseConfiguration{
-        val dbConfig = dbConfig.get()
+        val dbConfig = getDbConfig(nativeDataId)
         if(dbConfig == null)
             throw IllegalStateException("Accessing database configuration after database shutdown")
         else
@@ -61,17 +53,28 @@ class SQLiteConnection {
      * a mutex lock to prevent thread timing issues.
      */
     fun putDbConfig(config:SQLiteDatabaseConfiguration){
-        dbConfig.compareAndSwap(dbConfig.get(), config.freeze())
+        putDbConfig(nativeDataId, config.freeze())
     }
 
-    internal fun getTransaction():SQLiteSession.Transaction? = transaction.get()
+    internal fun getTransaction():SQLiteSession.Transaction? = getTransaction(nativeDataId)
     internal fun putTransaction(trans:SQLiteSession.Transaction?) {
-        transaction.compareAndSwap(transaction.get(), trans.freeze())
+        if(trans == null)
+        {
+            removeTransaction()
+        }
+        else
+        {
+            putTransaction(nativeDataId, trans)
+        }
+    }
+
+    private fun removeTransaction(){
+        removeTransaction(nativeDataId)
     }
 
     //Statement cache methods
     private fun cacheEvictAll(){
-        evictAll(nativeDataId, getConnectionPtr())
+        evictAll(nativeDataId)
     }
 
     private fun cacheRemove(sql:String){
@@ -89,10 +92,10 @@ class SQLiteConnection {
     private fun cachePutStatement(sql:String, stmt:NativePreparedStatement){
         if(!stmt.mInCache)
             throw IllegalStateException("Only mInCache goes in cache")
-        putStmt(nativeDataId, getConnectionPtr(), sql, stmt)
+        putStmt(nativeDataId, sql, stmt)
     }
 
-    internal fun hasConnection() = getConnectionPtr() != 0L
+    internal fun hasConnection() = getConnectionPtr(nativeDataId) != 0L
 
     // Closes the database closes and releases all of its associated resources.
     // Do not call methods on the connection after it is closed. It will probably crash.
@@ -108,7 +111,7 @@ class SQLiteConnection {
 
         createDataStore(nativeDataId, config.maxSqlCacheSize)
         putDbConfig(config)
-        putConnectionPtr(connectionPtr)
+        putConnectionPtr(nativeDataId, connectionPtr)
 
         setPageSize()
         setForeignKeyModeFromConfiguration()
@@ -121,7 +124,7 @@ class SQLiteConnection {
 
     private fun dispose() {
 
-        val connectionPtr = getConnectionPtr()
+        val connectionPtr = getConnectionPtr(nativeDataId)
 
         if (connectionPtr != 0L)
         {
@@ -130,8 +133,8 @@ class SQLiteConnection {
             {
                 cacheEvictAll()
                 nativeClose(connectionPtr)
-                dbConfig.compareAndSwap(dbConfig.get(), null)
-                putConnectionPtr(0)
+                removeDbConfig(nativeDataId)
+                putConnectionPtr(nativeDataId, 0)
                 removeDataStore(nativeDataId)
             }
             finally
@@ -287,7 +290,7 @@ class SQLiteConnection {
             withPreparedStatement(sql){statement ->
                 if (outStatementInfo != null)
                 {
-                    val connectionPtr = getConnectionPtr()
+                    val connectionPtr = getConnectionPtr(nativeDataId)
                     outStatementInfo.numParameters = statement.mNumParameters
                     outStatementInfo.readOnly = statement.mReadOnly
                     val columnCount = nativeGetColumnCount(
@@ -333,7 +336,7 @@ class SQLiteConnection {
             withPreparedStatement(sql){
                 statement ->
                 bindArguments(statement, bindArgs)
-                nativeExecute(getConnectionPtr(), statement.mStatementPtr)
+                nativeExecute(getConnectionPtr(nativeDataId), statement.mStatementPtr)
             }
         }
         catch (ex:RuntimeException) {
@@ -365,7 +368,7 @@ class SQLiteConnection {
         {
             return withPreparedStatement(sql){statement ->
                 bindArguments(statement, bindArgs)
-                nativeExecuteForLong(getConnectionPtr(), statement.mStatementPtr)
+                nativeExecuteForLong(getConnectionPtr(nativeDataId), statement.mStatementPtr)
             }
         }
         catch (ex:RuntimeException) {
@@ -397,7 +400,7 @@ class SQLiteConnection {
         {
             return withPreparedStatement(sql){statement ->
                 bindArguments(statement, bindArgs)
-                nativeExecuteForString(getConnectionPtr(), statement.mStatementPtr)
+                nativeExecuteForString(getConnectionPtr(nativeDataId), statement.mStatementPtr)
             }
         }
         catch (ex:RuntimeException) {
@@ -432,7 +435,7 @@ class SQLiteConnection {
             return withPreparedStatement(sql){statement ->
                 bindArguments(statement, bindArgs)
                 changedRows = nativeExecuteForChangedRowCount(
-                        getConnectionPtr(), statement.mStatementPtr)
+                        getConnectionPtr(nativeDataId), statement.mStatementPtr)
 
 
                 changedRows
@@ -472,7 +475,7 @@ class SQLiteConnection {
             return withPreparedStatement(sql){statement ->
                 bindArguments(statement, bindArgs)
                 nativeExecuteForLastInsertedRowId(
-                        getConnectionPtr(), statement.mStatementPtr)
+                        getConnectionPtr(nativeDataId), statement.mStatementPtr)
             }
         }
         catch (ex:RuntimeException) {
@@ -526,7 +529,7 @@ class SQLiteConnection {
                     bindArguments(statement, bindArgs)
 
                     val result = nativeExecuteForCursorWindow(
-                            getConnectionPtr(), statement.mStatementPtr, window.getWindowCursorPtr(),
+                            getConnectionPtr(nativeDataId), statement.mStatementPtr, window.getWindowCursorPtr(),
                             startPos, requiredPos, countAllRows)
                     actualPos = (result shr 32).toInt()
                     countedRows = result.toInt()
@@ -574,12 +577,12 @@ class SQLiteConnection {
             return cacheGetStatement(sql)
         }
         var statement:NativePreparedStatement? = null
-        val statementPtr = nativePrepareStatement(getConnectionPtr(), sql)
+        val statementPtr = nativePrepareStatement(getConnectionPtr(nativeDataId), sql)
         try
         {
-            val numParameters = nativeGetParameterCount(getConnectionPtr(), statementPtr)
+            val numParameters = nativeGetParameterCount(getConnectionPtr(nativeDataId), statementPtr)
             val type = DatabaseUtils.getSqlStatementType(sql)
-            val readOnly = nativeIsReadOnly(getConnectionPtr(), statementPtr)
+            val readOnly = nativeIsReadOnly(getConnectionPtr(nativeDataId), statementPtr)
             statement = obtainPreparedStatement(
                     sql,
                     statementPtr,
@@ -598,7 +601,7 @@ class SQLiteConnection {
             // it to the cache. If it is already in the cache, then leave it there.
             if (statement == null || !statement.mInCache)
             {
-                nativeFinalizeStatement(getConnectionPtr(), statementPtr)
+                nativeFinalizeStatement(getConnectionPtr(nativeDataId), statementPtr)
             }
             throw ex
         }
@@ -612,7 +615,7 @@ class SQLiteConnection {
         {
             try
             {
-                nativeResetStatementAndClearBindings(getConnectionPtr(), statement.mStatementPtr)
+                nativeResetStatementAndClearBindings(getConnectionPtr(nativeDataId), statement.mStatementPtr)
             }
             catch (ex:SQLiteException) {
                 // The statement could not be reset due to an error. Remove it from the cache.
@@ -630,7 +633,7 @@ class SQLiteConnection {
         }
         else
         {
-            nativeFinalizeStatement(getConnectionPtr(), statement.mStatementPtr)
+            nativeFinalizeStatement(getConnectionPtr(nativeDataId), statement.mStatementPtr)
         }
     }
 
@@ -638,7 +641,7 @@ class SQLiteConnection {
      * Cancel an open operation.
      */
     fun cancel() {
-        nativeCancel(getConnectionPtr())
+        nativeCancel(getConnectionPtr(nativeDataId))
     }
 
     private fun bindArguments(statement:NativePreparedStatement, bindArgs:Array<Any?>?) {
@@ -656,7 +659,7 @@ class SQLiteConnection {
         val statementPtr = statement.mStatementPtr
         for (i in 0 until count)
         {
-            val connectionPtr = getConnectionPtr()
+            val connectionPtr = getConnectionPtr(nativeDataId)
             val arg = bindArgs!![i]
             when (DatabaseUtils.getTypeOfObject(arg)) {
                 Cursor.FIELD_TYPE_NULL -> nativeBindNull(connectionPtr, statementPtr, i + 1)
@@ -712,7 +715,7 @@ class SQLiteConnection {
      */
     internal fun collectDbStats(dbStatsList:ArrayList<SQLiteDebug.DbStats>) {
         // Get information about the main database.
-        val lookaside = nativeGetDbLookaside(getConnectionPtr())
+        val lookaside = nativeGetDbLookaside(getConnectionPtr(nativeDataId))
         var pageCount:Long = 0
         var pageSize:Long = 0
         try
@@ -947,8 +950,14 @@ private external fun createDataStore(dataId:Int, maxCacheSize:Int)
 @SymbolName("SQLiteSupport_removeDataStore")
 private external fun removeDataStore(dataId:Int)
 
+@SymbolName("SQLiteSupport_getConnectionPtr")
+private external fun getConnectionPtr(dataId:Int):Long
+
+@SymbolName("SQLiteSupport_putConnectionPtr")
+private external fun putConnectionPtr(dataId:Int, connectionPtr:Long)
+
 @SymbolName("SQLiteSupport_putStmt")
-private external fun putStmt(dataId:Int, connectionPtr:Long, sql:String, ptr:NativePreparedStatement)
+private external fun putStmt(dataId:Int, sql:String, ptr:NativePreparedStatement)
 
 @SymbolName("SQLiteSupport_getStmt")
 private external fun getStmt(dataId:Int, sql:String):NativePreparedStatement
@@ -956,8 +965,26 @@ private external fun getStmt(dataId:Int, sql:String):NativePreparedStatement
 @SymbolName("SQLiteSupport_hasStmt")
 private external fun hasStmt(dataId:Int, sql:String):Boolean
 
+@SymbolName("SQLiteSupport_getTransaction")
+private external fun getTransaction(dataId:Int):SQLiteSession.Transaction?
+
+@SymbolName("SQLiteSupport_putTransaction")
+private external fun putTransaction(dataId:Int, trans:SQLiteSession.Transaction?)
+
+@SymbolName("SQLiteSupport_removeTransaction")
+private external fun removeTransaction(dataId:Int)
+
+@SymbolName("SQLiteSupport_getDbConfig")
+private external fun getDbConfig(dataId:Int):SQLiteDatabaseConfiguration?
+
+@SymbolName("SQLiteSupport_putDbConfig")
+private external fun putDbConfig(dataId:Int, dbConfig:SQLiteDatabaseConfiguration)
+
+@SymbolName("SQLiteSupport_removeDbConfig")
+private external fun removeDbConfig(dataId:Int)
+
 @SymbolName("SQLiteSupport_evictAll")
-private external fun evictAll(dataId:Int, connectionPtr:Long)
+private external fun evictAll(dataId:Int)
 
 @SymbolName("SQLiteSupport_remove")
 private external fun remove(dataId:Int, sql:String)
