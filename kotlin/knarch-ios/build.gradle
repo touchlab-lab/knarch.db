@@ -41,21 +41,23 @@ konanArtifacts {
         enableMultiplatform true
     }
 
-    framework('knarchtest', targets: ['iphone', 'iphone_sim']) {
-        srcDir 'src/main/kotlin'
-        srcDir 'src/test/kotlin'
+    if(!project.hasProperty('localPublish')) {
+        framework('knarchtest', targets: ['iphone', 'iphone_sim']) {
+            srcDir 'src/main/kotlin'
+            srcDir 'src/test/kotlin'
 
-        target('iphone_sim') {
-            nativeLibraries '../../cpp/bcdist/ios_x64/tlruntime.bc'
+            target('iphone_sim') {
+                nativeLibraries '../../cpp/bcdist/ios_x64/tlruntime.bc'
+            }
+
+            target('iphone') {
+                nativeLibraries '../../cpp/bcdist/ios_arm64/tlruntime.bc'
+            }
+
+            extraOpts "-tr", "-g"
+            linkerOpts "-lsqlite3"
+            enableMultiplatform true
         }
-
-        target('iphone') {
-            nativeLibraries '../../cpp/bcdist/ios_arm64/tlruntime.bc'
-        }
-
-        extraOpts "-tr", "-g"
-        linkerOpts "-lsqlite3"
-        enableMultiplatform true
     }
 
     program("knarchtestcmd", targets: ['macos_x64']) {
