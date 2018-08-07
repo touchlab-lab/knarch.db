@@ -4,7 +4,7 @@
 
 ## What is this?
 
-This library is primarily an implementation of sqlite for iOS and MacOS, (roughly) compatible with Android, impelented with Kotlin/Native, to faciliate Kotlin multiplatform development.
+This library is primarily an implementation of sqlite for iOS and MacOS, (roughly) compatible with Android, implemented with Kotlin/Native, to faciliate Kotlin multiplatform development.
 
 ## KNArch?
 
@@ -31,9 +31,7 @@ There's a lot that's different about Kotlin on native platforms from Kotlin on t
 
 2. How architecture will evolve for multiplatform from "Android" isn't necessarily clear. But it *should* evolve. Simply copying artifacts is probably not the best choice.
 
-The core database functionality works. On top of that, a core suite of tests from Android's CTS suite has been ported and applied. This is to verify that what the
-classes are supposed to do is what they actually do. The current goal is to create something that can be used in real, production apps by leveraging both AOSP-based logic and tests, to
-jumpstart the library.
+The core database functionality works. On top of that, a core suite of tests from Android's CTS suite has been ported and applied. This is to verify that what the classes are supposed to do is what they actually do. The current goal is to create something that can be used in real, production apps by leveraging both AOSP-based logic and tests, to jumpstart the library.
 
 With that in place, we will work on some next-stage goals simultaneously.
 
