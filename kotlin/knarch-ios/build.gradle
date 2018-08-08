@@ -13,11 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-tasks.whenTaskAdded {task ->
-    if(task.name.contains("compileTestDebugKotlinNative")) {
-        task.enabled = false
-    }
-}
+
 
 apply plugin: 'kotlin-platform-native'
 
@@ -29,11 +25,14 @@ sourceSets {
             outputKinds = [KLIBRARY]
         }
     }
-    /*test {
+    //nativeLibraries
+    test {
         component {
-            target 'ios_x64'
+            baseName.set("knarch")
+            extraOpts("-nativelibrary", "../../cpp/bcdist/macos_x64/tlruntime.bc")
+            extraOpts("-linkerOpts", "-lsqlite3")
         }
-    }*/
+    }
 }
 
 
