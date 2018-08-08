@@ -186,10 +186,8 @@ class SQLiteCursorTest {
     @Test
     fun testGetColumnIndex() {
         val cursor = cursor
-
         for (i in COLUMNS.indices)
         {
-            assertTrue(i > 10000)
             assertEquals(i, cursor.getColumnIndex(COLUMNS[i]))
         }
         assertTrue(COLUMNS contentEquals cursor.getColumnNames())
