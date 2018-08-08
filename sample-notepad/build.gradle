@@ -14,10 +14,10 @@ buildscript {
 
     ext.versions = [
             'supportLibrary'  : '27.1.0',
-            'kotlin'          : '1.2.41',
+            'kotlin'          : '1.2.60',
             'kotlin_native_version' : '0.9-dev-2922',
-            'kotlinCoroutines': '0.22.5',
-            'sqldelight'      : '1.0.0-SNAPSHOT'
+            'knarchDb' : '0.7-alpha4',
+            'knarchThreads' : '0.2.3'
     ]
 
     ext.deps = [
@@ -25,25 +25,12 @@ buildscript {
                     'stdlib'    : [
                             'common': "org.jetbrains.kotlin:kotlin-stdlib-common:${versions.kotlin}",
                             'jdk'   : "org.jetbrains.kotlin:kotlin-stdlib:${versions.kotlin}",
-                            'js'    : "org.jetbrains.kotlin:kotlin-stdlib-js:${versions.kotlin}",
-                    ],
-                    'coroutines': [
-                            'common' : "org.jetbrains.kotlinx:kotlinx-coroutines-core-common:${versions.kotlinCoroutines}",
-                            'jdk'    : "org.jetbrains.kotlinx:kotlinx-coroutines-core:${versions.kotlinCoroutines}",
-                            'js'     : "org.jetbrains.kotlinx:kotlinx-coroutines-core-js:${versions.kotlinCoroutines}",
-                            'android': "org.jetbrains.kotlinx:kotlinx-coroutines-android:${versions.kotlinCoroutines}",
-                            'rx2'    : "org.jetbrains.kotlinx:kotlinx-coroutines-rx2:${versions.kotlinCoroutines}",
                     ],
             ],
             'android'   : [
                     'arch': [
                             'dbFramework': 'android.arch.persistence:db-framework:1.0.0',
                     ],
-            ],
-
-            'sqldelight': [
-                    'android': "com.squareup.sqldelight:android-driver:${versions.sqldelight}",
-                    'runtime': "com.squareup.sqldelight:runtime:${versions.sqldelight}",
             ]
     ]
 
@@ -63,7 +50,6 @@ buildscript {
     dependencies {
         classpath 'com.android.tools.build:gradle:3.2.0-alpha08'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:${versions.kotlin}"
-        classpath "com.squareup.sqldelight:gradle-plugin:${versions.sqldelight}"
         classpath "org.jetbrains.kotlin:kotlin-native-gradle-plugin:${versions.kotlin_native_version}"
     }
 }

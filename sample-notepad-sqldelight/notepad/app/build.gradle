@@ -29,8 +29,8 @@ dependencies {
 
     implementation deps.sqldelight.runtimeJdk
     implementation deps.sqldelight.multiplatformdriverAndroid
-    implementation "co.touchlab.knarch:knarch-android:0.7-alpha1"
-    implementation "co.touchlab.knarch.threads:threads-android:0.2.0"
+    implementation "co.touchlab.knarch:knarch-android:${versions.knarchDb}"
+    implementation "co.touchlab.knarch.threads:threads-android:${versions.knarchThreads}"
 
     implementation "android.arch.lifecycle:runtime:1.1.1"
     implementation "android.arch.lifecycle:extensions:1.1.1"

@@ -32,6 +32,6 @@ task copyFramework() {
 
 dependencies {
     expectedBy project(':notepad')
-    implementation "co.touchlab.knarch:knarch:0.7-alpha4"
-    implementation "co.touchlab.knarch.threads:knarchThreads:0.2.3"
+    implementation "co.touchlab.knarch:knarch:${versions.knarchDb}"
+    implementation "co.touchlab.knarch.threads:knarchThreads:${versions.knarchThreads}"
 }

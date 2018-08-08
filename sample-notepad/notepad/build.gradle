@@ -2,12 +2,6 @@ apply plugin: 'kotlin-platform-common'
 
 dependencies {
     implementation deps.kotlin.stdlib.common
-    implementation "co.touchlab.knarch.threads:threads-common:0.2.3"
-    implementation "co.touchlab.knarch:knarch-common:0.7-alpha4"
-}
-
-kotlin {
-    experimental {
-        coroutines 'enable'
-    }
+    implementation "co.touchlab.knarch.threads:threads-common:${versions.knarchThreads}"
+    implementation "co.touchlab.knarch:knarch-common:${versions.knarchDb}"
 }

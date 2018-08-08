@@ -1,22 +1,31 @@
+apply plugin: 'kotlin-platform-native'
 
-apply plugin: 'konan'
+sourceSets {
+    main {
+        component {
+            baseName.set("NotepadArchitecture")
+            target 'ios_arm64', 'ios_x64'
+            outputKinds = [FRAMEWORK]
 
-konan.targets = ['iphone', 'iphone_sim']
-
-konanArtifacts {
-    framework('NotepadArchitecture') {
-        dependencies {
-            /*artifactNotepadArchitecture deps.knarch.dbNative
-            artifactNotepadArchitecture deps.sqldelight.runtimeNative*/
-//            artifactNotepadArchitecture deps.knarch.threadsNative
-            artifactNotepadArchitecture deps.sqldelight.multiplatformdriverNative
+            extraOpts("-linkerOpts", "-lsqlite3")
         }
+    }
+}
 
-        linkerOpts "-lsqlite3"
-        enableMultiplatform true
+task copyFramework() {
+    doLast {
+        def srcFile = tasks['compileDebugIos_x64KotlinNative'].outputFile
+        def targetDir = getProperty("konan.configuration.build.dir")
+        copy {
+            from srcFile.parent
+            into targetDir
+            include 'NotepadArchitecture.framework/**'
+            include 'NotepadArchitecture.framework.dSYM'
+        }
     }
 }
 
 dependencies {
     expectedBy project(':notepad')
+    implementation deps.sqldelight.multiplatformdriverNative
 }

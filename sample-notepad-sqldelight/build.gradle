@@ -15,13 +15,11 @@ buildscript {
     ext.versions = [
             'supportLibrary'  : '27.1.0',
             'kotlin'          : '1.2.50',
-            'kotlin_native_version' : '0.8',
+            'kotlin_native_version' : '0.9-dev-2922',
             'kotlinCoroutines': '0.22.5',
-            'knarchDb'      : '0.7-alpha1',
-            'knarchThreads'      : '0.2.0',
-            'sqldelight'      : '1.0.0-alpha4.7'
-//            ,
-//            'sqldelightKnarch'      : '1.0.0-alpha4.7'
+            'knarchDb'      : '0.7-alpha4',
+            'knarchThreads'      : '0.2.3',
+            'sqldelight'      : '1.0.0-alpha4.9'
     ]
 
     ext.deps = [
