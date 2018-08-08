@@ -1,4 +1,4 @@
 set -e
-pushd ..
+pushd ../..
 ./gradlew build
 popd
