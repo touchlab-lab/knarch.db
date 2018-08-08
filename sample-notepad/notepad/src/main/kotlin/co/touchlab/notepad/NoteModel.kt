@@ -11,21 +11,6 @@ class NoteModel {
         val dbHelper = NoteDbHelper()
     }
 
-    init {
-        dbHelper.noteUpdate = {
-
-            backgroundTask({
-                dbHelper.getNotes()
-            }) {
-                val proc = updateLocal.get()
-                println("proc null? ${proc == null}")
-                if (proc != null) {
-                    proc(it)
-                }
-            }
-        }
-    }
-
     val updateLocal = ThreadLocalImpl<(notes:Array<Note>)->Unit>()
 
     fun insertNote(title:String, description:String){
@@ -52,9 +37,15 @@ class NoteModel {
     }
 
 
-    fun runUpdate(){
-        if (dbHelper.noteUpdate != null) {
-            dbHelper.noteUpdate!!()
+    fun runUpdate() {
+        backgroundTask({
+            dbHelper.getNotes()
+        }) {
+            val proc = updateLocal.get()
+            println("proc null? ${proc == null}")
+            if (proc != null) {
+                proc(it)
+            }
         }
     }
 

@@ -13,7 +13,58 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-apply plugin: 'konan'
+tasks.whenTaskAdded {task ->
+    if(task.name.contains("compileTestDebugKotlinNative")) {
+        task.enabled = false
+    }
+}
+
+apply plugin: 'kotlin-platform-native'
+
+sourceSets {
+    main {
+        component {
+            baseName.set("knarch")
+            target 'ios_arm32', 'ios_arm64', 'ios_x64', 'macos_x64'
+            outputKinds = [KLIBRARY]
+        }
+    }
+    /*test {
+        component {
+            target 'ios_x64'
+        }
+    }*/
+}
+
+
+
+void mergeCppOutput(String config, String arch){
+    ant.zip(
+            update: "true",
+            destfile: "${project.buildDir}/lib/main/$config/$arch/knarch.klib"
+    ) {
+        zipfileset(
+                dir: "${project.projectDir}/../../cpp/bcdist/$arch",
+                prefix: "targets/$arch/native"
+        ) {
+            include(name: '**.bc')
+        }
+    }
+}
+
+task mergeCppAll(dependsOn:build) {
+    doLast {
+        mergeCppOutput("debug", "ios_arm32")
+        mergeCppOutput("debug", "ios_arm64")
+        mergeCppOutput("debug", "ios_x64")
+        mergeCppOutput("debug", "macos_x64")
+        mergeCppOutput("release", "ios_arm32")
+        mergeCppOutput("release", "ios_arm64")
+        mergeCppOutput("release", "ios_x64")
+        mergeCppOutput("release", "macos_x64")
+    }
+}
+
 apply plugin: 'maven-publish'
 
 apply from: '../gradle/configpublishnative.gradle'
@@ -22,59 +73,6 @@ if(project.hasProperty('deployIos')) {
     apply from: '../gradle/configbintray.gradle'
 }
 
-konan.targets = ['iphone', 'iphone_sim', 'macos_x64']
-
-konanArtifacts {
-    library("knarch"){
-        target('iphone_sim') {
-            nativeLibraries '../../cpp/bcdist/ios_x64/tlruntime.bc'
-        }
-
-        target('iphone') {
-            nativeLibraries '../../cpp/bcdist/ios_arm64/tlruntime.bc'
-        }
-
-        target('macos_x64') {
-            nativeLibraries '../../cpp/bcdist/macos_x64/tlruntime.bc'
-        }
-
-        enableMultiplatform true
-    }
-
-    if(!project.hasProperty('localPublish')) {
-        framework('knarchtest', targets: ['iphone', 'iphone_sim']) {
-            srcDir 'src/main/kotlin'
-            srcDir 'src/test/kotlin'
-
-            target('iphone_sim') {
-                nativeLibraries '../../cpp/bcdist/ios_x64/tlruntime.bc'
-            }
-
-            target('iphone') {
-                nativeLibraries '../../cpp/bcdist/ios_arm64/tlruntime.bc'
-            }
-
-            extraOpts "-tr", "-g"
-            linkerOpts "-lsqlite3"
-            enableMultiplatform true
-        }
-    }
-
-    program("knarchtestcmd", targets: ['macos_x64']) {
-        srcDir 'src/main/kotlin'
-        srcDir 'src/test/kotlin'
-        srcDir 'src/testexe/kotlin'
-
-        target('macos_x64') {
-            nativeLibraries '../../cpp/bcdist/macos_x64/tlruntime.bc'
-        }
-
-        extraOpts "-tr", "-g"
-        linkerOpts "-lsqlite3"
-        enableMultiplatform true
-    }
-
-}
 
 dependencies {
     expectedBy project(':knarch-common')
@@ -84,3 +82,4 @@ repositories {
     maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
 }
 
+tasks.findByName("publish").dependsOn("mergeCppAll")

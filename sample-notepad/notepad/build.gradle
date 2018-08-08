@@ -2,8 +2,8 @@ apply plugin: 'kotlin-platform-common'
 
 dependencies {
     implementation deps.kotlin.stdlib.common
-    implementation "co.touchlab.knarch.threads:threads-common:0.2.0"
-    implementation "co.touchlab.knarch:knarch-common:0.7-alpha1"
+    implementation "co.touchlab.knarch.threads:threads-common:0.2.3"
+    implementation "co.touchlab.knarch:knarch-common:0.7-alpha4"
 }
 
 kotlin {

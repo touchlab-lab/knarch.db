@@ -175,7 +175,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 7FF94ADE2058464C00590D0D /* Build configuration list for PBXNativeTarget "KotlinArithmeticParser" */;
 			buildPhases = (
-				7FF94AE12058466D00590D0D /* Compile Kotlin/Native */,
+				63645319211A800C0033F9F0 /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -239,19 +239,18 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		7FF94AE12058466D00590D0D /* Compile Kotlin/Native */ = {
+		63645319211A800C0033F9F0 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputPaths = (
 			);
-			name = "Compile Kotlin/Native";
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"$SRCROOT/../../gradlew\" -p \"$SRCROOT\" \"$KONAN_TASK\"          \\\n-Pkonan.configuration.build.dir=\"$CONFIGURATION_BUILD_DIR\" \\\n-Pkonan.debugging.symbols=\"$DEBUGGING_SYMBOLS\"             \\\n-Pkonan.optimizations.enable=\"$KONAN_ENABLE_OPTIMIZATIONS\"";
+			shellScript = "\"$SRCROOT/../../gradlew\" -p \"$SRCROOT/..\" \"$KONAN_TASK\" copyFramework \\\n-Pkonan.configuration.build.dir=\"$CONFIGURATION_BUILD_DIR\"        \\\n-Pkonan.debugging.symbols=\"$DEBUGGING_SYMBOLS\"                    \\\n-Pkonan.optimizations.enable=\"$KONAN_ENABLE_OPTIMIZATIONS\"";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -447,8 +446,8 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 11.2;
 				KONAN_ENABLE_OPTIMIZATIONS = NO;
 				KONAN_TASK = "";
-				"KONAN_TASK[sdk=iphoneos*]" = compileKonanKotlinArithmeticParserIos_arm64;
-				"KONAN_TASK[sdk=iphonesimulator*]" = compileKonanKotlinArithmeticParserIos_x64;
+				"KONAN_TASK[sdk=iphoneos*]" = compileDebugIos_arm64KotlinNative;
+				"KONAN_TASK[sdk=iphonesimulator*]" = compileDebugIos_x64KotlinNative;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				OTHER_LDFLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = JetBrains.KotlinArithmeticParser;
@@ -478,8 +477,8 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 11.2;
 				KONAN_ENABLE_OPTIMIZATIONS = YES;
 				KONAN_TASK = "";
-				"KONAN_TASK[sdk=iphoneos*]" = compileKonanKotlinArithmeticParserIos_arm64;
-				"KONAN_TASK[sdk=iphonesimulator*]" = compileKonanKotlinArithmeticParserIos_x64;
+				"KONAN_TASK[sdk=iphoneos*]" = compileReleaseIos_arm64KotlinNative;
+				"KONAN_TASK[sdk=iphonesimulator*]" = compileReleaseIos_x64KotlinNative;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				OTHER_LDFLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = JetBrains.KotlinArithmeticParser;

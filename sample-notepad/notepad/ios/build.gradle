@@ -1,24 +1,37 @@
+apply plugin: 'kotlin-platform-native'
 
-apply plugin: 'konan'
+sourceSets {
+    main {
+        component {
+            baseName.set("KotlinArithmeticParser")
+            target 'ios_arm64', 'ios_x64'
+            outputKinds = [FRAMEWORK]
 
-konan.targets = ['iphone', 'iphone_sim']
-
-konanArtifacts {
-    framework('KotlinArithmeticParser') {
-        dependencies{
-            artifactKotlinArithmeticParser "co.touchlab.knarch:knarch:0.7-alpha1"
-            artifactKotlinArithmeticParser "co.touchlab.knarch.threads:knarchThreads:0.2.0"
+            extraOpts("-linkerOpts", "-lsqlite3")
         }
-
-        linkerOpts "-lsqlite3"
-        enableMultiplatform true
+    }
+    test {
+        component {
+            target 'ios_x64'
+        }
     }
 }
 
-repositories {
-    maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
+task copyFramework() {
+    doLast {
+        def srcFile = tasks['compileDebugIos_x64KotlinNative'].outputFile
+        def targetDir = getProperty("konan.configuration.build.dir")
+        copy {
+            from srcFile.parent
+            into targetDir
+            include 'KotlinArithmeticParser.framework/**'
+            include 'KotlinArithmeticParser.framework.dSYM'
+        }
+    }
 }
 
 dependencies {
     expectedBy project(':notepad')
+    implementation "co.touchlab.knarch:knarch:0.7-alpha4"
+    implementation "co.touchlab.knarch.threads:knarchThreads:0.2.3"
 }

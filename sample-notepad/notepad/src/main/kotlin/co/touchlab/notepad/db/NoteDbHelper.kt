@@ -5,8 +5,8 @@ import co.touchlab.multiplatform.architecture.db.sqlite.*
 import co.touchlab.notepad.db.NoteColumns.Companion.NOTES_TABLE_NAME
 import co.touchlab.notepad.utils.createNativeOpenHelperFactory
 
-class NoteDbHelper {
-    var noteUpdate: (()->Unit)? = null
+class NoteDbHelper() {
+
     private var helper:SQLiteOpenHelper
     init {
         helper = createNativeOpenHelperFactory()

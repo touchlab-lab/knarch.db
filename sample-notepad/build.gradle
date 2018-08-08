@@ -15,7 +15,7 @@ buildscript {
     ext.versions = [
             'supportLibrary'  : '27.1.0',
             'kotlin'          : '1.2.41',
-            'kotlin_native_version' : '0.8',
+            'kotlin_native_version' : '0.9-dev-2922',
             'kotlinCoroutines': '0.22.5',
             'sqldelight'      : '1.0.0-SNAPSHOT'
     ]
@@ -56,8 +56,8 @@ buildscript {
         maven {
             url "https://dl.bintray.com/jetbrains/kotlin-native-dependencies"
         }
-        // maven { url 'https://dl.bintray.com/doppllib/j2objc' }
-       maven { url j2objcMavenDeploy }
+        maven { url 'https://dl.bintray.com/touchlabpublic/kotlin' }
+//        maven { url j2objcMavenDeploy }
     }
 
     dependencies {
@@ -74,7 +74,7 @@ allprojects {
         google()
         maven { url "https://kotlin.bintray.com/kotlinx" }
         maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
-        // maven { url 'https://dl.bintray.com/doppllib/j2objc' }
-       maven { url j2objcMavenDeploy }
+        maven { url 'https://dl.bintray.com/touchlabpublic/kotlin' }
+//        maven { url j2objcMavenDeploy }
     }
 }
