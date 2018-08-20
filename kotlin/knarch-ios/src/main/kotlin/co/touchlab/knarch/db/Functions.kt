@@ -17,7 +17,7 @@
 package co.touchlab.knarch.db
 
 import co.touchlab.knarch.db.sqlite.*
-import konan.internal.ExportForCppRuntime
+import kotlin.native.internal.ExportForCppRuntime
 
 @ExportForCppRuntime
 fun ThrowSql_IllegalStateException(message: String): Unit =

@@ -25,9 +25,9 @@ import co.touchlab.knarch.db.DatabaseUtils
 import co.touchlab.knarch.other.Printer
 import co.touchlab.knarch.Log
 import kotlin.system.*
-import konan.worker.*
+import kotlin.native.worker.*
 import kotlinx.cinterop.*
-import konan.internal.ExportForCppRuntime
+import kotlin.native.internal.ExportForCppRuntime
 
 class SQLiteConnection() {
     // The recent operations log.
@@ -35,7 +35,7 @@ class SQLiteConnection() {
     // The native SQLiteConnection pointer. (FOR INTERNAL USE ONLY)
     private val nativeDataId: Int = nextDataId()
 
-    private val connectionPtr = konan.worker.AtomicReference<Long>(0L)
+    private val connectionPtr = kotlin.native.worker.AtomicReference<Long>(0L)
 
     fun getDbConfig():SQLiteDatabaseConfiguration{
         val dbConfig = getDbConfig(nativeDataId)

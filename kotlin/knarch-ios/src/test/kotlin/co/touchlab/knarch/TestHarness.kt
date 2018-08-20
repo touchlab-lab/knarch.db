@@ -16,7 +16,7 @@
 
 package co.touchlab.knarch
 
-import konan.test.*
+import kotlin.native.test.*
 import kotlin.test.*
 
 class TestHarness{

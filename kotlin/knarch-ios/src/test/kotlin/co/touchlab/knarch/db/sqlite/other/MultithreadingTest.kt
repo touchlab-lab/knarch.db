@@ -21,8 +21,8 @@ import co.touchlab.knarch.db.*
 import co.touchlab.knarch.io.*
 import co.touchlab.knarch.db.sqlite.*
 import kotlin.test.*
-import konan.test.*
-import konan.worker.*
+import kotlin.native.test.*
+import kotlin.native.worker.*
 import platform.Foundation.*
 import kotlinx.cinterop.*
 import platform.posix.*
