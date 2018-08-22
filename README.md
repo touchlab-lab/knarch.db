@@ -4,7 +4,7 @@
 
 ![alt text](https://build.appcenter.ms/v0.1/apps/61048136-1ab0-4789-9ae4-7ad6e8df7777/branches/master/badge "Build Badge")
 
-## What is this?
+## What is this? 
 
 This library is primarily an implementation of sqlite for iOS and MacOS, (roughly) compatible with Android, implemented with Kotlin/Native, to faciliate Kotlin multiplatform development.
 
