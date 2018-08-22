@@ -17,7 +17,6 @@
 //This exists only to help with Intellij, until we can figure out a better setup.
 //I copy/paste this into build.gradle, then refresh and it recognizes kotlin. They undo.
 //Ugly, but functional.
-
 buildscript {
     ext.kotlin_version = '1.2.60'
     repositories {
@@ -27,38 +26,10 @@ buildscript {
 
     dependencies {
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-//        classpath "org.jetbrains.kotlin:kotlin-native-gradle-plugin:${project.property('konan.plugin.version')}"
     }
 }
 
-
-
-//apply plugin: 'konan'
 apply plugin: 'kotlin-platform-common'
-
-//konan.targets = ['iphone', 'iphone_sim'/*, 'macos_x64'*/]
-
-//def j2objcRuntime = System.getenv('J2OBJC_RUNTIME')
-
-/*
-konanArtifacts {
-    */
-/*interop ("objcsrc"){
-        includeDirs ".", "${j2objcRuntime}/include", "dbarch"
-        linkerOpts "-L${j2objcRuntime}/lib", "-Ldbarch/Build/Products/Debug-universal"
-    }*//*createDataStore
-
-
-    library("kurgan"){
-        */
-/*libraries {
-            artifact 'objcsrc'
-        }*//*
-
-        enableMultiplatform true
-    }
-}
-*/
 
 dependencies {
 //    expectedBy project(':knarch-common')
