@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import kotlin.native.test.*
+import konan.test.*
 import kotlin.test.*
 
 fun main(args: Array<String>):Int {

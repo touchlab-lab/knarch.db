@@ -23,7 +23,8 @@ import co.touchlab.knarch.Log
 import co.touchlab.knarch.db.CursorWindow
 import co.touchlab.knarch.db.DatabaseUtils
 import platform.Foundation.*
-import kotlin.native.worker.*
+import kotlin.native.*
+import kotlin.native.concurrent.*
 
 /**
  * In Android, the session is part of the stack that facilitates multithreaded sqlite access. Currently, due

@@ -309,7 +309,7 @@ class CursorWindowTest {
                 for (j in 0 until cols)
                 {
                     // generate random number
-                    col.add(if (j == 0) i else arc4random_uniform(400000000))
+                    col.add(if (j == 0) i else arc4random_uniform(400000000).toInt())
                 }
             }
             return list

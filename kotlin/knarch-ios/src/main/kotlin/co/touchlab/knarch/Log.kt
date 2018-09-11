@@ -16,22 +16,24 @@
 
 package co.touchlab.knarch
 
+import timber.log.*
+
 class Log{
     companion object {
         fun e(tag:String, message:String, t:Throwable? = null){
-            println("$tag: $message")
+            Timber.log(priority = Timber.ERROR, tag = tag, throwable = t, message = message)
         }
         fun w(tag:String, message:String, t:Throwable? = null){
-            println("$tag: $message")
+            Timber.log(priority = Timber.WARNING, tag = tag, throwable = t, message = message)
         }
         fun i(tag:String, message:String, t:Throwable? = null){
-            println("$tag: $message")
+            Timber.log(priority = Timber.INFO, tag = tag, throwable = t, message = message)
         }
         fun d(tag:String, message:String, t:Throwable? = null){
-            println("$tag: $message")
+            Timber.log(priority = Timber.DEBUG, tag = tag, throwable = t, message = message)
         }
         fun isLoggable(s:String, level:Int):Boolean{
-            return true
+            return Timber.isLoggable(priority = level, tag = s)
         }
 
         /**

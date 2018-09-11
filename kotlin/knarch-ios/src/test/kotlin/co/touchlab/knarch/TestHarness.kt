@@ -16,8 +16,8 @@
 
 package co.touchlab.knarch
 
-import kotlin.native.test.*
 import kotlin.test.*
+import kotlin.native.internal.test.*
 
 class TestHarness{
     fun testTest():Int

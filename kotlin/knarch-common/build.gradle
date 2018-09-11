@@ -24,5 +24,6 @@ if(project.hasProperty('deployCommon')) {
 
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-common:$kotlin_version"
+    implementation "com.jakewharton.timber:timber-common:$timber_version"
 }
 

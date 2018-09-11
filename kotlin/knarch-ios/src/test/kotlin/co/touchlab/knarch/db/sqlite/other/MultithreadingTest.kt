@@ -21,8 +21,8 @@ import co.touchlab.knarch.db.*
 import co.touchlab.knarch.io.*
 import co.touchlab.knarch.db.sqlite.*
 import kotlin.test.*
-import kotlin.native.test.*
-import kotlin.native.worker.*
+import kotlin.native.*
+import kotlin.native.concurrent.*
 import platform.Foundation.*
 import kotlinx.cinterop.*
 import platform.posix.*
@@ -74,10 +74,10 @@ class MultithreadingTest {
     @Test
     fun cycleOperations() {
         val COUNT = 10
-        val workers = Array(COUNT, { _ -> startWorker() })
+        val workers = Array(COUNT, { _ -> Worker.start() })
         var shouldFail = false
         val futures = Array(workers.size, { workerIndex ->
-            workers[workerIndex].schedule(TransferMode.CHECKED,
+            workers[workerIndex].execute(TransferMode.SAFE,
                     { Pair(mDatabase, workerIndex).freeze() }) { pair ->
                 val db = pair.first
                 val windex = pair.second
@@ -100,7 +100,7 @@ class MultithreadingTest {
                         allSuccess = false
                 }
 
-                return@schedule allSuccess
+                return@execute allSuccess
             }
         })
         val futureSet = futures.toSet()
@@ -127,12 +127,12 @@ class MultithreadingTest {
 
     fun runWorkers(dbArg: SQLiteDatabase) {
         val COUNT = 30
-        val workers = Array(COUNT, { _ -> startWorker() })
+        val workers = Array(COUNT, { _ -> Worker.start() })
         var shouldFail = false
 
         for (attempt in 1..3) {
             val futures = Array(workers.size, { workerIndex ->
-                workers[workerIndex].schedule(TransferMode.CHECKED,
+                workers[workerIndex].execute(TransferMode.SAFE,
                         { Triple(dbArg, workerIndex, attempt).freeze() }) { triple ->
                     val db = triple.first
                     val windex = triple.second
@@ -167,7 +167,7 @@ class MultithreadingTest {
                         println("attempt $attempt worker $windex run $runs")
                     }
 
-                    return@schedule allSuccess
+                    return@execute allSuccess
                 }
             })
             val futureSet = futures.toSet()

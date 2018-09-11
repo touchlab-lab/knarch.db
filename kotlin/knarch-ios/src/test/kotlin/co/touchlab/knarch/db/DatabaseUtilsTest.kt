@@ -115,15 +115,16 @@ class DatabaseUtilsTest {
 
     @Test
     fun testCreateDbFromSqlStatements() {
+        var TABLE_NAME_LOCAL = "tests_local"
         var dbName = "ExampleName"
-        var sqls = ("CREATE TABLE " + TABLE_NAME + " (_id INTEGER PRIMARY KEY, name TEXT);\n"
-                + "INSERT INTO " + TABLE_NAME + " (name) VALUES ('Mike');\n")
+        var sqls = ("CREATE TABLE " + TABLE_NAME_LOCAL + " (_id INTEGER PRIMARY KEY, name TEXT);\n"
+                + "INSERT INTO " + TABLE_NAME_LOCAL + " (name) VALUES ('Mike');\n")
         DatabaseUtils.createDbFromSqlStatements(getContext(), dbName, 1, sqls)
         var db = getContext().openOrCreateDatabase(dbName, 0, null, null)
         var PROJECTION = arrayOf<String>("_id", // 0
                 "name" // 1
         )
-        var cursor = db.query(TABLE_NAME, PROJECTION, null, null, null, null, null)
+        var cursor = db.query(TABLE_NAME_LOCAL, PROJECTION, null, null, null, null, null)
         assertNotNull(cursor)
         assertEquals(1, cursor.getCount())
         cursor.moveToFirst()

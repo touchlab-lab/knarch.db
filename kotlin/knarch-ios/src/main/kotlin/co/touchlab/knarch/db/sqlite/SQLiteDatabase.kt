@@ -23,7 +23,8 @@ import co.touchlab.knarch.Log
 import co.touchlab.knarch.db.*
 import co.touchlab.knarch.io.*
 import platform.Foundation.*
-import kotlin.native.worker.*
+import kotlin.native.*
+import kotlin.native.concurrent.*
 
 class SQLiteDatabase private constructor(cursorFactory: CursorFactory?, errorHandler: DatabaseErrorHandler?)  {
 

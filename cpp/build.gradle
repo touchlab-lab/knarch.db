@@ -52,6 +52,7 @@ allprojects {
         maven {
             url kotlinCompilerRepo
         }
+        maven { url 'https://dl.bintray.com/kotlin/kotlin-dev/' }
     }
 
     setupHostAndTarget()

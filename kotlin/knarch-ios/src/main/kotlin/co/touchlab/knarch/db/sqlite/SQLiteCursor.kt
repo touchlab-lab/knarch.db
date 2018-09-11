@@ -145,10 +145,8 @@ open class SQLiteCursor
 
     override fun close() {
         super.close()
-        synchronized (this) {
-            mQuery.close()
-            mDriver.cursorClosed()
-        }
+        mQuery.close()
+        mDriver.cursorClosed()
     }
 
     fun setWindow(window:CursorWindow) {
