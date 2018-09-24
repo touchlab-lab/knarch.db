@@ -30,6 +30,7 @@ allprojects {
         google()
         mavenCentral()
         maven { url "https://dl.bintray.com/kotlin/kotlin-dev/" }
+        maven { url "https://dl.bintray.com/kotlin/kotlin-eap/" }
         maven { url 'https://dl.bintray.com/touchlabpublic/kotlin' }
         maven { url "https://kotlin.bintray.com/kotlinx" }
         maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
@@ -38,12 +39,13 @@ allprojects {
 }
 
 buildscript{
-    ext.kotlin_version = '1.2.61'
+    ext.kotlin_version = kotlin_version
 
     repositories {
         google()
         mavenCentral()
         maven { url "https://dl.bintray.com/kotlin/kotlin-dev/" }
+        maven { url "https://dl.bintray.com/kotlin/kotlin-eap/" }
         jcenter()
         maven { url "https://dl.bintray.com/jetbrains/kotlin-native-dependencies" }
     }
