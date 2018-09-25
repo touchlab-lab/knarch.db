@@ -4,7 +4,7 @@
 
 ![alt text](https://build.appcenter.ms/v0.1/apps/61048136-1ab0-4789-9ae4-7ad6e8df7777/branches/master/badge "Build Badge")
 
-## What is this? 
+## What is this?
 
 This library is primarily an implementation of sqlite for iOS and MacOS, (roughly) compatible with Android, implemented with Kotlin/Native, to faciliate Kotlin multiplatform development.
 
@@ -101,43 +101,12 @@ Not available. This is a relatively complex feature that will have C++ and K/N r
 
 ## Usage
 
-To see a self-contained example, look at [sample-notepad-sqldelight](sample-notepad-sqldelight). The common and Android portions are configured as general multiplatform projects
-are set up. The iOS portion is set up somewhat differently.
+To see a self-contained example, look at [sample-notepad](sample-notepad).
 
-Dependency setup is on a per-artifact basis.
+For a more robust example, including Sqldelight, see the [Droidcon App](https://github.com/touchlab/DroidconKotlin/).
 
-```groovy
-apply plugin: 'konan'
-
-konan.targets = ['iphone', 'iphone_sim']
-
-konanArtifacts {
-    framework('NotepadArchitecture') {
-        dependencies {
-          artifactNotepadArchitecture "com.squareup.sqldelight:sqldelightmultiplatformdriverios:1.0.0-alpha4"
-        }
-
-        linkerOpts "-lsqlite3"
-        enableMultiplatform true
-    }
-}
-
-dependencies {
-    expectedBy project(':notepad')
-}
-```
-
-In our example, the artifact is called 'NotepadArchitecture'. The dependency config is of the form:
-
-```
-artifact[artifact name] "[maven id]"
-```
-
-Add the following repo:
-
-```
-maven { url 'https://dl.bintray.com/touchlabpublic/kotlin' }
-```
+The dependency mechanism of Kotlin Multiplatform is somewhat in flux, so refer to the previous 2 examples for current usage. You'll need to
+use Kotlin/Native 0.9.1, as 0.9.2 has incompatible dependency resolution. This is temporary until the new Multiplatform plugin is stable.
 
 ## Design
 
