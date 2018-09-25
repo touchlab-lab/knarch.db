@@ -6,12 +6,13 @@ import co.touchlab.notepad.db.NoteDbHelper
 import co.touchlab.notepad.utils.backgroundTask
 import co.touchlab.notepad.utils.currentTimeMillis
 
+//Should only exist in main thread as per rules. Not a great architecture, but fun to play with
+var noteModelUpdateLocal : ((notes:Array<Note>)->Unit)? = null
+
 class NoteModel {
     companion object {
         val dbHelper = NoteDbHelper()
     }
-
-    val updateLocal = ThreadLocalImpl<(notes:Array<Note>)->Unit>()
 
     fun insertNote(title:String, description:String){
         backgroundTask(
@@ -40,18 +41,17 @@ class NoteModel {
         backgroundTask({
             dbHelper.getNotes()
         }) {
-            val proc = updateLocal.get()
-            if (proc != null) {
-                proc(it)
+            if (noteModelUpdateLocal != null) {
+                noteModelUpdateLocal!!(it)
             }
         }
     }
 
     fun initUpdate(proc:(notes:Array<Note>)->Unit){
-        updateLocal.set(proc)
+        noteModelUpdateLocal = proc
     }
 
     fun clearUpdate(){
-        updateLocal.remove()
+        noteModelUpdateLocal = null
     }
 }
