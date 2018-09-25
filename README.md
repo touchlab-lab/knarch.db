@@ -14,16 +14,21 @@ K(otlin)N(ative)Arch(itecture)
 
 Sounds like **narc**.
 
-## TL;DR
-
-Clone repo, open [sample-notepad-sqldelight](sample-notepad-sqldelight) and build.
-
 ## Build
 
 The CI build is run on [MS App Center](https://appcenter.ms/). Currently it runs the Kotlin/Native iOS tests
 only, but that's the bulk of the framework. C++ builds are still done locally. Will be added to CI when K/N releases slow down a bit.
 
 [Looking for help to sort out multiplatform testing](https://github.com/touchlab/knarch.db/issues/38)
+
+## Usage
+
+To see a self-contained example, look at [sample-notepad](sample-notepad).
+
+For a more robust example, including Sqldelight, see the [Droidcon App](https://github.com/touchlab/DroidconKotlin/).
+
+The dependency mechanism of Kotlin Multiplatform is somewhat in flux, so refer to the previous 2 examples for current usage. You'll need to
+use Kotlin/Native 0.9.1, as 0.9.2 has incompatible dependency resolution. This is temporary until the new Multiplatform plugin is stable.
 
 ## Status
 
@@ -42,19 +47,6 @@ With that in place, we will work on some next-stage goals simultaneously.
 2. Refine the design. Changing the interface without a good reason isn't necessarily useful, but retaining everything from AOSP doesn't make sense either.
 
 TL;DR Yes, put this in your app today. It works. There's a lot that's going to change, but if you're looking at Kotlin Multiplatform for your iOS implementation, I assume you have a high tolerance for change. Our goal is to have solid *functionality* testing to verify that things work as expected, and starting with the AOSP base gives us that.
-
-## Samples
-
-There are 2 samples in the repo currently. Both implement a very basic "notepad" app. You can type in a title and a note,
-then add it. The list of notes appears below.
-
-### sample-notepad
-
-Simple sample that uses the database code directly with SQL.
-
-### sample-notepad-sqldelight
-
-Uses [SQLDelight multiplatform](https://github.com/square/sqldelight/blob/master/ALPHA.md) to interact with the database.
 
 ### Multiplatform
 
@@ -98,15 +90,6 @@ This functionality was removed during porting because of threading issues and ho
 ### Custom Functions
 
 Not available. This is a relatively complex feature that will have C++ and K/N repercussions (threading, etc). Something to look into down the road if desired.
-
-## Usage
-
-To see a self-contained example, look at [sample-notepad](sample-notepad).
-
-For a more robust example, including Sqldelight, see the [Droidcon App](https://github.com/touchlab/DroidconKotlin/).
-
-The dependency mechanism of Kotlin Multiplatform is somewhat in flux, so refer to the previous 2 examples for current usage. You'll need to
-use Kotlin/Native 0.9.1, as 0.9.2 has incompatible dependency resolution. This is temporary until the new Multiplatform plugin is stable.
 
 ## Design
 
