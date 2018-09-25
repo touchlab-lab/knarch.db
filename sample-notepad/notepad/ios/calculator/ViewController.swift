@@ -10,14 +10,14 @@ import UIKit
 import KotlinArithmeticParser
 
 class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
-    let noteModel = KAPNoteModel()
+    let noteModel = NoteModel()
     
     @IBOutlet weak var inputText: UITextField!
     @IBOutlet weak var inputDescription: UITextField!
     @IBOutlet weak var inputButton: UIButton!
     @IBOutlet weak var tableView: UITableView!
     
-    var notes:KAPStdlibArray? = nil
+    var notes:KotlinArray? = nil
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -34,12 +34,12 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         noteModel.clearUpdate()
     }
     
-    func updateUi(notes:KAPStdlibArray) -> KAPStdlibUnit{
+    func updateUi(notes:KotlinArray) -> KotlinUnit{
         self.notes = notes
         tableView.reloadData()
         inputButton.isEnabled = true
         print("array size \(notes.size)")
-        return KAPStdlibUnit()
+        return KotlinUnit()
     }
 
     override func didReceiveMemoryWarning() {
@@ -71,7 +71,7 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         // create a new cell if needed or reuse an old one
         let cell:UITableViewCell = self.tableView.dequeueReusableCell(withIdentifier: "cell") as UITableViewCell!
         
-        let note = self.notes!.get(index: Int32(indexPath.row)) as! KAPNote
+        let note = self.notes!.get(index: Int32(indexPath.row)) as! Note
         // set the text from the data model
         cell.textLabel?.text = note.title
         
@@ -80,7 +80,7 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
     
     // method to run when table view cell is tapped
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let note = self.notes!.get(index: Int32(indexPath.row)) as! KAPNote
+        let note = self.notes!.get(index: Int32(indexPath.row)) as! Note
         
         print("Description: \(note.note)")
     }

@@ -23,7 +23,6 @@ class NoteModel {
                             })
                 }
         ){
-            println("It worked?")
             runUpdate()
         }
     }
@@ -42,7 +41,6 @@ class NoteModel {
             dbHelper.getNotes()
         }) {
             val proc = updateLocal.get()
-            println("proc null? ${proc == null}")
             if (proc != null) {
                 proc(it)
             }

@@ -1,4 +1,0 @@
-include ':notepad'
-//include ':notepad:app'
-include ':notepad:ios'
-enableFeaturePreview('GRADLE_METADATA')

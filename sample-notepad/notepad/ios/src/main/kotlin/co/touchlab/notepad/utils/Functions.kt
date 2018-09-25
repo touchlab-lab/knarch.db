@@ -2,7 +2,9 @@ package co.touchlab.notepad.utils
 
 import kotlin.system.getTimeMillis
 import platform.darwin.*
-import konan.worker.*
+import kotlin.native.*
+import kotlin.native.concurrent.*
+import kotlinx.cinterop.*
 import co.touchlab.multiplatform.architecture.db.sqlite.*
 import co.touchlab.knarch.*
 
@@ -15,7 +17,7 @@ private var worker :Worker?=null
 private fun makeQueue():Worker{
     if(worker == null)
     {
-        worker = startWorker()
+        worker = Worker.start()
     }
     return worker!!
 }
@@ -31,6 +33,26 @@ actual fun <B> backgroundTask(backJob:()-> B, mainJob:(B) -> Unit){
     val jobWrapper = JobWrapper(backJob, mainJob).freeze()
 
     val worker = makeQueue()
+    worker.execute(TransferMode.SAFE,
+            { jobWrapper }){
+        dispatch_async_f(dispatch_get_main_queue(), DetachedObjectGraph {
+            ResultAndMain(it.backJob(), it.mainJob).freeze()
+        }.asCPointer(), staticCFunction {
+            it:COpaquePointer? ->
+            initRuntimeIfNeeded()
+            val data = DetachedObjectGraph<ResultAndMain<B>>(it).attach()
+            data.mainJob(data.result)
+        })
+    }
+}
+
+data class ResultAndMain<B>(val result:B, val mainJob:(B) -> Unit)
+
+/*actual fun <B> backgroundTask(backJob:()-> B, mainJob:(B) -> Unit){
+
+    val jobWrapper = JobWrapper(backJob, mainJob).freeze()
+
+    val worker = makeQueue()
     worker.schedule(TransferMode.CHECKED,
             { jobWrapper }){
         val result  = detachObjectGraph { it.backJob().freeze() as Any }
@@ -39,7 +61,7 @@ actual fun <B> backgroundTask(backJob:()-> B, mainJob:(B) -> Unit){
             it.mainJob(mainResult)
         }
     }
-}
+}*/
 
 data class JobWrapper<B>(val backJob:()-> B, val mainJob:(B) -> Unit)
 
