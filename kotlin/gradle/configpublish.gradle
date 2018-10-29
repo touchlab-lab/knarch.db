@@ -61,6 +61,15 @@ publishing {
             }
         }
     }*/
+    publications {
+        bar(MavenPublication) {
+            groupId GROUP
+            artifactId "knarch-androidlib"
+            version VERSION_NAME
+//            artifact(sourceJar)
+            artifact("$buildDir/outputs/aar/knarch-release.aar")
+        }
+    }
     repositories {
         maven {
             url (project.hasProperty('j2objcMavenDeploy') ? project.property('j2objcMavenDeploy') : 'file://nope/')

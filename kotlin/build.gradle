@@ -13,17 +13,32 @@ buildscript {
 
     dependencies {
         classpath "com.jfrog.bintray.gradle:gradle-bintray-plugin:$BINTRAY_VERSION"
+        classpath 'com.android.tools.build:gradle:3.2.1'
     }
 }
+
+
 
 plugins {
     id 'kotlin-multiplatform' version '1.3.0'//'1.3.20-dev-863'
 }
+
+apply plugin: 'com.android.library'
+
 repositories {
     maven {     url 'http://dl.bintray.com/kotlin/kotlin-eap' }
     maven {     url 'https://dl.bintray.com/kotlin/kotlin-dev' }
     maven { url 'https://dl.bintray.com/touchlabpublic/kotlin' }
+    google()
+    jcenter()
     mavenCentral()
+}
+
+android {
+    compileSdkVersion 27
+    defaultConfig {
+        minSdkVersion 16
+    }
 }
 
 kotlin {
@@ -42,8 +57,10 @@ kotlin {
             }
         }*/
 
+        fromPreset(presets.android, 'androidLib')
 
 //        fromPreset(presets.macosX64, 'nativeCommon')
+
 
         fromPreset(presets.macosX64, 'macos'){
             compilations.each {
