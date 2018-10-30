@@ -4,6 +4,7 @@
 # compile CXX with /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++
 CXX_FLAGS = -g -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.14.sdk   -std=gnu++11
 
-CXX_DEFINES =
+CXX_DEFINES = 
 
 CXX_INCLUDES = -I/Users/kgalligan/temp4/knarch/cpp/knarch/src/main/cpp -I/Users/kgalligan/temp6/kotlin-native-1.0/runtime/src/main/cpp 
+
