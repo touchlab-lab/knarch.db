@@ -16,8 +16,8 @@ set(CMAKE_CXX_COMPILER_ID "AppleClang")
 
 # The include file search paths:
 set(CMAKE_CXX_TARGET_INCLUDE_PATH
-  "/Users/kgalligan/temp4/kotlin-native-latest/runtime/src/main/cpp"
   "../knarch/src/main/cpp"
+  "/Users/kgalligan/temp6/kotlin-native-1.0/runtime/src/main/cpp"
   )
 
 # Targets to which this target links.
