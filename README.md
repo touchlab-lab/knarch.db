@@ -1,8 +1,10 @@
 # KNArch.db
 
-**NOTE** Updated to new gradle plugin for kotlin native. CI testing will fail till the test side is updated...
+## Move Along!
 
-![alt text](https://build.appcenter.ms/v0.1/apps/61048136-1ab0-4789-9ae4-7ad6e8df7777/branches/master/badge "Build Badge")
+This project is archived. All Sqlite work on Kotlin/Native is happening in [SQLiter](https://github.com/touchlab/SQLiter).
+
+For historical purposes, read all about KNarch.db below.
 
 ## What is this?
 
